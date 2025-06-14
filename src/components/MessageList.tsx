@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Shield, Lock, Check, CheckCheck, Clock } from 'lucide-react';
 import { AttachmentPreview } from './AttachmentPreview';
 
@@ -27,6 +27,18 @@ const contactNames = {
 };
 
 export const MessageList = ({ messages }: MessageListProps) => {
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const scrollToBottom = () => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+    // A small timeout allows the DOM to update before we scroll,
+    // ensuring we scroll to the very bottom, especially after an action.
+    const timer = setTimeout(scrollToBottom, 100);
+    return () => clearTimeout(timer);
+  }, [messages]);
+
   const getStatusIcon = (status: Message['status']) => {
     switch (status) {
       case 'sending':
@@ -96,6 +108,7 @@ export const MessageList = ({ messages }: MessageListProps) => {
           </div>
         );
       })}
+      <div ref={messagesEndRef} />
     </div>
   );
 };
