@@ -20,6 +20,7 @@ interface Message {
     name: string;
     url: string;
     type: string;
+    metadata?: any;
   };
 }
 
@@ -114,7 +115,7 @@ export const ChatArea = ({ activeChat, onStartCall }: ChatAreaProps) => {
     });
   }, []);
 
-  const handleSendMessage = async (messageText: string, attachmentFile: File | null) => {
+  const handleSendMessage = async (messageText: string, attachmentFile: File | null, encryptionMetadata?: any) => {
     if ((!messageText && !attachmentFile) || !session) return;
     
     console.log('Sending encrypted message:', messageText);
@@ -146,7 +147,12 @@ export const ChatArea = ({ activeChat, onStartCall }: ChatAreaProps) => {
           return;
       }
 
-      attachmentDetails = { name: file.name, url: data.signedUrl, type: file.type };
+      attachmentDetails = { 
+        name: file.name, 
+        url: data.signedUrl, 
+        type: file.type,
+        metadata: encryptionMetadata // Include encryption metadata
+      };
     }
       
     const newMessage: Message = {

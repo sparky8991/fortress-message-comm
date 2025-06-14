@@ -1,17 +1,20 @@
 
 import React, { useState, useRef } from 'react';
-import { Send, Paperclip, Smile, FileText, X, Shield } from 'lucide-react';
+import { Send, Paperclip, Smile, FileText, X, Shield, Lock } from 'lucide-react';
 import { EmojiPicker } from './EmojiPicker';
+import { EncryptedImageUpload } from './EncryptedImageUpload';
 import { toast } from '@/hooks/use-toast';
 
 interface MessageInputProps {
-  onSendMessage: (message: string, attachment: File | null) => void;
+  onSendMessage: (message: string, attachment: File | null, encryptionMetadata?: any) => void;
 }
 
 export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
   const [message, setMessage] = useState('');
   const [attachment, setAttachment] = useState<File | null>(null);
+  const [encryptionMetadata, setEncryptionMetadata] = useState<any>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showEncryptedUpload, setShowEncryptedUpload] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,11 +38,18 @@ export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
     event.target.value = ''; // Reset file input
   };
 
+  const handleEncryptedImageReady = (encryptedFile: File, metadata: any) => {
+    setAttachment(encryptedFile);
+    setEncryptionMetadata(metadata);
+    setShowEncryptedUpload(false);
+  };
+
   const handleSend = () => {
     if (!message.trim() && !attachment) return;
-    onSendMessage(message.trim(), attachment);
+    onSendMessage(message.trim(), attachment, encryptionMetadata);
     setMessage('');
     setAttachment(null);
+    setEncryptionMetadata(null);
     setShowEmojiPicker(false);
   };
 
@@ -47,24 +57,59 @@ export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
     setMessage(prev => prev + emoji);
   };
 
+  const isEncryptedFile = attachment?.name.includes('encrypted_') && attachment?.name.endsWith('.enc');
+
+  if (showEncryptedUpload) {
+    return (
+      <div className="p-4 border-t border-gray-700 bg-gray-800">
+        <EncryptedImageUpload
+          onEncryptedImageReady={handleEncryptedImageReady}
+          onCancel={() => setShowEncryptedUpload(false)}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="p-4 border-t border-gray-700 bg-gray-800">
       {attachment && (
         <div className="mb-2 px-2 py-1 bg-gray-700/80 rounded-lg flex items-center justify-between animate-in fade-in-50">
           <div className="flex items-center space-x-2 overflow-hidden">
-            <FileText className="w-5 h-5 text-gray-300 flex-shrink-0" />
-            <span className="text-sm text-white truncate">{attachment.name}</span>
+            {isEncryptedFile ? (
+              <Lock className="w-5 h-5 text-yellow-500 flex-shrink-0" />
+            ) : (
+              <FileText className="w-5 h-5 text-gray-300 flex-shrink-0" />
+            )}
+            <span className="text-sm text-white truncate">
+              {isEncryptedFile ? `🔒 ${encryptionMetadata?.originalName || 'Encrypted Image'}` : attachment.name}
+            </span>
           </div>
-          <button onClick={() => setAttachment(null)} className="p-1 text-gray-300 hover:text-white rounded-full hover:bg-gray-600">
+          <button onClick={() => {
+            setAttachment(null);
+            setEncryptionMetadata(null);
+          }} className="p-1 text-gray-300 hover:text-white rounded-full hover:bg-gray-600">
             <X className="w-4 h-4" />
           </button>
         </div>
       )}
+      
       <div className="flex items-center space-x-2">
         <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
+        
+        {/* Regular file attachment */}
         <button onClick={() => fileInputRef.current?.click()} className="p-2 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-colors">
           <Paperclip className="w-5 h-5" />
         </button>
+        
+        {/* Encrypted image upload */}
+        <button 
+          onClick={() => setShowEncryptedUpload(true)} 
+          className="p-2 text-yellow-500 hover:text-yellow-400 hover:bg-gray-700 rounded-lg transition-colors"
+          title="Send Encrypted Image"
+        >
+          <Lock className="w-5 h-5" />
+        </button>
+        
         <div className="flex-1 relative">
           <input
             type="text"

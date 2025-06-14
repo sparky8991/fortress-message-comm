@@ -1,11 +1,17 @@
 
 import React from 'react';
 import { FileText, Download } from 'lucide-react';
+import { EncryptedImageViewer } from './EncryptedImageViewer';
 
 interface Attachment {
   name: string;
   url: string;
   type: string;
+  metadata?: {
+    salt: string;
+    iv: string;
+    originalName: string;
+  };
 }
 
 interface AttachmentPreviewProps {
@@ -16,6 +22,12 @@ export const AttachmentPreview = ({ attachment }: AttachmentPreviewProps) => {
   const isImage = attachment.type.startsWith('image/');
   const isVideo = attachment.type.startsWith('video/');
   const isAudio = attachment.type.startsWith('audio/');
+  const isEncryptedFile = attachment.name.includes('encrypted_') && attachment.name.endsWith('.enc');
+
+  // Handle encrypted images
+  if (isEncryptedFile && attachment.metadata) {
+    return <EncryptedImageViewer attachment={attachment} />;
+  }
 
   if (isImage) {
     return (

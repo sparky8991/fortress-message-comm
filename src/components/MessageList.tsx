@@ -14,6 +14,11 @@ interface Message {
     name: string;
     url: string;
     type: string;
+    metadata?: {
+      salt: string;
+      iv: string;
+      originalName: string;
+    };
   };
 }
 
