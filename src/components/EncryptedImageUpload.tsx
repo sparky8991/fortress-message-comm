@@ -90,11 +90,11 @@ export const EncryptedImageUpload = ({ onEncryptedImageReady, onCancel }: Encryp
   };
 
   return (
-    <div className="bg-gray-800 border border-green-500/30 rounded-lg p-4 mx-2 my-2 max-w-full">
+    <div className="fixed bottom-20 left-2 right-2 z-50 bg-gray-900 border border-green-500/50 rounded-lg p-4 shadow-2xl animate-in slide-in-from-bottom-2">
       {/* Header with close button */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-2">
-          <Lock className="w-5 h-5 text-green-500" />
+          <Lock className="w-5 h-5 text-green-400" />
           <h3 className="text-lg font-semibold text-white">Encrypt Image</h3>
         </div>
         <button
@@ -121,7 +121,7 @@ export const EncryptedImageUpload = ({ onEncryptedImageReady, onCancel }: Encryp
           <Button
             variant="outline"
             onClick={() => document.getElementById('image-file')?.click()}
-            className="w-full justify-start bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
+            className="w-full justify-start bg-gray-700 border-gray-600 text-white hover:bg-gray-600 text-sm"
           >
             <Upload className="w-4 h-4 mr-2" />
             {selectedFile ? selectedFile.name : 'Choose Image File'}
@@ -140,7 +140,7 @@ export const EncryptedImageUpload = ({ onEncryptedImageReady, onCancel }: Encryp
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter secure password..."
-              className="bg-gray-700 border-gray-600 text-white placeholder-gray-400 pr-10"
+              className="bg-gray-700 border-gray-600 text-white placeholder-gray-400 pr-10 text-sm"
             />
             <button
               type="button"
@@ -154,11 +154,11 @@ export const EncryptedImageUpload = ({ onEncryptedImageReady, onCancel }: Encryp
       </div>
 
       {/* Action Buttons */}
-      <div className="flex space-x-2 mt-6">
+      <div className="flex space-x-2 mt-4">
         <Button
           onClick={handleEncryptAndUpload}
           disabled={!selectedFile || !password.trim() || isEncrypting}
-          className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+          className="flex-1 bg-green-600 hover:bg-green-700 text-white text-sm"
         >
           {isEncrypting ? (
             <>
@@ -175,7 +175,7 @@ export const EncryptedImageUpload = ({ onEncryptedImageReady, onCancel }: Encryp
         <Button
           variant="outline"
           onClick={onCancel}
-          className="bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
+          className="bg-gray-700 border-gray-600 text-white hover:bg-gray-600 text-sm"
         >
           Cancel
         </Button>
