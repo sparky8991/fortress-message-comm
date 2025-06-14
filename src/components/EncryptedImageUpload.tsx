@@ -90,86 +90,75 @@ export const EncryptedImageUpload = ({ onEncryptedImageReady, onCancel }: Encryp
   };
 
   return (
-    <div className="bg-white border border-gray-300 rounded-lg p-4 space-y-4 shadow-lg w-full max-w-full overflow-hidden relative">
-      {/* Close Button */}
-      <button
-        onClick={onCancel}
-        className="absolute top-3 right-3 p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors z-10"
-        title="Close encryption panel"
-      >
-        <X className="w-5 h-5" />
-      </button>
-
-      {/* Header */}
-      <div className="flex items-center space-x-3 border-b border-gray-200 pb-3 pr-10">
-        <Lock className="w-6 h-6 text-blue-600" />
-        <h3 className="text-lg font-semibold text-gray-900">
-          Encrypt Image
-        </h3>
-        <Shield className="w-5 h-5 text-green-600" />
+    <div className="bg-gray-800 border border-green-500/30 rounded-lg p-4 mx-2 my-2 max-w-full">
+      {/* Header with close button */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-2">
+          <Lock className="w-5 h-5 text-green-500" />
+          <h3 className="text-lg font-semibold text-white">Encrypt Image</h3>
+        </div>
+        <button
+          onClick={onCancel}
+          className="p-1 text-gray-400 hover:text-white rounded-full hover:bg-gray-700 transition-colors"
+        >
+          <X className="w-5 h-5" />
+        </button>
       </div>
 
-      <div className="space-y-4 w-full">
+      <div className="space-y-4">
         {/* File Selection */}
-        <div className="w-full">
-          <Label htmlFor="image-file" className="text-sm font-medium text-gray-700 block mb-2">
-            Select Image to Encrypt
+        <div>
+          <Label htmlFor="image-file" className="text-sm font-medium text-gray-300 mb-2 block">
+            Select Image
           </Label>
-          <div className="w-full">
-            <input
-              id="image-file"
-              type="file"
-              accept="image/*"
-              onChange={handleFileSelect}
-              className="hidden"
-            />
-            <Button
-              variant="outline"
-              onClick={() => document.getElementById('image-file')?.click()}
-              className="w-full h-12 justify-start border-2 border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100 hover:border-blue-400 transition-all duration-200"
-            >
-              <Upload className="w-5 h-5 mr-3" />
-              <span className="truncate text-left font-medium">
-                {selectedFile ? selectedFile.name : 'Choose Image File'}
-              </span>
-            </Button>
-          </div>
+          <input
+            id="image-file"
+            type="file"
+            accept="image/*"
+            onChange={handleFileSelect}
+            className="hidden"
+          />
+          <Button
+            variant="outline"
+            onClick={() => document.getElementById('image-file')?.click()}
+            className="w-full justify-start bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
+          >
+            <Upload className="w-4 h-4 mr-2" />
+            {selectedFile ? selectedFile.name : 'Choose Image File'}
+          </Button>
         </div>
 
         {/* Password Input */}
-        <div className="w-full">
-          <Label htmlFor="encryption-password" className="text-sm font-medium text-gray-700 block mb-2">
-            Encryption Password
+        <div>
+          <Label htmlFor="encryption-password" className="text-sm font-medium text-gray-300 mb-2 block">
+            Password (min 6 chars)
           </Label>
-          <div className="relative w-full">
+          <div className="relative">
             <Input
               id="encryption-password"
               type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter a secure password..."
-              className="bg-white border-2 border-gray-300 text-gray-900 placeholder-gray-500 pr-12 h-12 text-base focus:border-blue-500 focus:ring-blue-500/20 w-full"
+              placeholder="Enter secure password..."
+              className="bg-gray-700 border-gray-600 text-white placeholder-gray-400 pr-10"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors p-1"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
             >
-              {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
-          <p className="text-sm text-gray-600 mt-2">
-            Password must be at least 6 characters long
-          </p>
         </div>
       </div>
 
       {/* Action Buttons */}
-      <div className="flex flex-col space-y-3 pt-2 w-full">
+      <div className="flex space-x-2 mt-6">
         <Button
           onClick={handleEncryptAndUpload}
           disabled={!selectedFile || !password.trim() || isEncrypting}
-          className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 bg-green-600 hover:bg-green-700 text-white"
         >
           {isEncrypting ? (
             <>
@@ -186,7 +175,7 @@ export const EncryptedImageUpload = ({ onEncryptedImageReady, onCancel }: Encryp
         <Button
           variant="outline"
           onClick={onCancel}
-          className="w-full h-12 border-2 border-gray-300 bg-white text-gray-700 hover:bg-gray-50 font-medium"
+          className="bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
         >
           Cancel
         </Button>
