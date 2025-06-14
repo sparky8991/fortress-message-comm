@@ -12,67 +12,10 @@ interface Message {
 }
 
 interface MessageListProps {
-  activeChat: string;
+  messages: Message[];
 }
 
-const messagesByChat = {
-  'alice-johnson': [
-    {
-      id: '1',
-      text: 'Hey, are you ready for the secure file transfer?',
-      timestamp: '10:30 AM',
-      sender: 'contact' as const,
-      status: 'read' as const,
-      encrypted: true
-    },
-    {
-      id: '2',
-      text: 'Yes, all encryption protocols are active. Ready to receive.',
-      timestamp: '10:32 AM',
-      sender: 'me' as const,
-      status: 'read' as const,
-      encrypted: true
-    },
-    {
-      id: '3',
-      text: 'Perfect! The encrypted files have been sent securely through our protected channel.',
-      timestamp: '10:35 AM',
-      sender: 'contact' as const,
-      status: 'read' as const,
-      encrypted: true
-    },
-    {
-      id: '4',
-      text: 'Received and verified. All checksums match. Thanks for the secure transfer! 🔒',
-      timestamp: '10:37 AM',
-      sender: 'me' as const,
-      status: 'delivered' as const,
-      encrypted: true
-    }
-  ],
-  'bob-smith': [
-    {
-      id: '1',
-      text: 'Mission briefing at 1400 hours. Secure channel required.',
-      timestamp: '9:15 AM',
-      sender: 'contact' as const,
-      status: 'read' as const,
-      encrypted: true
-    },
-    {
-      id: '2',
-      text: 'Roger that, mission parameters confirmed. Encryption level set to maximum.',
-      timestamp: '9:16 AM',
-      sender: 'me' as const,
-      status: 'read' as const,
-      encrypted: true
-    }
-  ]
-};
-
-export const MessageList = ({ activeChat }: MessageListProps) => {
-  const messages = messagesByChat[activeChat as keyof typeof messagesByChat] || [];
-
+export const MessageList = ({ messages }: MessageListProps) => {
   const getStatusIcon = (status: Message['status']) => {
     switch (status) {
       case 'sending':

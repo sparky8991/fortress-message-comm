@@ -3,6 +3,15 @@ import React, { useState } from 'react';
 import { Phone, Video, MoreVertical, Shield, Lock, Send, Paperclip, Smile } from 'lucide-react';
 import { MessageList } from './MessageList';
 
+interface Message {
+  id: string;
+  text: string;
+  timestamp: string;
+  sender: 'me' | 'contact';
+  status: 'sending' | 'sent' | 'delivered' | 'read';
+  encrypted: boolean;
+}
+
 interface ChatAreaProps {
   activeChat: string;
   onStartCall: (type: 'voice' | 'video') => void;
@@ -15,16 +24,89 @@ const contactInfo = {
   'sarah-wilson': { name: 'Sarah Wilson', status: 'Last seen 2 hours ago', avatar: 'SW' }
 };
 
+const initialMessagesByChat = {
+  'alice-johnson': [
+    {
+      id: '1',
+      text: 'Hey, are you ready for the secure file transfer?',
+      timestamp: '10:30 AM',
+      sender: 'contact' as const,
+      status: 'read' as const,
+      encrypted: true
+    },
+    {
+      id: '2',
+      text: 'Yes, all encryption protocols are active. Ready to receive.',
+      timestamp: '10:32 AM',
+      sender: 'me' as const,
+      status: 'read' as const,
+      encrypted: true
+    },
+    {
+      id: '3',
+      text: 'Perfect! The encrypted files have been sent securely through our protected channel.',
+      timestamp: '10:35 AM',
+      sender: 'contact' as const,
+      status: 'read' as const,
+      encrypted: true
+    },
+    {
+      id: '4',
+      text: 'Received and verified. All checksums match. Thanks for the secure transfer! 🔒',
+      timestamp: '10:37 AM',
+      sender: 'me' as const,
+      status: 'delivered' as const,
+      encrypted: true
+    }
+  ],
+  'bob-smith': [
+    {
+      id: '1',
+      text: 'Mission briefing at 1400 hours. Secure channel required.',
+      timestamp: '9:15 AM',
+      sender: 'contact' as const,
+      status: 'read' as const,
+      encrypted: true
+    },
+    {
+      id: '2',
+      text: 'Roger that, mission parameters confirmed. Encryption level set to maximum.',
+      timestamp: '9:16 AM',
+      sender: 'me' as const,
+      status: 'read' as const,
+      encrypted: true
+    }
+  ]
+};
+
 export const ChatArea = ({ activeChat, onStartCall }: ChatAreaProps) => {
   const [message, setMessage] = useState('');
+  const [messagesByChat, setMessagesByChat] = useState(initialMessagesByChat);
   const contact = contactInfo[activeChat as keyof typeof contactInfo];
 
   const handleSendMessage = () => {
     if (message.trim()) {
       console.log('Sending encrypted message:', message);
+      
+      const newMessage: Message = {
+        id: Date.now().toString(),
+        text: message.trim(),
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        sender: 'me',
+        status: 'sent',
+        encrypted: true
+      };
+
+      setMessagesByChat(prev => ({
+        ...prev,
+        [activeChat]: [...(prev[activeChat as keyof typeof prev] || []), newMessage]
+      }));
+
       setMessage('');
     }
   };
+
+  const currentMessages = messagesByChat[activeChat as keyof typeof messagesByChat] || [];
 
   return (
     <div className="flex-1 flex flex-col bg-gray-900">
@@ -69,7 +151,7 @@ export const ChatArea = ({ activeChat, onStartCall }: ChatAreaProps) => {
 
       {/* Messages */}
       <div className="flex-1 overflow-hidden">
-        <MessageList activeChat={activeChat} />
+        <MessageList messages={currentMessages} />
       </div>
 
       {/* Message Input */}
