@@ -22,6 +22,11 @@ interface Message {
     type: string;
     metadata?: any;
   };
+  replyTo?: {
+    messageId: string;
+    messageText: string;
+    sender: string;
+  };
 }
 
 interface ChatAreaProps {
@@ -34,6 +39,11 @@ const contactInfo = {
   'bob-smith': { name: 'Bob Smith', status: 'Online • Last seen 5 min ago', avatar: 'BS' },
   'team-alpha': { name: 'Team Alpha', status: '12 members • 8 online', avatar: 'TA' },
   'sarah-wilson': { name: 'Sarah Wilson', status: 'Last seen 2 hours ago', avatar: 'SW' }
+};
+
+const contactNames = {
+  'me': 'You',
+  'contact': 'Alice Johnson'
 };
 
 const initialMessagesByChat = {
@@ -103,6 +113,11 @@ export const ChatArea = ({ activeChat, onStartCall }: ChatAreaProps) => {
     unreadReminderEnabled: true,
     unreadReminderTime: 5
   });
+  const [replyingTo, setReplyingTo] = useState<{
+    messageId: string;
+    messageText: string;
+    sender: string;
+  } | null>(null);
 
   const contact = contactInfo[activeChat as keyof typeof contactInfo];
   const currentMessages = messagesByChat[activeChat as keyof typeof messagesByChat] || [];
@@ -115,7 +130,22 @@ export const ChatArea = ({ activeChat, onStartCall }: ChatAreaProps) => {
     });
   }, []);
 
-  const handleSendMessage = async (messageText: string, attachmentFile: File | null, encryptionMetadata?: any) => {
+  const handleReply = (messageId: string, messageText: string) => {
+    const originalMessage = currentMessages.find(msg => msg.id === messageId);
+    if (originalMessage) {
+      setReplyingTo({
+        messageId,
+        messageText,
+        sender: contactNames[originalMessage.sender]
+      });
+    }
+  };
+
+  const handleCancelReply = () => {
+    setReplyingTo(null);
+  };
+
+  const handleSendMessage = async (messageText: string, attachmentFile: File | null, encryptionMetadata?: any, replyTo?: any) => {
     if ((!messageText && !attachmentFile) || !session) return;
     
     console.log('Sending encrypted message:', messageText);
@@ -164,6 +194,7 @@ export const ChatArea = ({ activeChat, onStartCall }: ChatAreaProps) => {
       encrypted: true,
       sentAt: new Date(),
       attachment: attachmentDetails,
+      replyTo: replyTo,
     };
 
     setMessagesByChat(prev => ({
@@ -182,11 +213,19 @@ export const ChatArea = ({ activeChat, onStartCall }: ChatAreaProps) => {
 
       {/* Messages */}
       <div className="flex-1 overflow-hidden">
-        <MessageList messages={currentMessages} />
+        <MessageList 
+          messages={currentMessages} 
+          onReply={handleReply}
+          onSendMessage={handleSendMessage}
+        />
       </div>
 
       {/* Message Input */}
-      <MessageInput onSendMessage={handleSendMessage} />
+      <MessageInput 
+        onSendMessage={handleSendMessage}
+        replyingTo={replyingTo}
+        onCancelReply={handleCancelReply}
+      />
 
       {/* Notification Settings Modal */}
       <NotificationSettings

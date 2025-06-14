@@ -1,6 +1,8 @@
+
 import React, { useEffect, useRef } from 'react';
 import { Shield, Lock, Check, CheckCheck, Clock } from 'lucide-react';
 import { AttachmentPreview } from './AttachmentPreview';
+import { MessageContextMenu } from './MessageContextMenu';
 
 interface Message {
   id: string;
@@ -19,10 +21,17 @@ interface Message {
       originalName: string;
     };
   };
+  replyTo?: {
+    messageId: string;
+    messageText: string;
+    sender: string;
+  };
 }
 
 interface MessageListProps {
   messages: Message[];
+  onReply: (messageId: string, messageText: string) => void;
+  onSendMessage: (message: string, attachment: File | null, encryptionMetadata?: any) => void;
 }
 
 const contactNames = {
@@ -30,7 +39,7 @@ const contactNames = {
   'contact': 'Alice Johnson' // This would be dynamic based on the active chat
 };
 
-export const MessageList = ({ messages }: MessageListProps) => {
+export const MessageList = ({ messages, onReply, onSendMessage }: MessageListProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -81,33 +90,52 @@ export const MessageList = ({ messages }: MessageListProps) => {
             )}
             
             <div className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'}`}>
-              <div
-                className={`max-w-[80%] lg:max-w-xl px-4 py-2 rounded-2xl ${
-                  message.sender === 'me'
-                    ? 'bg-green-500 text-white'
-                    : 'bg-gray-700 text-white'
-                }`}
+              <MessageContextMenu
+                onReply={onReply}
+                messageId={message.id}
+                messageText={message.text}
+                onSendMessage={onSendMessage}
               >
-                {message.attachment && <AttachmentPreview attachment={message.attachment} />}
-                {message.text && <p className="text-sm break-words">{message.text}</p>}
-                <div className="flex items-center justify-between mt-1 space-x-2">
-                  <div className="flex items-center space-x-1">
-                    {message.encrypted && (
-                      <Shield className="w-3 h-3 text-green-300 opacity-70" />
-                    )}
-                    <span className={`text-xs ${
-                      message.sender === 'me' ? 'text-green-100' : 'text-gray-300'
-                    }`}>
-                      {message.timestamp}
-                    </span>
-                  </div>
-                  {message.sender === 'me' && (
-                    <div className="flex-shrink-0">
-                      {getStatusIcon(message.status)}
+                <div
+                  className={`max-w-[80%] lg:max-w-xl px-4 py-2 rounded-2xl cursor-pointer select-none ${
+                    message.sender === 'me'
+                      ? 'bg-green-500 text-white'
+                      : 'bg-gray-700 text-white'
+                  }`}
+                >
+                  {/* Reply indicator */}
+                  {message.replyTo && (
+                    <div className="mb-2 p-2 bg-black/20 rounded-lg border-l-2 border-green-400">
+                      <p className="text-xs text-green-300 font-medium mb-1">
+                        {message.replyTo.sender}
+                      </p>
+                      <p className="text-xs opacity-80 truncate">
+                        {message.replyTo.messageText}
+                      </p>
                     </div>
                   )}
+                  
+                  {message.attachment && <AttachmentPreview attachment={message.attachment} />}
+                  {message.text && <p className="text-sm break-words">{message.text}</p>}
+                  <div className="flex items-center justify-between mt-1 space-x-2">
+                    <div className="flex items-center space-x-1">
+                      {message.encrypted && (
+                        <Shield className="w-3 h-3 text-green-300 opacity-70" />
+                      )}
+                      <span className={`text-xs ${
+                        message.sender === 'me' ? 'text-green-100' : 'text-gray-300'
+                      }`}>
+                        {message.timestamp}
+                      </span>
+                    </div>
+                    {message.sender === 'me' && (
+                      <div className="flex-shrink-0">
+                        {getStatusIcon(message.status)}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
+              </MessageContextMenu>
             </div>
           </div>
         );
