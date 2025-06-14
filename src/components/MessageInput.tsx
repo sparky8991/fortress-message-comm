@@ -55,6 +55,10 @@ export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
     setAttachment(encryptedFile);
     setEncryptionMetadata(metadata);
     setShowEncryptedUpload(false);
+    
+    // Auto-populate message with share instructions
+    const shareMessage = `🔒 ENCRYPTED PAYLOAD DEPLOYED\n\nDecryption Key: ${metadata.shareCode}\n\n⚠️ CLASSIFIED - Share key securely with authorized personnel only`;
+    setMessage(shareMessage);
   };
 
   const handleSend = () => {
@@ -99,6 +103,7 @@ export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
               onClick={() => {
                 setAttachment(null);
                 setEncryptionMetadata(null);
+                setMessage(''); // Clear auto-generated message when removing encrypted file
               }} 
               className="p-1 text-gray-300 hover:text-white rounded-full hover:bg-gray-600 transition-colors flex-shrink-0 ml-2"
             >
@@ -127,15 +132,15 @@ export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
           </button>
           
           <div className="flex-1 relative min-w-0">
-            <input
-              type="text"
+            <textarea
               placeholder="Enter encrypted transmission..."
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-full text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent pr-10 text-sm font-mono"
+              onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
+              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent pr-10 text-sm font-mono resize-none min-h-[40px] max-h-24"
+              rows={message.split('\n').length > 1 ? Math.min(message.split('\n').length, 3) : 1}
             />
-            <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+            <div className="absolute right-2 top-2">
               <button 
                 onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                 className="p-1 text-gray-300 hover:text-white transition-colors"

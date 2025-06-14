@@ -15,6 +15,7 @@ interface EncryptedImageViewerProps {
       salt: string;
       iv: string;
       originalName: string;
+      shareCode?: string;
     };
   };
 }
@@ -142,7 +143,7 @@ export const EncryptedImageViewer = ({ attachment }: EncryptedImageViewerProps) 
       </div>
       
       <p className="text-xs text-red-400/80 mb-3 font-mono break-words">
-        › Cipher key required to decrypt dark web transmission
+        › Enter the shared encryption key to decrypt payload
       </p>
       
       <div className="space-y-3 w-full">
@@ -151,7 +152,7 @@ export const EncryptedImageViewer = ({ attachment }: EncryptedImageViewerProps) 
             type={showPassword ? 'text' : 'password'}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter decryption cipher..."
+            placeholder="Paste encryption key here..."
             className="bg-black/80 border-red-500/50 text-red-400 placeholder-red-600/50 text-xs pr-10 h-10 font-mono focus:border-red-400 focus:ring-red-400/20 w-full"
             onKeyPress={(e) => e.key === 'Enter' && handleDecrypt()}
           />
