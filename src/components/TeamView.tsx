@@ -90,7 +90,11 @@ export const TeamView = ({ teamId, onBack }: TeamViewProps) => {
             </div>
 
             <div className="flex-1 overflow-y-auto p-4">
-                <TeamMembersList teamId={teamId} currentUserRole={currentUserRole} />
+                <TeamMembersList 
+                    teamId={teamId} 
+                    teamName={team.name}
+                    currentUserRole={currentUserRole} 
+                />
             </div>
         </div>
     );

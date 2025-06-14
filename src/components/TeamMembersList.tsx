@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { Crown, Shield, Users, Star, UserPlus } from 'lucide-react';
 import { Database } from '@/integrations/supabase/types';
+import { InviteMemberDialog } from './InviteMemberDialog';
 
 type TeamRole = Database['public']['Enums']['team_role'];
 
@@ -52,6 +52,7 @@ const updateMemberRole = async ({ teamId, userId, role }: { teamId: string; user
 
 interface TeamMembersListProps {
     teamId: string;
+    teamName: string;
     currentUserRole?: TeamRole;
 }
 
@@ -89,9 +90,10 @@ const formatRoleName = (role: TeamRole) => {
     return role.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 };
 
-export const TeamMembersList = ({ teamId, currentUserRole }: TeamMembersListProps) => {
+export const TeamMembersList = ({ teamId, teamName, currentUserRole }: TeamMembersListProps) => {
     const [selectedMember, setSelectedMember] = useState<string | null>(null);
     const [newRole, setNewRole] = useState<TeamRole | null>(null);
+    const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
     const queryClient = useQueryClient();
     const { toast } = useToast();
 
@@ -141,7 +143,11 @@ export const TeamMembersList = ({ teamId, currentUserRole }: TeamMembersListProp
             <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-white">Team Members</h3>
                 {canManageRoles && (
-                    <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                    <Button 
+                        size="sm" 
+                        className="bg-green-600 hover:bg-green-700"
+                        onClick={() => setIsInviteDialogOpen(true)}
+                    >
                         <UserPlus className="w-4 h-4 mr-2" />
                         Invite Member
                     </Button>
@@ -200,6 +206,13 @@ export const TeamMembersList = ({ teamId, currentUserRole }: TeamMembersListProp
                     </div>
                 ))}
             </div>
+
+            <InviteMemberDialog
+                isOpen={isInviteDialogOpen}
+                onOpenChange={setIsInviteDialogOpen}
+                teamId={teamId}
+                teamName={teamName}
+            />
         </div>
     );
 };

@@ -30,6 +30,53 @@ export type Database = {
         }
         Relationships: []
       }
+      team_invitations: {
+        Row: {
+          created_at: string
+          email: string | null
+          expires_at: string
+          id: string
+          invitation_code: string
+          invited_by: string
+          phone_number: string | null
+          role: Database["public"]["Enums"]["team_role"]
+          status: string
+          team_id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          expires_at?: string
+          id?: string
+          invitation_code?: string
+          invited_by: string
+          phone_number?: string | null
+          role?: Database["public"]["Enums"]["team_role"]
+          status?: string
+          team_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          expires_at?: string
+          id?: string
+          invitation_code?: string
+          invited_by?: string
+          phone_number?: string | null
+          role?: Database["public"]["Enums"]["team_role"]
+          status?: string
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_invitations_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       team_members: {
         Row: {
           joined_at: string
@@ -100,7 +147,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      accept_team_invitation: {
+        Args: { invitation_code: string }
+        Returns: Json
+      }
     }
     Enums: {
       team_role:
