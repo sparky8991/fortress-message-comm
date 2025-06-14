@@ -91,7 +91,7 @@ const formatRoleName = (role: TeamRole) => {
 
 export const TeamMembersList = ({ teamId, currentUserRole }: TeamMembersListProps) => {
     const [selectedMember, setSelectedMember] = useState<string | null>(null);
-    const [newRole, setNewRole] = useState<TeamRole | ''>('');
+    const [newRole, setNewRole] = useState<TeamRole | null>(null);
     const queryClient = useQueryClient();
     const { toast } = useToast();
 
@@ -109,7 +109,7 @@ export const TeamMembersList = ({ teamId, currentUserRole }: TeamMembersListProp
                 description: "Team member role has been updated successfully.",
             });
             setSelectedMember(null);
-            setNewRole('');
+            setNewRole(null);
         },
         onError: (error) => {
             toast({
@@ -123,11 +123,11 @@ export const TeamMembersList = ({ teamId, currentUserRole }: TeamMembersListProp
     const canManageRoles = currentUserRole === 'diamond_in_the_rough' || currentUserRole === 'team_lead';
 
     const handleRoleUpdate = () => {
-        if (selectedMember && newRole && newRole !== '') {
+        if (selectedMember && newRole) {
             updateRoleMutation.mutate({
                 teamId,
                 userId: selectedMember,
-                role: newRole as TeamRole
+                role: newRole
             });
         }
     };
@@ -167,7 +167,7 @@ export const TeamMembersList = ({ teamId, currentUserRole }: TeamMembersListProp
                             <div className="flex items-center space-x-2">
                                 {selectedMember === member.user_id ? (
                                     <>
-                                        <Select value={newRole} onValueChange={(value: TeamRole) => setNewRole(value)}>
+                                        <Select value={newRole || ''} onValueChange={(value: TeamRole) => setNewRole(value)}>
                                             <SelectTrigger className="w-40 bg-gray-600 border-gray-500">
                                                 <SelectValue placeholder="Select role" />
                                             </SelectTrigger>
@@ -182,7 +182,7 @@ export const TeamMembersList = ({ teamId, currentUserRole }: TeamMembersListProp
                                         </Button>
                                         <Button size="sm" variant="ghost" onClick={() => {
                                             setSelectedMember(null);
-                                            setNewRole('');
+                                            setNewRole(null);
                                         }}>
                                             Cancel
                                         </Button>
