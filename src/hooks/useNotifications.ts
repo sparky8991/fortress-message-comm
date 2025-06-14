@@ -1,21 +1,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from '@/hooks/use-toast';
-
-interface Message {
-  id: string;
-  text: string;
-  timestamp: string;
-  sender: 'me' | 'contact';
-  status: 'sending' | 'sent' | 'delivered' | 'read';
-  encrypted: boolean;
-  sentAt?: Date;
-  attachment?: {
-    name: string;
-    url: string;
-    type: string;
-  };
-}
+import { Message } from '@/constants/initialMessages';
 
 interface NotificationSettings {
   unreadReminderEnabled: boolean;

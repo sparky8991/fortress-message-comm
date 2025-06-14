@@ -3,30 +3,8 @@ import React, { useEffect, useRef } from 'react';
 import { Shield, Lock, Check, CheckCheck, Clock } from 'lucide-react';
 import { AttachmentPreview } from './AttachmentPreview';
 import { MessageContextMenu } from './MessageContextMenu';
-
-interface Message {
-  id: string;
-  text: string;
-  timestamp: string;
-  sender: 'me' | 'contact';
-  status: 'sending' | 'sent' | 'delivered' | 'read';
-  encrypted: boolean;
-  attachment?: {
-    name: string;
-    url: string;
-    type: string;
-    metadata?: {
-      salt: string;
-      iv: string;
-      originalName: string;
-    };
-  };
-  replyTo?: {
-    messageId: string;
-    messageText: string;
-    sender: string;
-  };
-}
+import { Message } from '@/constants/initialMessages';
+import { contactNames } from '@/constants/contactInfo';
 
 interface MessageListProps {
   messages: Message[];
@@ -35,11 +13,6 @@ interface MessageListProps {
   onStartNewGroup?: (contactName: string) => void;
   contactName?: string;
 }
-
-const contactNames = {
-  'me': 'You',
-  'contact': 'Alice Johnson' // This would be dynamic based on the active chat
-};
 
 export const MessageList = ({ 
   messages, 
