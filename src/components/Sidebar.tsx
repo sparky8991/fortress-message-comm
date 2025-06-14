@@ -1,8 +1,10 @@
 
 import React, { useState } from 'react';
-import { Search, Settings, Shield, Lock, Users, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Search, Settings, Shield, Lock, Users, LogOut } from 'lucide-react';
 import { ContactList } from './ContactList';
 import { SecurityPanel } from './SecurityPanel';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SidebarProps {
   activeChat: string;
@@ -12,6 +14,12 @@ interface SidebarProps {
 export const Sidebar = ({ activeChat, onChatSelect }: SidebarProps) => {
   const [activeTab, setActiveTab] = useState<'chats' | 'security'>('chats');
   const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/auth');
+  };
 
   return (
     <div className="w-80 bg-gray-800 border-r border-gray-700 flex flex-col">
@@ -78,6 +86,17 @@ export const Sidebar = ({ activeChat, onChatSelect }: SidebarProps) => {
         ) : (
           <SecurityPanel />
         )}
+      </div>
+
+      {/* Footer with Logout */}
+      <div className="p-4 border-t border-gray-700">
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center justify-center space-x-2 py-2 px-4 bg-red-600/20 hover:bg-red-600/40 rounded-lg text-red-400 hover:text-red-300 font-medium transition-colors"
+        >
+          <LogOut className="w-4 h-4" />
+          <span>Logout</span>
+        </button>
       </div>
     </div>
   );
