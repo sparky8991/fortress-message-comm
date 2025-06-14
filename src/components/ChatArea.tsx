@@ -1,7 +1,7 @@
-
 import React, { useState } from 'react';
 import { Phone, Video, MoreVertical, Shield, Lock, Send, Paperclip, Smile } from 'lucide-react';
 import { MessageList } from './MessageList';
+import { EmojiPicker } from './EmojiPicker';
 
 interface Message {
   id: string;
@@ -82,6 +82,7 @@ const initialMessagesByChat = {
 export const ChatArea = ({ activeChat, onStartCall }: ChatAreaProps) => {
   const [message, setMessage] = useState('');
   const [messagesByChat, setMessagesByChat] = useState(initialMessagesByChat);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const contact = contactInfo[activeChat as keyof typeof contactInfo];
 
   const handleSendMessage = () => {
@@ -104,6 +105,10 @@ export const ChatArea = ({ activeChat, onStartCall }: ChatAreaProps) => {
 
       setMessage('');
     }
+  };
+
+  const handleEmojiSelect = (emoji: string) => {
+    setMessage(prev => prev + emoji);
   };
 
   const currentMessages = messagesByChat[activeChat as keyof typeof messagesByChat] || [];
@@ -169,9 +174,19 @@ export const ChatArea = ({ activeChat, onStartCall }: ChatAreaProps) => {
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
               className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-full text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent pr-12"
             />
-            <button className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 text-gray-300 hover:text-white transition-colors">
-              <Smile className="w-5 h-5" />
-            </button>
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 relative">
+              <button 
+                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                className="p-1 text-gray-300 hover:text-white transition-colors"
+              >
+                <Smile className="w-5 h-5" />
+              </button>
+              <EmojiPicker
+                onEmojiSelect={handleEmojiSelect}
+                isOpen={showEmojiPicker}
+                onClose={() => setShowEmojiPicker(false)}
+              />
+            </div>
           </div>
           <button
             onClick={handleSendMessage}
