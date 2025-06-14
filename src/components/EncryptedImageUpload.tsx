@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Lock, Upload, Eye, EyeOff } from 'lucide-react';
+import { Lock, Upload, Eye, EyeOff, Shield, Skull } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,21 +24,25 @@ export const EncryptedImageUpload = ({ onEncryptedImageReady, onCancel }: Encryp
 
     if (!file.type.startsWith('image/')) {
       toast({
-        title: 'Invalid file type',
-        description: 'Please select an image file.',
+        title: '⚠️ INVALID PAYLOAD',
+        description: 'Only image files accepted in this secure channel.',
         variant: 'destructive'
       });
       return;
     }
 
     setSelectedFile(file);
+    toast({
+      title: '🎯 TARGET ACQUIRED',
+      description: 'File loaded into encryption chamber.',
+    });
   };
 
   const handleEncryptAndUpload = async () => {
     if (!selectedFile || !password.trim()) {
       toast({
-        title: 'Missing information',
-        description: 'Please select an image and enter a password.',
+        title: '🚫 ACCESS DENIED',
+        description: 'Encryption key and payload required for secure transmission.',
         variant: 'destructive'
       });
       return;
@@ -46,8 +50,8 @@ export const EncryptedImageUpload = ({ onEncryptedImageReady, onCancel }: Encryp
 
     if (password.length < 6) {
       toast({
-        title: 'Password too short',
-        description: 'Password must be at least 6 characters long.',
+        title: '🔐 WEAK CIPHER',
+        description: 'Minimum 6-character encryption key required for deep web security.',
         variant: 'destructive'
       });
       return;
@@ -58,11 +62,9 @@ export const EncryptedImageUpload = ({ onEncryptedImageReady, onCancel }: Encryp
     try {
       const { encryptedData, salt, iv, fileName } = await ImageEncryption.encryptImage(selectedFile, password);
       
-      // Create a blob from encrypted data
       const encryptedBlob = new Blob([encryptedData], { type: 'application/octet-stream' });
       const encryptedFile = new File([encryptedBlob], `encrypted_${fileName}.enc`, { type: 'application/octet-stream' });
 
-      // Convert salt and iv to base64 for storage
       const metadata = {
         salt: btoa(String.fromCharCode(...salt)),
         iv: btoa(String.fromCharCode(...iv)),
@@ -72,14 +74,14 @@ export const EncryptedImageUpload = ({ onEncryptedImageReady, onCancel }: Encryp
       onEncryptedImageReady(encryptedFile, metadata);
       
       toast({
-        title: 'Image encrypted successfully',
-        description: 'Your image has been encrypted and is ready to send.',
+        title: '🔒 PAYLOAD ENCRYPTED',
+        description: 'Data successfully obfuscated. Ready for dark transmission.',
       });
     } catch (error) {
       console.error('Encryption error:', error);
       toast({
-        title: 'Encryption failed',
-        description: 'Failed to encrypt the image. Please try again.',
+        title: '💀 ENCRYPTION FAILED',
+        description: 'Cipher protocol corrupted. Retry secure operation.',
         variant: 'destructive'
       });
     } finally {
@@ -88,15 +90,20 @@ export const EncryptedImageUpload = ({ onEncryptedImageReady, onCancel }: Encryp
   };
 
   return (
-    <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 space-y-4">
-      <div className="flex items-center space-x-2">
-        <Lock className="w-5 h-5 text-green-500" />
-        <h3 className="text-lg font-medium text-white">Encrypt Image</h3>
+    <div className="bg-black/95 border-2 border-red-500/50 rounded-lg p-3 sm:p-4 space-y-3 sm:space-y-4 shadow-2xl shadow-red-500/20 backdrop-blur-sm">
+      <div className="flex items-center space-x-2 border-b border-red-500/30 pb-2">
+        <Skull className="w-5 h-5 text-red-500 animate-pulse" />
+        <h3 className="text-base sm:text-lg font-mono font-bold text-red-500 tracking-wider">
+          [ENCRYPT_PAYLOAD]
+        </h3>
+        <Shield className="w-4 h-4 text-green-400" />
       </div>
 
       <div className="space-y-3">
         <div>
-          <Label htmlFor="image-file" className="text-sm text-gray-300">Select Image</Label>
+          <Label htmlFor="image-file" className="text-xs sm:text-sm text-green-400 font-mono uppercase tracking-wide">
+            › Select Target File
+          </Label>
           <div className="mt-1">
             <input
               id="image-file"
@@ -108,53 +115,55 @@ export const EncryptedImageUpload = ({ onEncryptedImageReady, onCancel }: Encryp
             <Button
               variant="outline"
               onClick={() => document.getElementById('image-file')?.click()}
-              className="w-full border-gray-600 text-gray-300 hover:text-white"
+              className="w-full h-10 sm:h-12 border-green-500/50 bg-black/50 text-green-400 hover:text-green-300 hover:bg-green-500/10 hover:border-green-400 font-mono text-xs sm:text-sm transition-all duration-300"
             >
               <Upload className="w-4 h-4 mr-2" />
-              {selectedFile ? selectedFile.name : 'Choose Image'}
+              {selectedFile ? `[${selectedFile.name}]` : '[BROWSE_FILES]'}
             </Button>
           </div>
         </div>
 
         <div>
-          <Label htmlFor="encryption-password" className="text-sm text-gray-300">Encryption Password</Label>
+          <Label htmlFor="encryption-password" className="text-xs sm:text-sm text-green-400 font-mono uppercase tracking-wide">
+            › Cipher Key
+          </Label>
           <div className="mt-1 relative">
             <Input
               id="encryption-password"
               type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter password to encrypt image..."
-              className="bg-gray-700 border-gray-600 text-white pr-10"
+              placeholder="Enter deep web encryption key..."
+              className="bg-black/80 border-green-500/50 text-green-400 placeholder-green-600/50 pr-10 h-10 sm:h-12 font-mono text-xs sm:text-sm focus:border-green-400 focus:ring-green-400/20"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-600 hover:text-green-400 transition-colors"
             >
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
-          <p className="text-xs text-gray-400 mt-1">
-            Share this password with people who should see the image
+          <p className="text-xs text-green-600/70 mt-1 font-mono">
+            › Share cipher with authorized users only
           </p>
         </div>
       </div>
 
-      <div className="flex space-x-2">
+      <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 pt-2">
         <Button
           onClick={handleEncryptAndUpload}
           disabled={!selectedFile || !password.trim() || isEncrypting}
-          className="flex-1 bg-green-600 hover:bg-green-700"
+          className="flex-1 h-10 sm:h-12 bg-red-600 hover:bg-red-700 text-white font-mono text-xs sm:text-sm tracking-wide transition-all duration-300 shadow-lg shadow-red-600/30"
         >
-          {isEncrypting ? 'Encrypting...' : 'Encrypt & Send'}
+          {isEncrypting ? '[ENCRYPTING...]' : '[ENCRYPT & TRANSMIT]'}
         </Button>
         <Button
           variant="outline"
           onClick={onCancel}
-          className="border-gray-600 text-gray-300 hover:text-white"
+          className="h-10 sm:h-12 border-gray-600 bg-black/50 text-gray-400 hover:text-gray-300 hover:bg-gray-800/50 font-mono text-xs sm:text-sm"
         >
-          Cancel
+          [ABORT]
         </Button>
       </div>
     </div>

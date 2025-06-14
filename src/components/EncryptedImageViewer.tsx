@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Lock, Eye, EyeOff, Download } from 'lucide-react';
+import { Lock, Eye, EyeOff, Download, Skull, Terminal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/hooks/use-toast';
@@ -29,8 +29,8 @@ export const EncryptedImageViewer = ({ attachment }: EncryptedImageViewerProps) 
   const handleDecrypt = async () => {
     if (!password.trim()) {
       toast({
-        title: 'Password required',
-        description: 'Please enter the password to decrypt the image.',
+        title: '🚫 ACCESS DENIED',
+        description: 'Cipher key required for payload decryption.',
         variant: 'destructive'
       });
       return;
@@ -38,8 +38,8 @@ export const EncryptedImageViewer = ({ attachment }: EncryptedImageViewerProps) 
 
     if (!attachment.metadata) {
       toast({
-        title: 'Invalid encrypted image',
-        description: 'This image is missing encryption metadata.',
+        title: '💀 CORRUPTED DATA',
+        description: 'Encrypted payload missing metadata headers.',
         variant: 'destructive'
       });
       return;
@@ -48,33 +48,29 @@ export const EncryptedImageViewer = ({ attachment }: EncryptedImageViewerProps) 
     setIsDecrypting(true);
 
     try {
-      // Fetch the encrypted file
       const response = await fetch(attachment.url);
       const encryptedData = await response.arrayBuffer();
 
-      // Convert base64 salt and iv back to Uint8Array
       const salt = new Uint8Array(atob(attachment.metadata.salt).split('').map(char => char.charCodeAt(0)));
       const iv = new Uint8Array(atob(attachment.metadata.iv).split('').map(char => char.charCodeAt(0)));
 
-      // Decrypt the image
       const decryptedData = await ImageEncryption.decryptImage(encryptedData, password, salt, iv);
       
-      // Create blob URL for the decrypted image
-      const mimeType = 'image/jpeg'; // You might want to store the original mime type in metadata
+      const mimeType = 'image/jpeg';
       const blobUrl = ImageEncryption.createBlobUrl(decryptedData, mimeType);
       
       setDecryptedImageUrl(blobUrl);
       setIsDecrypted(true);
       
       toast({
-        title: 'Image decrypted successfully',
-        description: 'The encrypted image has been unlocked.',
+        title: '🔓 PAYLOAD DECRYPTED',
+        description: 'Cipher successfully broken. Data accessed.',
       });
     } catch (error) {
       console.error('Decryption error:', error);
       toast({
-        title: 'Decryption failed',
-        description: 'Invalid password or corrupted image data.',
+        title: '💥 DECRYPTION FAILED',
+        description: 'Invalid cipher key or corrupted payload.',
         variant: 'destructive'
       });
     } finally {
@@ -90,10 +86,14 @@ export const EncryptedImageViewer = ({ attachment }: EncryptedImageViewerProps) 
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      
+      toast({
+        title: '📥 PAYLOAD EXTRACTED',
+        description: 'Decrypted data saved to local storage.',
+      });
     }
   };
 
-  // Clean up blob URL when component unmounts
   React.useEffect(() => {
     return () => {
       if (decryptedImageUrl) {
@@ -104,26 +104,26 @@ export const EncryptedImageViewer = ({ attachment }: EncryptedImageViewerProps) 
 
   if (isDecrypted && decryptedImageUrl) {
     return (
-      <div className="my-2">
+      <div className="my-2 bg-black/90 border border-green-500/30 rounded-lg p-2 sm:p-3">
         <img 
           src={decryptedImageUrl} 
-          alt={attachment.metadata?.originalName || 'Decrypted image'} 
-          className="max-w-full h-auto rounded-lg" 
+          alt={attachment.metadata?.originalName || 'Decrypted payload'} 
+          className="max-w-full h-auto rounded-lg border border-green-500/20" 
           style={{ maxHeight: '300px' }} 
         />
-        <div className="flex items-center justify-between mt-2">
-          <span className="text-xs text-green-500 flex items-center">
+        <div className="flex items-center justify-between mt-2 text-xs sm:text-sm">
+          <span className="text-green-400 flex items-center font-mono">
             <Lock className="w-3 h-3 mr-1" />
-            Decrypted: {attachment.metadata?.originalName}
+            [DECRYPTED]: {attachment.metadata?.originalName}
           </span>
           <Button
             size="sm"
             variant="outline"
             onClick={handleDownload}
-            className="text-xs"
+            className="text-xs border-green-500/50 bg-black/50 text-green-400 hover:bg-green-500/10 font-mono h-8"
           >
             <Download className="w-3 h-3 mr-1" />
-            Download
+            [EXTRACT]
           </Button>
         </div>
       </div>
@@ -131,14 +131,17 @@ export const EncryptedImageViewer = ({ attachment }: EncryptedImageViewerProps) 
   }
 
   return (
-    <div className="bg-gray-700/50 p-4 rounded-lg my-2 border border-yellow-500/50">
+    <div className="bg-black/95 border-2 border-red-500/50 rounded-lg my-2 p-3 sm:p-4 shadow-2xl shadow-red-500/20 backdrop-blur-sm">
       <div className="flex items-center space-x-2 mb-3">
-        <Lock className="w-5 h-5 text-yellow-500" />
-        <span className="text-sm font-medium text-yellow-500">Encrypted Image</span>
+        <Terminal className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 animate-pulse" />
+        <span className="text-xs sm:text-sm font-mono font-bold text-red-500 tracking-wider uppercase">
+          [ENCRYPTED_PAYLOAD]
+        </span>
+        <Skull className="w-4 h-4 text-red-400" />
       </div>
       
-      <p className="text-xs text-gray-300 mb-3">
-        This image is encrypted. Enter the password to view it.
+      <p className="text-xs text-red-400/80 mb-3 font-mono">
+        › Cipher key required to decrypt dark web transmission
       </p>
       
       <div className="space-y-3">
@@ -147,14 +150,14 @@ export const EncryptedImageViewer = ({ attachment }: EncryptedImageViewerProps) 
             type={showPassword ? 'text' : 'password'}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter decryption password..."
-            className="bg-gray-600 border-gray-500 text-white text-sm pr-10"
+            placeholder="Enter decryption cipher..."
+            className="bg-black/80 border-red-500/50 text-red-400 placeholder-red-600/50 text-xs sm:text-sm pr-10 h-10 sm:h-12 font-mono focus:border-red-400 focus:ring-red-400/20"
             onKeyPress={(e) => e.key === 'Enter' && handleDecrypt()}
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-600 hover:text-red-400 transition-colors"
           >
             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
@@ -164,9 +167,9 @@ export const EncryptedImageViewer = ({ attachment }: EncryptedImageViewerProps) 
           onClick={handleDecrypt}
           disabled={!password.trim() || isDecrypting}
           size="sm"
-          className="w-full bg-yellow-600 hover:bg-yellow-700 text-black"
+          className="w-full h-10 sm:h-12 bg-red-600 hover:bg-red-700 text-white font-mono text-xs sm:text-sm tracking-wide transition-all duration-300 shadow-lg shadow-red-600/30"
         >
-          {isDecrypting ? 'Decrypting...' : 'Decrypt Image'}
+          {isDecrypting ? '[DECRYPTING...]' : '[DECRYPT_PAYLOAD]'}
         </Button>
       </div>
     </div>
