@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, PlusCircle, Users } from 'lucide-react';
 import { CreateTeamDialog } from './CreateTeamDialog';
+import { TeamView } from './TeamView';
 import { Tables } from '@/integrations/supabase/types';
 
 const fetchTeams = async () => {
@@ -24,10 +25,20 @@ interface TeamListProps {
 
 export const TeamList = ({ onTeamSelect }: TeamListProps) => {
     const [isCreateTeamDialogOpen, setCreateTeamDialogOpen] = useState(false);
+    const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
     const { data: teams, isLoading, error } = useQuery({
         queryKey: ['teams'],
         queryFn: fetchTeams
     });
+
+    if (selectedTeam) {
+        return (
+            <TeamView 
+                teamId={selectedTeam} 
+                onBack={() => setSelectedTeam(null)}
+            />
+        );
+    }
 
     if (isLoading) {
         return <div className="p-4 text-center"><Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" /></div>;
@@ -53,7 +64,7 @@ export const TeamList = ({ onTeamSelect }: TeamListProps) => {
                     teams.map(team => (
                         <div
                             key={team.id}
-                            onClick={() => onTeamSelect(team.id)}
+                            onClick={() => setSelectedTeam(team.id)}
                             className="p-4 border-b border-gray-700 cursor-pointer transition-colors hover:bg-gray-750"
                         >
                             <div className="flex items-center space-x-3">

@@ -96,7 +96,10 @@ export const Sidebar = ({ activeChat, onChatSelect }: SidebarProps) => {
             searchQuery={searchQuery}
           />
         ) : activeTab === 'teams' ? (
-          <TeamList onTeamSelect={(teamId) => console.log('Selected team:', teamId)} />
+          <TeamList onTeamSelect={(teamId) => {
+            // Team selection is now handled internally by TeamList component
+            console.log('Team selected:', teamId);
+          }} />
         ) : (
           <SecurityPanel />
         )}

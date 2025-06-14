@@ -33,16 +33,19 @@ export type Database = {
       team_members: {
         Row: {
           joined_at: string
+          role: Database["public"]["Enums"]["team_role"]
           team_id: string
           user_id: string
         }
         Insert: {
           joined_at?: string
+          role?: Database["public"]["Enums"]["team_role"]
           team_id: string
           user_id: string
         }
         Update: {
           joined_at?: string
+          role?: Database["public"]["Enums"]["team_role"]
           team_id?: string
           user_id?: string
         }
@@ -100,7 +103,11 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      team_role:
+        | "diamond_in_the_rough"
+        | "team_lead"
+        | "team_organizer"
+        | "team_user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -215,6 +222,13 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      team_role: [
+        "diamond_in_the_rough",
+        "team_lead",
+        "team_organizer",
+        "team_user",
+      ],
+    },
   },
 } as const
