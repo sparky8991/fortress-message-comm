@@ -6,6 +6,11 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Users, CheckCircle, XCircle } from 'lucide-react';
 
+interface InvitationResponse {
+  success: boolean;
+  message: string;
+}
+
 export const InvitePage = () => {
   const { inviteCode } = useParams<{ inviteCode: string }>();
   const navigate = useNavigate();
@@ -77,17 +82,19 @@ export const InvitePage = () => {
 
       if (error) throw error;
 
-      if (data.success) {
+      const response = data as InvitationResponse;
+
+      if (response.success) {
         setStatus('accepted');
         toast({
           title: "Welcome to the team!",
-          description: data.message,
+          description: response.message,
         });
         setTimeout(() => navigate('/'), 2000);
       } else {
         toast({
           title: "Error",
-          description: data.message,
+          description: response.message,
           variant: "destructive",
         });
       }
