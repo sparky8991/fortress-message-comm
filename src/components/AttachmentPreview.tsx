@@ -31,16 +31,20 @@ export const AttachmentPreview = ({ attachment }: AttachmentPreviewProps) => {
 
   if (isImage) {
     return (
-      <a href={attachment.url} target="_blank" rel="noopener noreferrer" className="block mb-2">
-        <img src={attachment.url} alt={attachment.name} className="max-w-full h-auto rounded-lg" style={{ maxHeight: '300px' }} />
+      <a href={attachment.url} target="_blank" rel="noopener noreferrer" className="block my-2">
+        <img
+          src={attachment.url}
+          alt={attachment.name}
+          className="w-full h-auto object-contain border border-gray-700 rounded-lg max-h-[250px] sm:max-h-[300px]"
+        />
       </a>
     );
   }
 
   if (isVideo) {
     return (
-      <div className="mb-2">
-        <video controls src={attachment.url} className="max-w-full h-auto rounded-lg" style={{ maxHeight: '300px' }}>
+      <div className="my-2">
+        <video controls src={attachment.url} className="w-full h-auto rounded-lg border border-gray-700 max-h-[250px] sm:max-h-[300px]">
           Your browser does not support the video tag.
         </video>
       </div>

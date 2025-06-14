@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import { Shield, Lock, Check, CheckCheck, Clock } from 'lucide-react';
 import { AttachmentPreview } from './AttachmentPreview';
@@ -83,7 +82,7 @@ export const MessageList = ({ messages }: MessageListProps) => {
             
             <div className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'}`}>
               <div
-                className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
+                className={`max-w-[80%] lg:max-w-xl px-4 py-2 rounded-2xl ${
                   message.sender === 'me'
                     ? 'bg-green-500 text-white'
                     : 'bg-gray-700 text-white'
