@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { Shield, LogIn } from 'lucide-react';
+import { Shield, LogIn, ShieldAlert } from 'lucide-react';
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -10,12 +10,14 @@ const AuthPage = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setSuccess(null);
 
     try {
       let authError;
@@ -38,11 +40,37 @@ const AuthPage = () => {
       }
       
       if (!isLogin) {
-        alert('Check your email for the confirmation link!');
+        setSuccess("Registration successful! Please check your email for a verification link to activate your account.");
       }
       // The onAuthStateChange listener in Index.tsx will handle navigation
     } catch (err: any) {
-      setError(err.error_description || err.message);
+      const errorMessage = err.message;
+      let errorCode = "AUTH_FAILURE";
+      let detailedMessage = "An unexpected error occurred. Please try again.";
+
+      if (isLogin) {
+        if (errorMessage.includes("Email not confirmed")) {
+          errorCode = "EMAIL_NOT_VERIFIED";
+          detailedMessage = "Account not active. Please check your inbox for a verification email. A new one has been sent.";
+          await supabase.auth.resend({ type: 'signup', email });
+        } else if (errorMessage.includes("Invalid login credentials")) {
+          errorCode = "INVALID_CREDENTIALS";
+          detailedMessage = "Access denied. Incorrect email or password.";
+        }
+      } else { // Sign up
+        if (errorMessage.includes("User already registered")) {
+          errorCode = "USER_ALREADY_EXISTS";
+          detailedMessage = "Registration failed. An account with this email already exists.";
+        } else if (errorMessage.includes("Password should be at least 6 characters")) {
+          errorCode = "WEAK_PASSWORD";
+          detailedMessage = "Registration failed. Password does not meet security requirements (min. 6 characters).";
+        } else if (errorMessage.includes("Unable to validate email address")) {
+            errorCode = "INVALID_EMAIL_FORMAT";
+            detailedMessage = "Registration failed. The provided email address is not valid.";
+        }
+      }
+      
+      setError(`// ERROR_CODE: ${errorCode}\n${detailedMessage}`);
     } finally {
       setLoading(false);
     }
@@ -95,8 +123,18 @@ const AuthPage = () => {
           </button>
         </form>
 
+        {success && (
+          <p className="mt-4 text-center text-green-400 bg-green-900/50 p-3 rounded-lg">{success}</p>
+        )}
+
         {error && (
-          <p className="mt-4 text-center text-red-400 bg-red-900/50 p-3 rounded-lg">{error}</p>
+          <div className="mt-6 bg-black border border-red-700 rounded-lg p-4 font-mono text-sm text-red-400/90 shadow-lg shadow-red-500/10">
+            <div className="flex items-center gap-x-2 border-b border-red-700/50 pb-2 mb-2">
+              <ShieldAlert className="w-5 h-5 text-red-500 flex-shrink-0" />
+              <span className="font-bold text-red-500">SYSTEM ALERT: AUTHENTICATION FAILURE</span>
+            </div>
+            <pre className="whitespace-pre-wrap text-xs">{error}</pre>
+          </div>
         )}
 
         <p className="mt-6 text-center text-sm text-gray-400">
@@ -105,6 +143,7 @@ const AuthPage = () => {
             onClick={() => {
               setIsLogin(!isLogin);
               setError(null);
+              setSuccess(null);
             }}
             className="ml-2 font-medium text-green-500 hover:underline"
           >
