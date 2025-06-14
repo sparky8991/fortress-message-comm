@@ -1,11 +1,18 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Settings, Shield, Lock, Users, LogOut, MessageSquare } from 'lucide-react';
+import { Search, Settings, Shield, Lock, Users, LogOut, MessageSquare, MoreVertical, User as UserIcon } from 'lucide-react';
 import { ContactList } from './ContactList';
 import { SecurityPanel } from './SecurityPanel';
 import { supabase } from '@/integrations/supabase/client';
 import { TeamList } from './TeamList';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 interface SidebarProps {
   activeChat: string;
@@ -31,9 +38,35 @@ export const Sidebar = ({ activeChat, onChatSelect }: SidebarProps) => {
             <Shield className="w-6 h-6 text-green-500" />
             <h1 className="text-xl font-bold text-white">SecureChat</h1>
           </div>
-          <div className="flex items-center space-x-2">
-            <Lock className="w-4 h-4 text-green-500" />
-            <span className="text-xs text-green-500 font-medium">ENCRYPTED</span>
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-1">
+                <Lock className="w-4 h-4 text-green-500" />
+                <span className="text-xs text-green-500 font-medium">ENCRYPTED</span>
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="p-1 rounded-full text-gray-400 hover:text-white hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500">
+                  <MoreVertical className="w-5 h-5" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-gray-800 border-gray-700 text-white w-48">
+                <DropdownMenuItem
+                  onSelect={() => navigate('/profile-settings')}
+                  className="cursor-pointer focus:bg-gray-700 focus:text-white"
+                >
+                  <UserIcon className="w-4 h-4 mr-2" />
+                  <span>Profile Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-gray-700" />
+                <DropdownMenuItem
+                  onSelect={handleLogout}
+                  className="cursor-pointer text-red-400 focus:bg-red-600/30 focus:text-red-300"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  <span>Logout</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
         
