@@ -32,6 +32,8 @@ interface MessageListProps {
   messages: Message[];
   onReply: (messageId: string, messageText: string) => void;
   onSendMessage: (message: string, attachment: File | null, encryptionMetadata?: any) => void;
+  onStartNewGroup?: (contactName: string) => void;
+  contactName?: string;
 }
 
 const contactNames = {
@@ -39,7 +41,13 @@ const contactNames = {
   'contact': 'Alice Johnson' // This would be dynamic based on the active chat
 };
 
-export const MessageList = ({ messages, onReply, onSendMessage }: MessageListProps) => {
+export const MessageList = ({ 
+  messages, 
+  onReply, 
+  onSendMessage, 
+  onStartNewGroup,
+  contactName = 'Alice Johnson'
+}: MessageListProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -95,6 +103,8 @@ export const MessageList = ({ messages, onReply, onSendMessage }: MessageListPro
                 messageId={message.id}
                 messageText={message.text}
                 onSendMessage={onSendMessage}
+                onStartNewGroup={onStartNewGroup}
+                contactName={contactName}
               >
                 <div
                   className={`max-w-[80%] lg:max-w-xl px-4 py-2 rounded-2xl cursor-pointer select-none ${

@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Reply, Lock, Paperclip } from 'lucide-react';
+import { Reply, Lock, Users } from 'lucide-react';
 import {
   ContextMenu,
   ContextMenuContent,
@@ -15,6 +15,8 @@ interface MessageContextMenuProps {
   messageId: string;
   messageText: string;
   onSendMessage: (message: string, attachment: File | null, encryptionMetadata?: any) => void;
+  onStartNewGroup?: (contactName: string) => void;
+  contactName: string;
 }
 
 export const MessageContextMenu = ({ 
@@ -22,12 +24,20 @@ export const MessageContextMenu = ({
   onReply, 
   messageId, 
   messageText,
-  onSendMessage 
+  onSendMessage,
+  onStartNewGroup,
+  contactName
 }: MessageContextMenuProps) => {
   const [showEncryptedUpload, setShowEncryptedUpload] = useState(false);
 
   const handleReply = () => {
     onReply(messageId, messageText);
+  };
+
+  const handleStartNewGroup = () => {
+    if (onStartNewGroup) {
+      onStartNewGroup(contactName);
+    }
   };
 
   const handleEncryptedImageReady = (encryptedFile: File, metadata: any) => {
@@ -42,7 +52,7 @@ export const MessageContextMenu = ({
         <ContextMenuTrigger asChild>
           {children}
         </ContextMenuTrigger>
-        <ContextMenuContent className="w-48 bg-gray-800 border-gray-700">
+        <ContextMenuContent className="w-56 bg-gray-800 border-gray-700">
           <ContextMenuItem 
             onClick={handleReply}
             className="text-white hover:bg-gray-700 cursor-pointer"
@@ -56,6 +66,13 @@ export const MessageContextMenu = ({
           >
             <Lock className="w-4 h-4 mr-2" />
             Send encrypted image
+          </ContextMenuItem>
+          <ContextMenuItem 
+            onClick={handleStartNewGroup}
+            className="text-blue-400 hover:bg-gray-700 cursor-pointer"
+          >
+            <Users className="w-4 h-4 mr-2" />
+            Start new group with {contactName}
           </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>

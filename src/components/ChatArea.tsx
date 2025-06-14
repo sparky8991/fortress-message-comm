@@ -130,6 +130,15 @@ export const ChatArea = ({ activeChat, onStartCall }: ChatAreaProps) => {
     });
   }, []);
 
+  const handleStartNewGroup = (contactName: string) => {
+    toast({
+      title: "Starting New Group",
+      description: `Creating a new group with ${contactName}...`,
+    });
+    // Here you would implement the actual group creation logic
+    console.log(`Starting new group with ${contactName}`);
+  };
+
   const handleReply = (messageId: string, messageText: string) => {
     const originalMessage = currentMessages.find(msg => msg.id === messageId);
     if (originalMessage) {
@@ -217,6 +226,8 @@ export const ChatArea = ({ activeChat, onStartCall }: ChatAreaProps) => {
           messages={currentMessages} 
           onReply={handleReply}
           onSendMessage={handleSendMessage}
+          onStartNewGroup={handleStartNewGroup}
+          contactName={contact?.name || 'Contact'}
         />
       </div>
 
