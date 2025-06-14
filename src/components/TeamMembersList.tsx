@@ -7,9 +7,23 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Crown, Shield, Users, Star, UserPlus } from 'lucide-react';
-import { Tables } from '@/integrations/supabase/types';
+import { Database } from '@/integrations/supabase/types';
 
-const fetchTeamMembers = async (teamId: string) => {
+type TeamRole = Database['public']['Enums']['team_role'];
+
+interface TeamMemberWithProfile {
+    user_id: string;
+    team_id: string;
+    joined_at: string;
+    role: TeamRole;
+    profiles: {
+        id: string;
+        username: string | null;
+        full_name: string | null;
+    } | null;
+}
+
+const fetchTeamMembers = async (teamId: string): Promise<TeamMemberWithProfile[]> => {
     const { data, error } = await supabase
         .from('team_members')
         .select(`
@@ -23,10 +37,10 @@ const fetchTeamMembers = async (teamId: string) => {
         .eq('team_id', teamId);
     
     if (error) throw error;
-    return data;
+    return data as TeamMemberWithProfile[];
 };
 
-const updateMemberRole = async ({ teamId, userId, role }: { teamId: string; userId: string; role: string }) => {
+const updateMemberRole = async ({ teamId, userId, role }: { teamId: string; userId: string; role: TeamRole }) => {
     const { error } = await supabase
         .from('team_members')
         .update({ role })
@@ -38,10 +52,10 @@ const updateMemberRole = async ({ teamId, userId, role }: { teamId: string; user
 
 interface TeamMembersListProps {
     teamId: string;
-    currentUserRole?: string;
+    currentUserRole?: TeamRole;
 }
 
-const getRoleIcon = (role: string) => {
+const getRoleIcon = (role: TeamRole) => {
     switch (role) {
         case 'diamond_in_the_rough':
             return <Crown className="w-4 h-4 text-yellow-500" />;
@@ -56,7 +70,7 @@ const getRoleIcon = (role: string) => {
     }
 };
 
-const getRoleBadgeColor = (role: string) => {
+const getRoleBadgeColor = (role: TeamRole) => {
     switch (role) {
         case 'diamond_in_the_rough':
             return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50';
@@ -71,13 +85,13 @@ const getRoleBadgeColor = (role: string) => {
     }
 };
 
-const formatRoleName = (role: string) => {
+const formatRoleName = (role: TeamRole) => {
     return role.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 };
 
 export const TeamMembersList = ({ teamId, currentUserRole }: TeamMembersListProps) => {
     const [selectedMember, setSelectedMember] = useState<string | null>(null);
-    const [newRole, setNewRole] = useState<string>('');
+    const [newRole, setNewRole] = useState<TeamRole | ''>('');
     const queryClient = useQueryClient();
     const { toast } = useToast();
 
@@ -109,11 +123,11 @@ export const TeamMembersList = ({ teamId, currentUserRole }: TeamMembersListProp
     const canManageRoles = currentUserRole === 'diamond_in_the_rough' || currentUserRole === 'team_lead';
 
     const handleRoleUpdate = () => {
-        if (selectedMember && newRole) {
+        if (selectedMember && newRole && newRole !== '') {
             updateRoleMutation.mutate({
                 teamId,
                 userId: selectedMember,
-                role: newRole
+                role: newRole as TeamRole
             });
         }
     };
@@ -153,7 +167,7 @@ export const TeamMembersList = ({ teamId, currentUserRole }: TeamMembersListProp
                             <div className="flex items-center space-x-2">
                                 {selectedMember === member.user_id ? (
                                     <>
-                                        <Select value={newRole} onValueChange={setNewRole}>
+                                        <Select value={newRole} onValueChange={(value: TeamRole) => setNewRole(value)}>
                                             <SelectTrigger className="w-40 bg-gray-600 border-gray-500">
                                                 <SelectValue placeholder="Select role" />
                                             </SelectTrigger>
