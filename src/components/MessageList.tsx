@@ -1,0 +1,135 @@
+
+import React from 'react';
+import { Shield, Lock, Check, CheckCheck, Clock } from 'lucide-react';
+
+interface Message {
+  id: string;
+  text: string;
+  timestamp: string;
+  sender: 'me' | 'contact';
+  status: 'sending' | 'sent' | 'delivered' | 'read';
+  encrypted: boolean;
+}
+
+interface MessageListProps {
+  activeChat: string;
+}
+
+const messagesByChat = {
+  'alice-johnson': [
+    {
+      id: '1',
+      text: 'Hey, are you ready for the secure file transfer?',
+      timestamp: '10:30 AM',
+      sender: 'contact' as const,
+      status: 'read' as const,
+      encrypted: true
+    },
+    {
+      id: '2',
+      text: 'Yes, all encryption protocols are active. Ready to receive.',
+      timestamp: '10:32 AM',
+      sender: 'me' as const,
+      status: 'read' as const,
+      encrypted: true
+    },
+    {
+      id: '3',
+      text: 'Perfect! The encrypted files have been sent securely through our protected channel.',
+      timestamp: '10:35 AM',
+      sender: 'contact' as const,
+      status: 'read' as const,
+      encrypted: true
+    },
+    {
+      id: '4',
+      text: 'Received and verified. All checksums match. Thanks for the secure transfer! 🔒',
+      timestamp: '10:37 AM',
+      sender: 'me' as const,
+      status: 'delivered' as const,
+      encrypted: true
+    }
+  ],
+  'bob-smith': [
+    {
+      id: '1',
+      text: 'Mission briefing at 1400 hours. Secure channel required.',
+      timestamp: '9:15 AM',
+      sender: 'contact' as const,
+      status: 'read' as const,
+      encrypted: true
+    },
+    {
+      id: '2',
+      text: 'Roger that, mission parameters confirmed. Encryption level set to maximum.',
+      timestamp: '9:16 AM',
+      sender: 'me' as const,
+      status: 'read' as const,
+      encrypted: true
+    }
+  ]
+};
+
+export const MessageList = ({ activeChat }: MessageListProps) => {
+  const messages = messagesByChat[activeChat as keyof typeof messagesByChat] || [];
+
+  const getStatusIcon = (status: Message['status']) => {
+    switch (status) {
+      case 'sending':
+        return <Clock className="w-3 h-3 text-gray-400" />;
+      case 'sent':
+        return <Check className="w-3 h-3 text-gray-400" />;
+      case 'delivered':
+        return <CheckCheck className="w-3 h-3 text-gray-400" />;
+      case 'read':
+        return <CheckCheck className="w-3 h-3 text-green-500" />;
+    }
+  };
+
+  return (
+    <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      {/* Encryption Notice */}
+      <div className="flex items-center justify-center py-4">
+        <div className="bg-gray-800 px-4 py-2 rounded-full flex items-center space-x-2">
+          <Lock className="w-4 h-4 text-green-500" />
+          <span className="text-xs text-green-500">End-to-end encrypted conversation</span>
+        </div>
+      </div>
+
+      {/* Messages */}
+      {messages.map((message) => (
+        <div
+          key={message.id}
+          className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'}`}
+        >
+          <div
+            className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
+              message.sender === 'me'
+                ? 'bg-green-500 text-white'
+                : 'bg-gray-700 text-white'
+            }`}
+          >
+            <p className="text-sm">{message.text}</p>
+            <div className="flex items-center justify-between mt-1 space-x-2">
+              <div className="flex items-center space-x-1">
+                {message.encrypted && (
+                  <Shield className="w-3 h-3 text-green-300 opacity-70" />
+                )}
+                <span className={`text-xs ${
+                  message.sender === 'me' ? 'text-green-100' : 'text-gray-300'
+                }`}>
+                  {message.timestamp}
+                </span>
+              </div>
+              {message.sender === 'me' && (
+                <div className="flex-shrink-0">
+                  {getStatusIcon(message.status)}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};

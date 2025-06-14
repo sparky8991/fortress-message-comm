@@ -1,12 +1,37 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import React, { useState } from 'react';
+import { Sidebar } from '@/components/Sidebar';
+import { ChatArea } from '@/components/ChatArea';
+import { CallInterface } from '@/components/CallInterface';
 
 const Index = () => {
+  const [activeChat, setActiveChat] = useState('alice-johnson');
+  const [isInCall, setIsInCall] = useState(false);
+  const [callType, setCallType] = useState<'voice' | 'video'>('voice');
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-gray-900 flex">
+      {isInCall ? (
+        <CallInterface 
+          callType={callType}
+          onEndCall={() => setIsInCall(false)}
+          contactName="Alice Johnson"
+        />
+      ) : (
+        <>
+          <Sidebar 
+            activeChat={activeChat}
+            onChatSelect={setActiveChat}
+          />
+          <ChatArea 
+            activeChat={activeChat}
+            onStartCall={(type) => {
+              setCallType(type);
+              setIsInCall(true);
+            }}
+          />
+        </>
+      )}
     </div>
   );
 };
