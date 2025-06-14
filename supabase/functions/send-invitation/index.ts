@@ -29,7 +29,12 @@ const handler = async (req: Request): Promise<Response> => {
 
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
-      throw new Error("No authorization header");
+      const errorCode = "MISSING_AUTH_HEADER";
+      console.error(`// ERROR_CODE: ${errorCode}`, 'No authorization header');
+      return new Response(
+        JSON.stringify({ errorCode, error: "Missing Authorization header." }),
+        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
     }
 
     const { data: { user }, error: userError } = await supabase.auth.getUser(
@@ -37,10 +42,24 @@ const handler = async (req: Request): Promise<Response> => {
     );
 
     if (userError || !user) {
-      throw new Error("Unauthorized");
+      const errorCode = "UNAUTHORIZED";
+      console.error(`// ERROR_CODE: ${errorCode}`, userError);
+      return new Response(
+        JSON.stringify({ errorCode, error: "Authentication failed." }),
+        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
     }
 
     const { teamId, teamName, contact, contactType, role }: InvitationRequest = await req.json();
+
+    if (!teamId || !teamName || !contact || !contactType || !role) {
+        const errorCode = "INVALID_PAYLOAD";
+        console.error(`// ERROR_CODE: ${errorCode}`, 'Missing required fields in invitation request.');
+        return new Response(
+          JSON.stringify({ errorCode, error: "Invalid request payload. Missing required fields." }),
+          { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
+    }
 
     // Create invitation record
     const invitationData = {
@@ -57,27 +76,41 @@ const handler = async (req: Request): Promise<Response> => {
       .single();
 
     if (inviteError) {
-      throw inviteError;
+      const errorCode = "DB_INSERTION_FAILED";
+      console.error(`// ERROR_CODE: ${errorCode}`, inviteError);
+      return new Response(
+        JSON.stringify({ errorCode, error: "Database error: Could not create invitation." }),
+        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
     }
 
     const inviteUrl = `${req.headers.get('origin')}/invite/${invitation.invitation_code}`;
 
     if (contactType === 'email') {
       // Send email invitation
-      const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
-      
-      await resend.emails.send({
-        from: "SecureChat <onboarding@resend.dev>",
-        to: [contact],
-        subject: `You've been invited to join ${teamName}`,
-        html: `
-          <h1>Team Invitation</h1>
-          <p>You've been invited to join the team "${teamName}" on SecureChat.</p>
-          <p>Click the link below to accept the invitation:</p>
-          <a href="${inviteUrl}" style="background-color: #22c55e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Join Team</a>
-          <p>This invitation will expire in 7 days.</p>
-        `,
-      });
+      try {
+        const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+        
+        await resend.emails.send({
+          from: "SecureChat <onboarding@resend.dev>",
+          to: [contact],
+          subject: `You've been invited to join ${teamName}`,
+          html: `
+            <h1>Team Invitation</h1>
+            <p>You've been invited to join the team "${teamName}" on SecureChat.</p>
+            <p>Click the link below to accept the invitation:</p>
+            <a href="${inviteUrl}" style="background-color: #22c55e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Join Team</a>
+            <p>This invitation will expire in 7 days.</p>
+          `,
+        });
+      } catch(emailError) {
+          const errorCode = "EMAIL_SEND_FAILED";
+          console.error(`// ERROR_CODE: ${errorCode}`, emailError);
+          return new Response(
+            JSON.stringify({ errorCode, error: "Failed to send invitation email." }),
+            { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+          );
+      }
     } else {
       // For SMS, we'll use Twilio (placeholder - user will need to configure)
       console.log(`SMS invitation would be sent to ${contact}: Join ${teamName} on SecureChat: ${inviteUrl}`);
@@ -104,10 +137,11 @@ const handler = async (req: Request): Promise<Response> => {
         headers: { "Content-Type": "application/json", ...corsHeaders },
       }
     );
-  } catch (error) {
-    console.error("Error sending invitation:", error);
+  } catch (error: any) {
+    const errorCode = "UNKNOWN_SERVER_ERROR";
+    console.error(`// ERROR_CODE: ${errorCode}`, error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ errorCode, error: error.message || "An unexpected server error occurred." }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },

@@ -25,15 +25,21 @@ export const GhostModeToggle = () => {
 
         if (error) throw error;
         setIsGhostMode(data?.ghost_mode_active || false);
-      } catch (error) {
-        console.error('Error fetching ghost mode status:', error);
+      } catch (error: any) {
+        const errorCode = "GHOST_MODE_FETCH_FAILED";
+        console.error(`// ERROR_CODE: ${errorCode}\nError fetching ghost mode status:`, error);
+        toast({
+            title: "Error",
+            description: `Could not load Ghost Mode status. (Code: ${errorCode})`,
+            variant: "destructive",
+        });
       } finally {
         setLoading(false);
       }
     };
 
     fetchGhostModeStatus();
-  }, []);
+  }, [toast]);
 
   const toggleGhostMode = async () => {
     try {
@@ -59,11 +65,12 @@ export const GhostModeToggle = () => {
           ? "You appear offline to team members. You can still join ghost sessions."
           : "You're now visible to team members.",
       });
-    } catch (error) {
-      console.error('Error toggling ghost mode:', error);
+    } catch (error: any) {
+      const errorCode = "GHOST_MODE_TOGGLE_FAILED";
+      console.error(`// ERROR_CODE: ${errorCode}\nError toggling ghost mode:`, error);
       toast({
         title: "Error",
-        description: "Failed to toggle ghost mode. Please try again.",
+        description: `Failed to toggle ghost mode. Please try again. (Code: ${errorCode})`,
         variant: "destructive",
       });
     }

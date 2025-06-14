@@ -48,16 +48,22 @@ export const InvitePage = () => {
           setInvitation(data);
           setStatus('valid');
         }
-      } catch (error) {
-        console.error('Error checking invitation:', error);
+      } catch (error: any) {
+        const errorCode = "INVITE_CHECK_FAILED";
+        console.error(`// ERROR_CODE: ${errorCode}\nError checking invitation:`, error);
         setStatus('error');
+        toast({
+          title: "Error",
+          description: `Failed to verify invitation. Please try again. (Code: ${errorCode})`,
+          variant: "destructive",
+        });
       } finally {
         setLoading(false);
       }
     };
 
     checkInvitation();
-  }, [inviteCode]);
+  }, [inviteCode, toast]);
 
   const handleAcceptInvitation = async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -79,7 +85,11 @@ export const InvitePage = () => {
         invitation_code: inviteCode
       });
 
-      if (error) throw error;
+      if (error) {
+        const rpcError = new Error(error.message);
+        rpcError.name = "SupabaseRPCError";
+        throw rpcError;
+      };
 
       // Safely cast the response with proper type checking
       const response = data as unknown as InvitationResponse;
@@ -98,11 +108,12 @@ export const InvitePage = () => {
           variant: "destructive",
         });
       }
-    } catch (error) {
-      console.error('Error accepting invitation:', error);
+    } catch (error: any) {
+      const errorCode = "INVITE_ACCEPT_FAILED";
+      console.error(`// ERROR_CODE: ${errorCode}\nError accepting invitation:`, error);
       toast({
         title: "Error",
-        description: "Failed to accept invitation. Please try again.",
+        description: `Failed to accept invitation. Please try again. (Code: ${errorCode})`,
         variant: "destructive",
       });
     } finally {
