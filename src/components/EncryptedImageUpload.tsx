@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Lock, Upload, Eye, EyeOff, Shield, Skull, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -123,10 +124,10 @@ export const EncryptedImageUpload = ({ onEncryptedImageReady, onCancel }: Encryp
             <Button
               variant="outline"
               onClick={() => document.getElementById('image-file')?.click()}
-              className="w-full h-10 border-green-500/50 bg-black/50 text-green-400 hover:text-green-300 hover:bg-green-500/10 hover:border-green-400 font-mono text-xs transition-all duration-300"
+              className="w-full h-10 justify-start border-green-500/50 bg-black/50 text-green-400 hover:text-green-300 hover:bg-green-500/10 hover:border-green-400 font-mono text-xs transition-all duration-300"
             >
-              <Upload className="w-4 h-4 mr-2 flex-shrink-0" />
-              <span className="truncate">
+              <Upload />
+              <span className="truncate min-w-0">
                 {selectedFile ? `[${selectedFile.name}]` : '[BROWSE_FILES]'}
               </span>
             </Button>
