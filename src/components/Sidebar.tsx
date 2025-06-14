@@ -1,10 +1,11 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Settings, Shield, Lock, Users, LogOut } from 'lucide-react';
+import { Search, Settings, Shield, Lock, Users, LogOut, MessageSquare } from 'lucide-react';
 import { ContactList } from './ContactList';
 import { SecurityPanel } from './SecurityPanel';
 import { supabase } from '@/integrations/supabase/client';
+import { TeamList } from './TeamList';
 
 interface SidebarProps {
   activeChat: string;
@@ -12,7 +13,7 @@ interface SidebarProps {
 }
 
 export const Sidebar = ({ activeChat, onChatSelect }: SidebarProps) => {
-  const [activeTab, setActiveTab] = useState<'chats' | 'security'>('chats');
+  const [activeTab, setActiveTab] = useState<'chats' | 'teams' | 'security'>('chats');
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
 
@@ -41,7 +42,7 @@ export const Sidebar = ({ activeChat, onChatSelect }: SidebarProps) => {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
-            placeholder="Search conversations..."
+            placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
@@ -59,8 +60,19 @@ export const Sidebar = ({ activeChat, onChatSelect }: SidebarProps) => {
               : 'text-gray-300 hover:text-white'
           }`}
         >
-          <Users className="w-4 h-4 inline mr-2" />
+          <MessageSquare className="w-4 h-4 inline mr-2" />
           Chats
+        </button>
+        <button
+          onClick={() => setActiveTab('teams')}
+          className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
+            activeTab === 'teams'
+              ? 'text-green-500 border-b-2 border-green-500 bg-gray-750'
+              : 'text-gray-300 hover:text-white'
+          }`}
+        >
+          <Users className="w-4 h-4 inline mr-2" />
+          Teams
         </button>
         <button
           onClick={() => setActiveTab('security')}
@@ -76,13 +88,15 @@ export const Sidebar = ({ activeChat, onChatSelect }: SidebarProps) => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-y-auto">
         {activeTab === 'chats' ? (
           <ContactList 
             activeChat={activeChat}
             onChatSelect={onChatSelect}
             searchQuery={searchQuery}
           />
+        ) : activeTab === 'teams' ? (
+          <TeamList onTeamSelect={(teamId) => console.log('Selected team:', teamId)} />
         ) : (
           <SecurityPanel />
         )}
