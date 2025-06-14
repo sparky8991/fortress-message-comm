@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Lock, Upload, Eye, EyeOff, Shield, Skull } from 'lucide-react';
+import { Lock, Upload, Eye, EyeOff, Shield, Skull, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -90,8 +89,17 @@ export const EncryptedImageUpload = ({ onEncryptedImageReady, onCancel }: Encryp
   };
 
   return (
-    <div className="bg-black/95 border-2 border-red-500/50 rounded-lg p-3 space-y-3 shadow-2xl shadow-red-500/20 backdrop-blur-sm w-full max-w-full overflow-hidden">
-      <div className="flex items-center space-x-2 border-b border-red-500/30 pb-2 min-w-0">
+    <div className="bg-black/95 border-2 border-red-500/50 rounded-lg p-3 space-y-3 shadow-2xl shadow-red-500/20 backdrop-blur-sm w-full max-w-full overflow-hidden relative">
+      {/* Close Button */}
+      <button
+        onClick={onCancel}
+        className="absolute top-2 right-2 p-1 text-red-500 hover:text-red-400 hover:bg-red-500/10 rounded-full transition-colors z-10 flex-shrink-0"
+        title="Close encryption panel"
+      >
+        <X className="w-4 h-4" />
+      </button>
+
+      <div className="flex items-center space-x-2 border-b border-red-500/30 pb-2 min-w-0 pr-8">
         <Skull className="w-4 h-4 text-red-500 animate-pulse flex-shrink-0" />
         <h3 className="text-sm font-mono font-bold text-red-500 tracking-wider truncate">
           [ENCRYPT_PAYLOAD]
