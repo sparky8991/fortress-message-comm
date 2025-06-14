@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -39,10 +38,11 @@ const AuthPage = () => {
         throw authError;
       }
       
-      if (!isLogin) {
+      if (isLogin) {
+        navigate('/');
+      } else {
         setSuccess("Registration successful! Please check your email for a verification link to activate your account.");
       }
-      // The onAuthStateChange listener in Index.tsx will handle navigation
     } catch (err: any) {
       const errorMessage = err.message;
       let errorCode = "AUTH_FAILURE";
