@@ -12,7 +12,7 @@ const fetchTeams = async () => {
 
     const { data, error } = await supabase
       .from('teams')
-      .select('id, name, created_at');
+      .select('*');
       
     if (error) throw error;
     return data;
@@ -24,7 +24,7 @@ interface TeamListProps {
 
 export const TeamList = ({ onTeamSelect }: TeamListProps) => {
     const [isCreateTeamDialogOpen, setCreateTeamDialogOpen] = useState(false);
-    const { data: teams, isLoading, error } = useQuery<Tables<'teams'>[], Error>({
+    const { data: teams, isLoading, error } = useQuery({
         queryKey: ['teams'],
         queryFn: fetchTeams
     });
