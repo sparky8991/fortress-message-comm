@@ -104,23 +104,24 @@ export const EncryptedImageViewer = ({ attachment }: EncryptedImageViewerProps) 
 
   if (isDecrypted && decryptedImageUrl) {
     return (
-      <div className="my-2 bg-black/90 border border-green-500/30 rounded-lg p-2 sm:p-3">
-        <img 
-          src={decryptedImageUrl} 
-          alt={attachment.metadata?.originalName || 'Decrypted payload'} 
-          className="max-w-full h-auto rounded-lg border border-green-500/20" 
-          style={{ maxHeight: '300px' }} 
-        />
-        <div className="flex items-center justify-between mt-2 text-xs sm:text-sm">
-          <span className="text-green-400 flex items-center font-mono">
-            <Lock className="w-3 h-3 mr-1" />
-            [DECRYPTED]: {attachment.metadata?.originalName}
+      <div className="my-2 bg-black/90 border border-green-500/30 rounded-lg p-2 w-full max-w-full overflow-hidden">
+        <div className="w-full overflow-hidden rounded-lg">
+          <img 
+            src={decryptedImageUrl} 
+            alt={attachment.metadata?.originalName || 'Decrypted payload'} 
+            className="w-full h-auto object-contain border border-green-500/20 rounded-lg max-h-[250px] sm:max-h-[300px]" 
+          />
+        </div>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-2 gap-2">
+          <span className="text-green-400 flex items-center font-mono text-xs break-all">
+            <Lock className="w-3 h-3 mr-1 flex-shrink-0" />
+            <span className="truncate">[DECRYPTED]: {attachment.metadata?.originalName}</span>
           </span>
           <Button
             size="sm"
             variant="outline"
             onClick={handleDownload}
-            className="text-xs border-green-500/50 bg-black/50 text-green-400 hover:bg-green-500/10 font-mono h-8"
+            className="text-xs border-green-500/50 bg-black/50 text-green-400 hover:bg-green-500/10 font-mono h-8 flex-shrink-0 w-full sm:w-auto"
           >
             <Download className="w-3 h-3 mr-1" />
             [EXTRACT]
@@ -131,33 +132,33 @@ export const EncryptedImageViewer = ({ attachment }: EncryptedImageViewerProps) 
   }
 
   return (
-    <div className="bg-black/95 border-2 border-red-500/50 rounded-lg my-2 p-3 sm:p-4 shadow-2xl shadow-red-500/20 backdrop-blur-sm">
-      <div className="flex items-center space-x-2 mb-3">
-        <Terminal className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 animate-pulse" />
-        <span className="text-xs sm:text-sm font-mono font-bold text-red-500 tracking-wider uppercase">
+    <div className="bg-black/95 border-2 border-red-500/50 rounded-lg my-2 p-3 shadow-2xl shadow-red-500/20 backdrop-blur-sm w-full max-w-full overflow-hidden">
+      <div className="flex items-center space-x-2 mb-3 min-w-0">
+        <Terminal className="w-4 h-4 text-red-500 animate-pulse flex-shrink-0" />
+        <span className="text-xs font-mono font-bold text-red-500 tracking-wider uppercase truncate">
           [ENCRYPTED_PAYLOAD]
         </span>
-        <Skull className="w-4 h-4 text-red-400" />
+        <Skull className="w-4 h-4 text-red-400 flex-shrink-0" />
       </div>
       
-      <p className="text-xs text-red-400/80 mb-3 font-mono">
+      <p className="text-xs text-red-400/80 mb-3 font-mono break-words">
         › Cipher key required to decrypt dark web transmission
       </p>
       
-      <div className="space-y-3">
-        <div className="relative">
+      <div className="space-y-3 w-full">
+        <div className="relative w-full">
           <Input
             type={showPassword ? 'text' : 'password'}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter decryption cipher..."
-            className="bg-black/80 border-red-500/50 text-red-400 placeholder-red-600/50 text-xs sm:text-sm pr-10 h-10 sm:h-12 font-mono focus:border-red-400 focus:ring-red-400/20"
+            className="bg-black/80 border-red-500/50 text-red-400 placeholder-red-600/50 text-xs pr-10 h-10 font-mono focus:border-red-400 focus:ring-red-400/20 w-full"
             onKeyPress={(e) => e.key === 'Enter' && handleDecrypt()}
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-600 hover:text-red-400 transition-colors"
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-600 hover:text-red-400 transition-colors flex-shrink-0"
           >
             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
@@ -167,7 +168,7 @@ export const EncryptedImageViewer = ({ attachment }: EncryptedImageViewerProps) 
           onClick={handleDecrypt}
           disabled={!password.trim() || isDecrypting}
           size="sm"
-          className="w-full h-10 sm:h-12 bg-red-600 hover:bg-red-700 text-white font-mono text-xs sm:text-sm tracking-wide transition-all duration-300 shadow-lg shadow-red-600/30"
+          className="w-full h-10 bg-red-600 hover:bg-red-700 text-white font-mono text-xs tracking-wide transition-all duration-300 shadow-lg shadow-red-600/30"
         >
           {isDecrypting ? '[DECRYPTING...]' : '[DECRYPT_PAYLOAD]'}
         </Button>

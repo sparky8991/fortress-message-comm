@@ -90,21 +90,21 @@ export const EncryptedImageUpload = ({ onEncryptedImageReady, onCancel }: Encryp
   };
 
   return (
-    <div className="bg-black/95 border-2 border-red-500/50 rounded-lg p-3 sm:p-4 space-y-3 sm:space-y-4 shadow-2xl shadow-red-500/20 backdrop-blur-sm">
-      <div className="flex items-center space-x-2 border-b border-red-500/30 pb-2">
-        <Skull className="w-5 h-5 text-red-500 animate-pulse" />
-        <h3 className="text-base sm:text-lg font-mono font-bold text-red-500 tracking-wider">
+    <div className="bg-black/95 border-2 border-red-500/50 rounded-lg p-3 space-y-3 shadow-2xl shadow-red-500/20 backdrop-blur-sm w-full max-w-full overflow-hidden">
+      <div className="flex items-center space-x-2 border-b border-red-500/30 pb-2 min-w-0">
+        <Skull className="w-4 h-4 text-red-500 animate-pulse flex-shrink-0" />
+        <h3 className="text-sm font-mono font-bold text-red-500 tracking-wider truncate">
           [ENCRYPT_PAYLOAD]
         </h3>
-        <Shield className="w-4 h-4 text-green-400" />
+        <Shield className="w-4 h-4 text-green-400 flex-shrink-0" />
       </div>
 
-      <div className="space-y-3">
-        <div>
-          <Label htmlFor="image-file" className="text-xs sm:text-sm text-green-400 font-mono uppercase tracking-wide">
+      <div className="space-y-3 w-full">
+        <div className="w-full">
+          <Label htmlFor="image-file" className="text-xs text-green-400 font-mono uppercase tracking-wide block mb-1">
             › Select Target File
           </Label>
-          <div className="mt-1">
+          <div className="w-full">
             <input
               id="image-file"
               type="file"
@@ -115,53 +115,55 @@ export const EncryptedImageUpload = ({ onEncryptedImageReady, onCancel }: Encryp
             <Button
               variant="outline"
               onClick={() => document.getElementById('image-file')?.click()}
-              className="w-full h-10 sm:h-12 border-green-500/50 bg-black/50 text-green-400 hover:text-green-300 hover:bg-green-500/10 hover:border-green-400 font-mono text-xs sm:text-sm transition-all duration-300"
+              className="w-full h-10 border-green-500/50 bg-black/50 text-green-400 hover:text-green-300 hover:bg-green-500/10 hover:border-green-400 font-mono text-xs transition-all duration-300"
             >
-              <Upload className="w-4 h-4 mr-2" />
-              {selectedFile ? `[${selectedFile.name}]` : '[BROWSE_FILES]'}
+              <Upload className="w-4 h-4 mr-2 flex-shrink-0" />
+              <span className="truncate">
+                {selectedFile ? `[${selectedFile.name}]` : '[BROWSE_FILES]'}
+              </span>
             </Button>
           </div>
         </div>
 
-        <div>
-          <Label htmlFor="encryption-password" className="text-xs sm:text-sm text-green-400 font-mono uppercase tracking-wide">
+        <div className="w-full">
+          <Label htmlFor="encryption-password" className="text-xs text-green-400 font-mono uppercase tracking-wide block mb-1">
             › Cipher Key
           </Label>
-          <div className="mt-1 relative">
+          <div className="relative w-full">
             <Input
               id="encryption-password"
               type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter deep web encryption key..."
-              className="bg-black/80 border-green-500/50 text-green-400 placeholder-green-600/50 pr-10 h-10 sm:h-12 font-mono text-xs sm:text-sm focus:border-green-400 focus:ring-green-400/20"
+              className="bg-black/80 border-green-500/50 text-green-400 placeholder-green-600/50 pr-10 h-10 font-mono text-xs focus:border-green-400 focus:ring-green-400/20 w-full"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-600 hover:text-green-400 transition-colors"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-600 hover:text-green-400 transition-colors flex-shrink-0"
             >
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
-          <p className="text-xs text-green-600/70 mt-1 font-mono">
+          <p className="text-xs text-green-600/70 mt-1 font-mono break-words">
             › Share cipher with authorized users only
           </p>
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 pt-2">
+      <div className="flex flex-col space-y-2 pt-2 w-full">
         <Button
           onClick={handleEncryptAndUpload}
           disabled={!selectedFile || !password.trim() || isEncrypting}
-          className="flex-1 h-10 sm:h-12 bg-red-600 hover:bg-red-700 text-white font-mono text-xs sm:text-sm tracking-wide transition-all duration-300 shadow-lg shadow-red-600/30"
+          className="w-full h-10 bg-red-600 hover:bg-red-700 text-white font-mono text-xs tracking-wide transition-all duration-300 shadow-lg shadow-red-600/30"
         >
           {isEncrypting ? '[ENCRYPTING...]' : '[ENCRYPT & TRANSMIT]'}
         </Button>
         <Button
           variant="outline"
           onClick={onCancel}
-          className="h-10 sm:h-12 border-gray-600 bg-black/50 text-gray-400 hover:text-gray-300 hover:bg-gray-800/50 font-mono text-xs sm:text-sm"
+          className="w-full h-10 border-gray-600 bg-black/50 text-gray-400 hover:text-gray-300 hover:bg-gray-800/50 font-mono text-xs"
         >
           [ABORT]
         </Button>
