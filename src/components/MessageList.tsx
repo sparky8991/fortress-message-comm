@@ -15,6 +15,11 @@ interface MessageListProps {
   messages: Message[];
 }
 
+const contactNames = {
+  'me': 'You',
+  'contact': 'Alice Johnson' // This would be dynamic based on the active chat
+};
+
 export const MessageList = ({ messages }: MessageListProps) => {
   const getStatusIcon = (status: Message['status']) => {
     switch (status) {
@@ -40,39 +45,50 @@ export const MessageList = ({ messages }: MessageListProps) => {
       </div>
 
       {/* Messages */}
-      {messages.map((message) => (
-        <div
-          key={message.id}
-          className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'}`}
-        >
-          <div
-            className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
-              message.sender === 'me'
-                ? 'bg-green-500 text-white'
-                : 'bg-gray-700 text-white'
-            }`}
-          >
-            <p className="text-sm">{message.text}</p>
-            <div className="flex items-center justify-between mt-1 space-x-2">
-              <div className="flex items-center space-x-1">
-                {message.encrypted && (
-                  <Shield className="w-3 h-3 text-green-300 opacity-70" />
-                )}
-                <span className={`text-xs ${
-                  message.sender === 'me' ? 'text-green-100' : 'text-gray-300'
-                }`}>
-                  {message.timestamp}
+      {messages.map((message, index) => {
+        const showUsername = index === 0 || messages[index - 1].sender !== message.sender;
+        
+        return (
+          <div key={message.id} className="space-y-1">
+            {showUsername && (
+              <div className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'}`}>
+                <span className="text-xs text-gray-400 px-2">
+                  {contactNames[message.sender]}
                 </span>
               </div>
-              {message.sender === 'me' && (
-                <div className="flex-shrink-0">
-                  {getStatusIcon(message.status)}
+            )}
+            
+            <div className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'}`}>
+              <div
+                className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
+                  message.sender === 'me'
+                    ? 'bg-green-500 text-white'
+                    : 'bg-gray-700 text-white'
+                }`}
+              >
+                <p className="text-sm">{message.text}</p>
+                <div className="flex items-center justify-between mt-1 space-x-2">
+                  <div className="flex items-center space-x-1">
+                    {message.encrypted && (
+                      <Shield className="w-3 h-3 text-green-300 opacity-70" />
+                    )}
+                    <span className={`text-xs ${
+                      message.sender === 'me' ? 'text-green-100' : 'text-gray-300'
+                    }`}>
+                      {message.timestamp}
+                    </span>
+                  </div>
+                  {message.sender === 'me' && (
+                    <div className="flex-shrink-0">
+                      {getStatusIcon(message.status)}
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
             </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };

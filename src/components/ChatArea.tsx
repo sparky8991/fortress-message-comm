@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Phone, Video, MoreVertical, Shield, Lock, Send, Paperclip, Smile } from 'lucide-react';
+import { Phone, Video, MoreVertical, Shield, Lock, Send, Paperclip, Smile, Settings } from 'lucide-react';
 import { MessageList } from './MessageList';
 import { EmojiPicker } from './EmojiPicker';
+import { NotificationSettings } from './NotificationSettings';
+import { useNotifications } from '@/hooks/useNotifications';
 
 interface Message {
   id: string;
@@ -10,6 +12,7 @@ interface Message {
   sender: 'me' | 'contact';
   status: 'sending' | 'sent' | 'delivered' | 'read';
   encrypted: boolean;
+  sentAt: Date;
 }
 
 interface ChatAreaProps {
@@ -32,15 +35,17 @@ const initialMessagesByChat = {
       timestamp: '10:30 AM',
       sender: 'contact' as const,
       status: 'read' as const,
-      encrypted: true
+      encrypted: true,
+      sentAt: new Date(Date.now() - 30 * 60 * 1000) // 30 minutes ago
     },
     {
       id: '2',
       text: 'Yes, all encryption protocols are active. Ready to receive.',
       timestamp: '10:32 AM',
       sender: 'me' as const,
-      status: 'read' as const,
-      encrypted: true
+      status: 'delivered' as const, // Changed to show unread status
+      encrypted: true,
+      sentAt: new Date(Date.now() - 28 * 60 * 1000) // 28 minutes ago
     },
     {
       id: '3',
@@ -48,7 +53,8 @@ const initialMessagesByChat = {
       timestamp: '10:35 AM',
       sender: 'contact' as const,
       status: 'read' as const,
-      encrypted: true
+      encrypted: true,
+      sentAt: new Date(Date.now() - 25 * 60 * 1000)
     },
     {
       id: '4',
@@ -56,7 +62,8 @@ const initialMessagesByChat = {
       timestamp: '10:37 AM',
       sender: 'me' as const,
       status: 'delivered' as const,
-      encrypted: true
+      encrypted: true,
+      sentAt: new Date(Date.now() - 7 * 60 * 1000) // 7 minutes ago - should trigger notification
     }
   ],
   'bob-smith': [
@@ -83,19 +90,30 @@ export const ChatArea = ({ activeChat, onStartCall }: ChatAreaProps) => {
   const [message, setMessage] = useState('');
   const [messagesByChat, setMessagesByChat] = useState(initialMessagesByChat);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showNotificationSettings, setShowNotificationSettings] = useState(false);
+  const [notificationSettings, setNotificationSettings] = useState({
+    unreadReminderEnabled: true,
+    unreadReminderTime: 5
+  });
+
   const contact = contactInfo[activeChat as keyof typeof contactInfo];
+  const currentMessages = messagesByChat[activeChat as keyof typeof messagesByChat] || [];
+  
+  // Initialize notifications hook
+  useNotifications(currentMessages, notificationSettings);
 
   const handleSendMessage = () => {
     if (message.trim()) {
       console.log('Sending encrypted message:', message);
       
-      const newMessage: Message = {
+      const newMessage = {
         id: Date.now().toString(),
         text: message.trim(),
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        sender: 'me',
-        status: 'sent',
-        encrypted: true
+        sender: 'me' as const,
+        status: 'sent' as const,
+        encrypted: true,
+        sentAt: new Date()
       };
 
       setMessagesByChat(prev => ({
@@ -110,8 +128,6 @@ export const ChatArea = ({ activeChat, onStartCall }: ChatAreaProps) => {
   const handleEmojiSelect = (emoji: string) => {
     setMessage(prev => prev + emoji);
   };
-
-  const currentMessages = messagesByChat[activeChat as keyof typeof messagesByChat] || [];
 
   return (
     <div className="flex-1 flex flex-col bg-gray-900">
@@ -146,6 +162,13 @@ export const ChatArea = ({ activeChat, onStartCall }: ChatAreaProps) => {
               className="p-2 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
             >
               <Video className="w-5 h-5" />
+            </button>
+            <button 
+              onClick={() => setShowNotificationSettings(true)}
+              className="p-2 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
+              title="Notification Settings"
+            >
+              <Settings className="w-5 h-5" />
             </button>
             <button className="p-2 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-colors">
               <MoreVertical className="w-5 h-5" />
@@ -204,6 +227,12 @@ export const ChatArea = ({ activeChat, onStartCall }: ChatAreaProps) => {
           </div>
         </div>
       </div>
+
+      {/* Notification Settings Modal */}
+      <NotificationSettings
+        isOpen={showNotificationSettings}
+        onClose={() => setShowNotificationSettings(false)}
+      />
     </div>
   );
 };
