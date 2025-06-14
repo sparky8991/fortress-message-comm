@@ -9,23 +9,140 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      ghost_messages: {
+        Row: {
+          created_at: string
+          encrypted_content: string
+          id: string
+          message_hash: string
+          sender_id: string
+          session_id: string
+        }
+        Insert: {
+          created_at?: string
+          encrypted_content: string
+          id?: string
+          message_hash: string
+          sender_id: string
+          session_id: string
+        }
+        Update: {
+          created_at?: string
+          encrypted_content?: string
+          id?: string
+          message_hash?: string
+          sender_id?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ghost_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "ghost_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ghost_session_members: {
+        Row: {
+          id: string
+          is_active: boolean
+          joined_at: string
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          is_active?: boolean
+          joined_at?: string
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          is_active?: boolean
+          joined_at?: string
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ghost_session_members_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "ghost_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ghost_sessions: {
+        Row: {
+          created_at: string
+          created_by: string
+          encryption_key: string
+          expires_at: string
+          id: string
+          is_active: boolean
+          max_members: number
+          session_name: string
+          team_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          encryption_key: string
+          expires_at?: string
+          id?: string
+          is_active?: boolean
+          max_members?: number
+          session_name: string
+          team_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          encryption_key?: string
+          expires_at?: string
+          id?: string
+          is_active?: boolean
+          max_members?: number
+          session_name?: string
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ghost_sessions_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
           full_name: string | null
+          ghost_mode_active: boolean | null
           id: string
+          last_seen: string | null
           username: string | null
         }
         Insert: {
           avatar_url?: string | null
           full_name?: string | null
+          ghost_mode_active?: boolean | null
           id: string
+          last_seen?: string | null
           username?: string | null
         }
         Update: {
           avatar_url?: string | null
           full_name?: string | null
+          ghost_mode_active?: boolean | null
           id?: string
+          last_seen?: string | null
           username?: string | null
         }
         Relationships: []
@@ -150,6 +267,18 @@ export type Database = {
       accept_team_invitation: {
         Args: { invitation_code: string }
         Returns: Json
+      }
+      create_ghost_session: {
+        Args: {
+          p_team_id: string
+          p_session_name: string
+          p_encryption_key: string
+        }
+        Returns: string
+      }
+      join_ghost_session: {
+        Args: { p_session_id: string }
+        Returns: boolean
       }
     }
     Enums: {

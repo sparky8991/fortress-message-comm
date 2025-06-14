@@ -1,10 +1,12 @@
-
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { TeamMembersList } from './TeamMembersList';
+import { GhostModeToggle } from './GhostModeToggle';
+import { GhostSessionManager } from './GhostSessionManager';
 import { ArrowLeft, Calendar, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const fetchTeamDetails = async (teamId: string) => {
     const { data, error } = await supabase
@@ -74,27 +76,48 @@ export const TeamView = ({ teamId, onBack }: TeamViewProps) => {
                     Back to Teams
                 </Button>
                 
-                <div className="space-y-2">
-                    <h2 className="text-2xl font-bold text-white">{team.name}</h2>
-                    <div className="flex items-center space-x-4 text-sm text-gray-400">
-                        <div className="flex items-center space-x-1">
-                            <Crown className="w-4 h-4 text-yellow-500" />
-                            <span>Created by {team.profiles?.full_name || team.profiles?.username || 'Unknown'}</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                            <Calendar className="w-4 h-4" />
-                            <span>{new Date(team.created_at).toLocaleDateString()}</span>
+                <div className="space-y-4">
+                    <div>
+                        <h2 className="text-2xl font-bold text-white">{team.name}</h2>
+                        <div className="flex items-center space-x-4 text-sm text-gray-400">
+                            <div className="flex items-center space-x-1">
+                                <Crown className="w-4 h-4 text-yellow-500" />
+                                <span>Created by {team.profiles?.full_name || team.profiles?.username || 'Unknown'}</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                                <Calendar className="w-4 h-4" />
+                                <span>{new Date(team.created_at).toLocaleDateString()}</span>
+                            </div>
                         </div>
                     </div>
+                    
+                    <GhostModeToggle />
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4">
-                <TeamMembersList 
-                    teamId={teamId} 
-                    teamName={team.name}
-                    currentUserRole={currentUserRole} 
-                />
+            <div className="flex-1 overflow-y-auto">
+                <Tabs defaultValue="members" className="h-full">
+                    <TabsList className="grid w-full grid-cols-2 bg-gray-800 border-b border-gray-700 rounded-none">
+                        <TabsTrigger value="members" className="data-[state=active]:bg-gray-700">
+                            Team Members
+                        </TabsTrigger>
+                        <TabsTrigger value="ghost" className="data-[state=active]:bg-gray-700">
+                            Ghost Sessions
+                        </TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="members" className="p-4 h-full">
+                        <TeamMembersList 
+                            teamId={teamId} 
+                            teamName={team.name}
+                            currentUserRole={currentUserRole} 
+                        />
+                    </TabsContent>
+                    
+                    <TabsContent value="ghost" className="p-4 h-full">
+                        <GhostSessionManager teamId={teamId} />
+                    </TabsContent>
+                </Tabs>
             </div>
         </div>
     );

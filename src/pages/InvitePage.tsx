@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -82,7 +81,8 @@ export const InvitePage = () => {
 
       if (error) throw error;
 
-      const response = data as InvitationResponse;
+      // Safely cast the response with proper type checking
+      const response = data as unknown as InvitationResponse;
 
       if (response.success) {
         setStatus('accepted');
