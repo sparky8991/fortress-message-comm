@@ -10,6 +10,11 @@ interface Message {
   status: 'sending' | 'sent' | 'delivered' | 'read';
   encrypted: boolean;
   sentAt?: Date;
+  attachment?: {
+    name: string;
+    url: string;
+    type: string;
+  };
 }
 
 interface NotificationSettings {

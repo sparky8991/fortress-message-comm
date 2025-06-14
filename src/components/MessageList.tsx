@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Shield, Lock, Check, CheckCheck, Clock } from 'lucide-react';
+import { AttachmentPreview } from './AttachmentPreview';
 
 interface Message {
   id: string;
@@ -9,6 +10,11 @@ interface Message {
   sender: 'me' | 'contact';
   status: 'sending' | 'sent' | 'delivered' | 'read';
   encrypted: boolean;
+  attachment?: {
+    name: string;
+    url: string;
+    type: string;
+  };
 }
 
 interface MessageListProps {
@@ -66,7 +72,8 @@ export const MessageList = ({ messages }: MessageListProps) => {
                     : 'bg-gray-700 text-white'
                 }`}
               >
-                <p className="text-sm">{message.text}</p>
+                {message.attachment && <AttachmentPreview attachment={message.attachment} />}
+                {message.text && <p className="text-sm break-words">{message.text}</p>}
                 <div className="flex items-center justify-between mt-1 space-x-2">
                   <div className="flex items-center space-x-1">
                     {message.encrypted && (
