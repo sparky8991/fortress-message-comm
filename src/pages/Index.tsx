@@ -91,9 +91,9 @@ const Index = () => {
               {isMobile && (
                   <button 
                       onClick={() => setSidebarOpen(true)}
-                      className="absolute top-4 left-4 z-10 p-2 bg-gray-800/90 hover:bg-gray-700 rounded-full text-white backdrop-blur-sm border border-gray-600 shadow-lg"
+                      className="absolute top-2 left-2 z-40 p-2 bg-gray-800/95 hover:bg-gray-700 rounded-lg text-white backdrop-blur-sm border border-gray-600 shadow-xl"
                   >
-                      <PanelLeft className="h-5 w-5" />
+                      <PanelLeft className="h-4 w-4" />
                   </button>
               )}
               <ChatArea 
