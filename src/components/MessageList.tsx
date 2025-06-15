@@ -94,7 +94,7 @@ export const MessageList = ({
                   {message.replyTo && (
                     <div className="mb-2 p-2 bg-black/40 rounded-lg border-l-2 border-green-400">
                       <p className="text-xs text-green-300 font-medium mb-1 font-mono">
-                        > {message.replyTo.sender}
+                        {'>'} {message.replyTo.sender}
                       </p>
                       <p className="text-xs opacity-80 truncate font-mono">
                         {message.replyTo.messageText}

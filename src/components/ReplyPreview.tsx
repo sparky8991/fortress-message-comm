@@ -21,7 +21,7 @@ export const ReplyPreview = ({ replyingTo, onCancelReply }: ReplyPreviewProps) =
           <Reply className="w-4 h-4 text-green-400 flex-shrink-0" />
           <div className="min-w-0 flex-1">
             <p className="text-xs text-green-400 font-medium font-mono">
-              > REPLYING_TO: {replyingTo.sender}
+              {'>'} REPLYING_TO: {replyingTo.sender}
             </p>
             <p className="text-sm text-gray-300 truncate font-mono">
               {replyingTo.messageText}
