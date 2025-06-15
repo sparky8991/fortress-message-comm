@@ -91,7 +91,7 @@ const Index = () => {
               {isMobile && (
                   <button 
                       onClick={() => setSidebarOpen(true)}
-                      className="absolute top-5 left-4 z-10 p-2 bg-gray-700/50 hover:bg-gray-700 rounded-full text-white backdrop-blur-sm"
+                      className="absolute top-4 left-4 z-20 p-2 bg-gray-800/80 hover:bg-gray-700 rounded-full text-white backdrop-blur-sm border border-gray-600 shadow-lg"
                   >
                       <PanelLeft className="h-5 w-5" />
                   </button>

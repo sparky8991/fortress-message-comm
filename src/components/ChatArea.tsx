@@ -34,12 +34,15 @@ export const ChatArea = ({ activeChat, onStartCall }: ChatAreaProps) => {
   useNotifications(currentMessages, notificationSettings);
 
   return (
-    <div className="flex-1 flex flex-col bg-gray-900">
-      <ChatHeader
-        contact={contact}
-        onStartCall={onStartCall}
-        onShowNotificationSettings={() => setShowNotificationSettings(true)}
-      />
+    <div className="flex-1 flex flex-col bg-gray-900 relative">
+      {/* Fixed Header */}
+      <div className="relative z-10">
+        <ChatHeader
+          contact={contact}
+          onStartCall={onStartCall}
+          onShowNotificationSettings={() => setShowNotificationSettings(true)}
+        />
+      </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-hidden">
