@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { Send, Paperclip, Smile, FileText, X, Shield, Lock, Terminal } from 'lucide-react';
 import { EmojiPicker } from './EmojiPicker';
@@ -147,17 +148,21 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
             
             <div className="flex-1 relative min-w-0">
               <textarea
-                placeholder="Enter encrypted transmission..."
+                placeholder="> ENTER_ENCRYPTED_TRANSMISSION..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
-                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent pr-10 text-sm font-mono resize-none min-h-[40px] max-h-24"
+                className="w-full px-3 py-2 bg-black/90 border border-green-500/50 rounded-lg text-green-400 placeholder-green-600/70 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-400 pr-10 text-sm font-mono resize-none min-h-[40px] max-h-24 shadow-inner shadow-green-500/20 caret-green-400"
                 rows={message.split('\n').length > 1 ? Math.min(message.split('\n').length, 3) : 1}
+                style={{ 
+                  fontFamily: "'Fira Code', 'Source Code Pro', 'Consolas', 'Monaco', 'Courier New', monospace",
+                  letterSpacing: '0.5px'
+                }}
               />
               <div className="absolute right-2 top-2">
                 <button 
                   onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                  className="p-1 text-gray-300 hover:text-white transition-colors"
+                  className="p-1 text-green-400 hover:text-green-300 transition-colors"
                 >
                   <Smile className="w-4 h-4" />
                 </button>
@@ -170,7 +175,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
             </div>
             <button
               onClick={handleSend}
-              className="p-2 bg-green-500 hover:bg-green-600 rounded-full text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+              className="p-2 bg-green-500 hover:bg-green-600 rounded-full text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 shadow-lg shadow-green-500/30"
               disabled={!message.trim() && !attachment}
             >
               <Send className="w-4 h-4" />
@@ -179,8 +184,8 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
           
           <div className="flex items-center justify-center mt-2">
             <div className="flex items-center space-x-1 text-xs text-green-500 font-mono">
-              <Shield className="w-3 h-3 flex-shrink-0" />
-              <span className="text-center">Deep web secured with military-grade encryption</span>
+              <Shield className="w-3 h-3 flex-shrink-0 animate-pulse" />
+              <span className="text-center">QUANTUM_ENCRYPTED_CHANNEL_ACTIVE</span>
             </div>
           </div>
         </div>

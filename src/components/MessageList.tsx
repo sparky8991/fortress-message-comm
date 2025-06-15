@@ -50,9 +50,9 @@ export const MessageList = ({
     <div className="flex-1 overflow-y-auto p-4 space-y-4">
       {/* Encryption Notice */}
       <div className="flex items-center justify-center py-4">
-        <div className="bg-gray-800 px-4 py-2 rounded-full flex items-center space-x-2">
-          <Lock className="w-4 h-4 text-green-500" />
-          <span className="text-xs text-green-500">End-to-end encrypted conversation</span>
+        <div className="bg-black/90 border border-green-500/50 px-4 py-2 rounded-full flex items-center space-x-2 shadow-lg shadow-green-500/20">
+          <Lock className="w-4 h-4 text-green-500 animate-pulse" />
+          <span className="text-xs text-green-500 font-mono">QUANTUM_ENCRYPTION_PROTOCOL_ACTIVE</span>
         </div>
       </div>
 
@@ -64,8 +64,8 @@ export const MessageList = ({
           <div key={message.id} className="space-y-1">
             {showUsername && (
               <div className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'}`}>
-                <span className="text-xs text-gray-400 px-2">
-                  {contactNames[message.sender]}
+                <span className="text-xs text-green-400 px-2 font-mono">
+                  [{contactNames[message.sender]}]
                 </span>
               </div>
             )}
@@ -80,35 +80,39 @@ export const MessageList = ({
                 contactName={contactName}
               >
                 <div
-                  className={`max-w-[80%] lg:max-w-xl px-4 py-2 rounded-2xl cursor-pointer select-none ${
+                  className={`max-w-[80%] lg:max-w-xl px-4 py-2 rounded-2xl cursor-pointer select-none border ${
                     message.sender === 'me'
-                      ? 'bg-green-500 text-white'
-                      : 'bg-gray-700 text-white'
+                      ? 'bg-black/90 text-green-400 border-green-500/50 shadow-lg shadow-green-500/20'
+                      : 'bg-gray-800/90 text-gray-100 border-gray-600/50 shadow-lg'
                   }`}
+                  style={{ 
+                    fontFamily: "'Fira Code', 'Source Code Pro', 'Consolas', 'Monaco', 'Courier New', monospace",
+                    letterSpacing: '0.3px'
+                  }}
                 >
                   {/* Reply indicator */}
                   {message.replyTo && (
-                    <div className="mb-2 p-2 bg-black/20 rounded-lg border-l-2 border-green-400">
-                      <p className="text-xs text-green-300 font-medium mb-1">
-                        {message.replyTo.sender}
+                    <div className="mb-2 p-2 bg-black/40 rounded-lg border-l-2 border-green-400">
+                      <p className="text-xs text-green-300 font-medium mb-1 font-mono">
+                        > {message.replyTo.sender}
                       </p>
-                      <p className="text-xs opacity-80 truncate">
+                      <p className="text-xs opacity-80 truncate font-mono">
                         {message.replyTo.messageText}
                       </p>
                     </div>
                   )}
                   
                   {message.attachment && <AttachmentPreview attachment={message.attachment} />}
-                  {message.text && <p className="text-sm break-words">{message.text}</p>}
+                  {message.text && <p className="text-sm break-words font-mono leading-relaxed">{message.text}</p>}
                   <div className="flex items-center justify-between mt-1 space-x-2">
                     <div className="flex items-center space-x-1">
                       {message.encrypted && (
-                        <Shield className="w-3 h-3 text-green-300 opacity-70" />
+                        <Shield className="w-3 h-3 text-green-300 opacity-70 animate-pulse" />
                       )}
-                      <span className={`text-xs ${
-                        message.sender === 'me' ? 'text-green-100' : 'text-gray-300'
+                      <span className={`text-xs font-mono ${
+                        message.sender === 'me' ? 'text-green-300/80' : 'text-gray-400'
                       }`}>
-                        {message.timestamp}
+                        [{message.timestamp}]
                       </span>
                     </div>
                     {message.sender === 'me' && (
