@@ -34,9 +34,9 @@ export const ChatArea = ({ activeChat, onStartCall }: ChatAreaProps) => {
   useNotifications(currentMessages, notificationSettings);
 
   return (
-    <div className="flex-1 flex flex-col bg-gray-900 relative">
-      {/* Fixed Header */}
-      <div className="relative z-10">
+    <div className="flex-1 flex flex-col bg-gray-900 h-full">
+      {/* Header - Fixed at top */}
+      <div className="flex-shrink-0 z-30">
         <ChatHeader
           contact={contact}
           onStartCall={onStartCall}
@@ -44,7 +44,7 @@ export const ChatArea = ({ activeChat, onStartCall }: ChatAreaProps) => {
         />
       </div>
 
-      {/* Messages */}
+      {/* Messages - Scrollable area */}
       <div className="flex-1 overflow-hidden">
         <MessageList 
           messages={currentMessages} 
@@ -55,12 +55,14 @@ export const ChatArea = ({ activeChat, onStartCall }: ChatAreaProps) => {
         />
       </div>
 
-      {/* Message Input */}
-      <MessageInput 
-        onSendMessage={handleSendMessage}
-        replyingTo={replyingTo}
-        onCancelReply={handleCancelReply}
-      />
+      {/* Message Input - Fixed at bottom */}
+      <div className="flex-shrink-0">
+        <MessageInput 
+          onSendMessage={handleSendMessage}
+          replyingTo={replyingTo}
+          onCancelReply={handleCancelReply}
+        />
+      </div>
 
       {/* Notification Settings Modal */}
       <NotificationSettings
