@@ -6,6 +6,7 @@ import { ContactList } from './ContactList';
 import { SecurityPanel } from './SecurityPanel';
 import { supabase } from '@/integrations/supabase/client';
 import { TeamList } from './TeamList';
+import { useIsMobile } from '@/hooks/use-mobile';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +23,7 @@ interface SidebarProps {
 export const Sidebar = ({ activeChat, onChatSelect }: SidebarProps) => {
   const [activeTab, setActiveTab] = useState<'chats' | 'teams' | 'security'>('chats');
   const [searchQuery, setSearchQuery] = useState('');
+  const isMobile = useIsMobile();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -30,23 +32,23 @@ export const Sidebar = ({ activeChat, onChatSelect }: SidebarProps) => {
   };
 
   return (
-    <div className="w-80 bg-gray-800 border-r border-gray-700 flex flex-col">
+    <div className="w-80 bg-gray-800 border-r border-gray-700 flex flex-col h-full">
       {/* Header */}
-      <div className="p-4 border-b border-gray-700">
-        <div className="flex items-center justify-between mb-4">
+      <div className={`${isMobile ? 'p-3' : 'p-4'} border-b border-gray-700`}>
+        <div className="flex items-center justify-between mb-3 md:mb-4">
           <div className="flex items-center space-x-2">
-            <Shield className="w-6 h-6 text-green-500" />
-            <h1 className="text-xl font-bold text-white">SecureChat</h1>
+            <Shield className="w-5 h-5 md:w-6 md:h-6 text-green-500" />
+            <h1 className="text-lg md:text-xl font-bold text-white">SecureChat</h1>
           </div>
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2 md:space-x-3">
             <div className="flex items-center space-x-1">
-                <Lock className="w-4 h-4 text-green-500" />
+                <Lock className="w-3 h-3 md:w-4 md:h-4 text-green-500" />
                 <span className="text-xs text-green-500 font-medium">ENCRYPTED</span>
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="p-1 rounded-full text-gray-400 hover:text-white hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500">
-                  <MoreVertical className="w-5 h-5" />
+                <button className="p-1 rounded-full text-gray-400 hover:text-white hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 min-h-[40px] min-w-[40px] flex items-center justify-center">
+                  <MoreVertical className="w-4 h-4 md:w-5 md:h-5" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-gray-800 border-gray-700 text-white w-48">
@@ -78,7 +80,7 @@ export const Sidebar = ({ activeChat, onChatSelect }: SidebarProps) => {
             placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            className={`w-full pl-10 pr-4 ${isMobile ? 'py-2.5' : 'py-2'} bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm`}
           />
         </div>
       </div>
@@ -87,36 +89,36 @@ export const Sidebar = ({ activeChat, onChatSelect }: SidebarProps) => {
       <div className="flex border-b border-gray-700">
         <button
           onClick={() => setActiveTab('chats')}
-          className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
+          className={`flex-1 ${isMobile ? 'py-3 px-2' : 'py-3 px-4'} text-xs md:text-sm font-medium transition-colors min-h-[48px] flex items-center justify-center ${
             activeTab === 'chats'
               ? 'text-green-500 border-b-2 border-green-500 bg-gray-750'
               : 'text-gray-300 hover:text-white'
           }`}
         >
-          <MessageSquare className="w-4 h-4 inline mr-2" />
-          Chats
+          <MessageSquare className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+          <span className="hidden sm:inline">Chats</span>
         </button>
         <button
           onClick={() => setActiveTab('teams')}
-          className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
+          className={`flex-1 ${isMobile ? 'py-3 px-2' : 'py-3 px-4'} text-xs md:text-sm font-medium transition-colors min-h-[48px] flex items-center justify-center ${
             activeTab === 'teams'
               ? 'text-green-500 border-b-2 border-green-500 bg-gray-750'
               : 'text-gray-300 hover:text-white'
           }`}
         >
-          <Users className="w-4 h-4 inline mr-2" />
-          Teams
+          <Users className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+          <span className="hidden sm:inline">Teams</span>
         </button>
         <button
           onClick={() => setActiveTab('security')}
-          className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
+          className={`flex-1 ${isMobile ? 'py-3 px-2' : 'py-3 px-4'} text-xs md:text-sm font-medium transition-colors min-h-[48px] flex items-center justify-center ${
             activeTab === 'security'
               ? 'text-green-500 border-b-2 border-green-500 bg-gray-750'
               : 'text-gray-300 hover:text-white'
           }`}
         >
-          <Settings className="w-4 h-4 inline mr-2" />
-          Security
+          <Settings className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+          <span className="hidden sm:inline">Security</span>
         </button>
       </div>
 
@@ -139,10 +141,10 @@ export const Sidebar = ({ activeChat, onChatSelect }: SidebarProps) => {
       </div>
 
       {/* Footer with Logout */}
-      <div className="p-4 border-t border-gray-700">
+      <div className={`${isMobile ? 'p-3' : 'p-4'} border-t border-gray-700`}>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center space-x-2 py-2 px-4 bg-red-600/20 hover:bg-red-600/40 rounded-lg text-red-400 hover:text-red-300 font-medium transition-colors"
+          className={`w-full flex items-center justify-center space-x-2 ${isMobile ? 'py-3' : 'py-2'} px-4 bg-red-600/20 hover:bg-red-600/40 rounded-lg text-red-400 hover:text-red-300 font-medium transition-colors min-h-[44px]`}
         >
           <LogOut className="w-4 h-4" />
           <span>Logout</span>

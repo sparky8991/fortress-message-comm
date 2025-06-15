@@ -6,7 +6,7 @@ import { Sidebar } from '@/components/Sidebar';
 import { ChatArea } from '@/components/ChatArea';
 import { CallInterface } from '@/components/CallInterface';
 import { Session } from '@supabase/supabase-js';
-import { Loader2, PanelLeft } from 'lucide-react';
+import { Loader2, Menu } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 
@@ -91,9 +91,10 @@ const Index = () => {
               {isMobile && (
                   <button 
                       onClick={() => setSidebarOpen(true)}
-                      className="absolute top-2 left-2 z-40 p-2 bg-gray-800/95 hover:bg-gray-700 rounded-lg text-white backdrop-blur-sm border border-gray-600 shadow-xl"
+                      className="fixed top-3 left-3 z-50 p-3 bg-gray-800/95 hover:bg-gray-700 rounded-lg text-white backdrop-blur-sm border border-gray-600 shadow-xl transition-all duration-200 hover:scale-105 min-h-[48px] min-w-[48px] flex items-center justify-center"
+                      aria-label="Open sidebar"
                   >
-                      <PanelLeft className="h-4 w-4" />
+                      <Menu className="h-5 w-5" />
                   </button>
               )}
               <ChatArea 
