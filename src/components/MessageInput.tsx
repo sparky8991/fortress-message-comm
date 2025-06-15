@@ -101,14 +101,14 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
           onCancelReply={onCancelReply || (() => {})} 
         />
 
-        <div className="p-3">
+        <div className="p-2 md:p-3">
           {attachment && (
-            <div className="mb-2 px-2 py-1 bg-black/80 border border-green-500/30 rounded-lg flex items-center justify-between animate-in fade-in-50 min-w-0">
+            <div className="mb-2 px-2 py-1.5 bg-black/80 border border-green-500/30 rounded-lg flex items-center justify-between animate-in fade-in-50 min-w-0">
               <div className="flex items-center space-x-2 overflow-hidden min-w-0 flex-1">
                 {isEncryptedFile ? (
-                  <Terminal className="w-4 h-4 text-red-500 flex-shrink-0 animate-pulse" />
+                  <Terminal className="w-3 h-3 md:w-4 md:h-4 text-red-500 flex-shrink-0 animate-pulse" />
                 ) : (
-                  <FileText className="w-4 h-4 text-gray-300 flex-shrink-0" />
+                  <FileText className="w-3 h-3 md:w-4 md:h-4 text-gray-300 flex-shrink-0" />
                 )}
                 <span className="text-xs text-white truncate font-mono min-w-0">
                   {isEncryptedFile ? `[ENCRYPTED]: ${encryptionMetadata?.originalName || 'PAYLOAD'}` : `[FILE]: ${attachment.name}`}
@@ -122,28 +122,28 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                 }} 
                 className="p-1 text-gray-300 hover:text-white rounded-full hover:bg-gray-600 transition-colors flex-shrink-0 ml-2"
               >
-                <X className="w-4 h-4" />
+                <X className="w-3 h-3 md:w-4 md:h-4" />
               </button>
             </div>
           )}
           
-          <div className="flex items-center space-x-2 w-full">
+          <div className="flex items-end space-x-1 md:space-x-2 w-full">
             <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
             
             <button 
               onClick={() => fileInputRef.current?.click()} 
-              className="p-2 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-colors flex-shrink-0"
+              className="p-2 md:p-2.5 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-colors flex-shrink-0"
               title="Attach File"
             >
-              <Paperclip className="w-4 h-4" />
+              <Paperclip className="w-4 h-4 md:w-5 md:h-5" />
             </button>
             
             <button 
               onClick={() => setShowEncryptedUpload(true)} 
-              className="p-2 text-red-500 hover:text-red-400 hover:bg-gray-700 rounded-lg transition-colors flex-shrink-0 animate-pulse"
+              className="p-2 md:p-2.5 text-red-500 hover:text-red-400 hover:bg-gray-700 rounded-lg transition-colors flex-shrink-0 animate-pulse"
               title="Encrypt Image"
             >
-              <Lock className="w-4 h-4" />
+              <Lock className="w-4 h-4 md:w-5 md:h-5" />
             </button>
             
             <div className="flex-1 relative min-w-0">
@@ -152,19 +152,19 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
-                className="w-full px-3 py-2 bg-black/90 border border-green-500/50 rounded-lg text-green-400 placeholder-green-600/70 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-400 pr-10 text-sm font-mono resize-none min-h-[40px] max-h-24 shadow-inner shadow-green-500/20 caret-green-400"
+                className="w-full px-2 md:px-3 py-2 md:py-2.5 bg-black/90 border border-green-500/50 rounded-lg text-green-400 placeholder-green-600/70 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-400 pr-8 md:pr-10 text-xs md:text-sm font-mono resize-none min-h-[36px] md:min-h-[40px] max-h-20 md:max-h-24 shadow-inner shadow-green-500/20 caret-green-400"
                 rows={message.split('\n').length > 1 ? Math.min(message.split('\n').length, 3) : 1}
                 style={{ 
                   fontFamily: "'Fira Code', 'Source Code Pro', 'Consolas', 'Monaco', 'Courier New', monospace",
-                  letterSpacing: '0.5px'
+                  letterSpacing: '0.25px'
                 }}
               />
-              <div className="absolute right-2 top-2">
+              <div className="absolute right-1 md:right-2 top-1 md:top-2">
                 <button 
                   onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                   className="p-1 text-green-400 hover:text-green-300 transition-colors"
                 >
-                  <Smile className="w-4 h-4" />
+                  <Smile className="w-3 h-3 md:w-4 md:h-4" />
                 </button>
                 <EmojiPicker
                   onEmojiSelect={handleEmojiSelect}
@@ -175,17 +175,17 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
             </div>
             <button
               onClick={handleSend}
-              className="p-2 bg-green-500 hover:bg-green-600 rounded-full text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 shadow-lg shadow-green-500/30"
+              className="p-2 md:p-2.5 bg-green-500 hover:bg-green-600 rounded-full text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 shadow-lg shadow-green-500/30"
               disabled={!message.trim() && !attachment}
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-4 h-4 md:w-5 md:h-5" />
             </button>
           </div>
           
-          <div className="flex items-center justify-center mt-2">
+          <div className="flex items-center justify-center mt-1.5 md:mt-2">
             <div className="flex items-center space-x-1 text-xs text-green-500 font-mono">
-              <Shield className="w-3 h-3 flex-shrink-0 animate-pulse" />
-              <span className="text-center">QUANTUM_ENCRYPTED_CHANNEL_ACTIVE</span>
+              <Shield className="w-2.5 h-2.5 md:w-3 md:h-3 flex-shrink-0 animate-pulse" />
+              <span className="text-center text-xs md:text-sm">QUANTUM_ENCRYPTED_CHANNEL_ACTIVE</span>
             </div>
           </div>
         </div>
