@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Settings, Shield, Lock, Users, LogOut, MessageSquare, MoreVertical, User as UserIcon } from 'lucide-react';
@@ -72,8 +71,8 @@ export const Sidebar = ({ activeChat, onChatSelect }: SidebarProps) => {
           </div>
         </div>
         
-        {/* Search with adjusted padding */}
-        <div className="pt-4 pb-2">
+        {/* Search with fine-tuned padding */}
+        <div className="pt-5 pb-1">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-3 h-3 text-gray-400" />
             <input
