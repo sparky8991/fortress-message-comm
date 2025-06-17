@@ -97,8 +97,8 @@ const Index = () => {
               />
           )}
 
-          {/* Main chat area */}
-          <div className="flex-1 flex flex-col relative px-1 md:px-4 max-w-full overflow-hidden">
+          {/* Main chat area - adjusted padding to ensure header is visible */}
+          <div className="flex-1 flex flex-col relative overflow-hidden">
               <div className="flex-1 flex flex-col min-w-0 max-w-full">
                 <ChatArea 
                   activeChat={activeChat}
