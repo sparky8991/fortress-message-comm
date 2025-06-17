@@ -1,7 +1,18 @@
 
 import React from 'react';
-import { Phone, Video, MoreVertical, Lock, Settings } from 'lucide-react';
+import { Phone, Video, MoreVertical, Lock, Settings, User, Bell, Shield, LogOut, Info, MessageSquare, Phone as PhoneIcon } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface ContactInfo {
   name: string;
@@ -18,6 +29,29 @@ interface ChatHeaderProps {
 
 export const ChatHeader = ({ contact, onStartCall, onShowNotificationSettings, onToggleSidebar }: ChatHeaderProps) => {
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      toast({
+        title: "Logged out",
+        description: "You have been successfully logged out."
+      });
+      
+      navigate('/auth');
+    } catch (error: any) {
+      console.error('Logout error:', error);
+      toast({
+        title: "Logout failed",
+        description: error.message || "Failed to log out. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
 
   return (
     <div className="p-3 border-b border-gray-700/80 bg-gray-800/95 backdrop-blur-sm shadow-lg">
@@ -88,13 +122,86 @@ export const ChatHeader = ({ contact, onStartCall, onShowNotificationSettings, o
               <Settings className="w-4 h-4" />
             </button>
           )}
-          <button 
-            className="p-2 text-gray-300 hover:text-white hover:bg-gray-700/80 rounded-xl transition-all duration-200 min-h-[40px] min-w-[40px] flex items-center justify-center hover:scale-105 active:scale-95"
-            title="More options"
-            aria-label="More options"
-          >
-            <MoreVertical className="w-4 h-4" />
-          </button>
+          
+          {/* Settings Dropdown Menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button 
+                className="p-2 text-gray-300 hover:text-white hover:bg-gray-700/80 rounded-xl transition-all duration-200 min-h-[40px] min-w-[40px] flex items-center justify-center hover:scale-105 active:scale-95"
+                title="Settings Menu"
+                aria-label="Open settings menu"
+              >
+                <MoreVertical className="w-4 h-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent 
+              align="end" 
+              className="w-56 bg-gray-800 border-gray-700 text-white shadow-xl"
+              sideOffset={8}
+            >
+              <DropdownMenuLabel className="text-green-400 font-mono text-xs tracking-wider">
+                SETTINGS
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-gray-700" />
+              
+              {/* Profile Settings */}
+              <DropdownMenuItem 
+                onClick={() => navigate('/profile-settings')}
+                className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer"
+              >
+                <User className="mr-2 h-4 w-4 text-green-500" />
+                <span>Profile Settings</span>
+              </DropdownMenuItem>
+
+              {/* Notification Settings - Always show, but different behavior */}
+              <DropdownMenuItem 
+                onClick={onShowNotificationSettings}
+                className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer"
+              >
+                <Bell className="mr-2 h-4 w-4 text-blue-500" />
+                <span>Notifications</span>
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator className="bg-gray-700" />
+
+              {/* Privacy & Security */}
+              <DropdownMenuItem className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer">
+                <Shield className="mr-2 h-4 w-4 text-purple-500" />
+                <span>Privacy & Security</span>
+              </DropdownMenuItem>
+
+              {/* Call Settings */}
+              <DropdownMenuItem className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer">
+                <PhoneIcon className="mr-2 h-4 w-4 text-orange-500" />
+                <span>Call Settings</span>
+              </DropdownMenuItem>
+
+              {/* Chat Settings */}
+              <DropdownMenuItem className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer">
+                <MessageSquare className="mr-2 h-4 w-4 text-cyan-500" />
+                <span>Chat Settings</span>
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator className="bg-gray-700" />
+
+              {/* About */}
+              <DropdownMenuItem className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer">
+                <Info className="mr-2 h-4 w-4 text-gray-400" />
+                <span>About SecureChat</span>
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator className="bg-gray-700" />
+
+              {/* Logout */}
+              <DropdownMenuItem 
+                onClick={handleLogout}
+                className="hover:bg-red-900/50 focus:bg-red-900/50 cursor-pointer text-red-400 hover:text-red-300"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Logout</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </div>
