@@ -98,7 +98,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
           onCancelReply={onCancelReply || (() => {})} 
         />
 
-        <div className="p-3 md:p-4 space-y-3">
+        <div className="p-3 md:p-4 space-y-3 mx-2 md:mx-0">
           {attachment && (
             <div className="px-3 py-2 bg-black/90 border border-green-500/40 rounded-lg flex items-center justify-between animate-in fade-in-50 duration-200 min-w-0 shadow-lg shadow-green-500/10">
               <div className="flex items-center space-x-2 overflow-hidden min-w-0 flex-1">
@@ -134,10 +134,10 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
             </div>
           )}
           
-          <div className="flex items-end space-x-2 w-full">
+          <div className="flex items-end space-x-2 w-full min-w-0">
             <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
             
-            <div className="flex space-x-1">
+            <div className="flex space-x-1 flex-shrink-0">
               <button 
                 onClick={() => fileInputRef.current?.click()} 
                 className="p-3 text-gray-300 hover:text-white hover:bg-gray-700/80 rounded-lg transition-all duration-200 flex-shrink-0 min-h-[48px] min-w-[48px] flex items-center justify-center hover:scale-105 active:scale-95"
@@ -157,7 +157,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
               </button>
             </div>
             
-            <div className="flex-1 relative min-w-0">
+            <div className="flex-1 relative min-w-0 mr-2">
               <textarea
                 placeholder="Secure message..."
                 value={message}
@@ -190,7 +190,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
             
             <button
               onClick={handleSend}
-              className="p-3 bg-green-500 hover:bg-green-600 rounded-lg text-black transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 shadow-lg shadow-green-500/30 min-h-[48px] min-w-[48px] flex items-center justify-center hover:scale-105 active:scale-95 disabled:hover:scale-100"
+              className="p-3 bg-green-500 hover:bg-green-600 rounded-lg text-black transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 shadow-lg shadow-green-500/30 min-h-[48px] min-w-[48px] flex items-center justify-center hover:scale-105 active:scale-95 disabled:hover:scale-100 mr-2"
               disabled={!message.trim() && !attachment}
               aria-label="Send message"
             >

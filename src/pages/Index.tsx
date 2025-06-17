@@ -65,11 +65,13 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-black flex overflow-hidden h-screen">
       {isInCall ? (
-        <CallInterface 
-          callType={callType}
-          onEndCall={() => setIsInCall(false)}
-          contactName="Alice Johnson"
-        />
+        <div className="w-full px-2 md:px-4">
+          <CallInterface 
+            callType={callType}
+            onEndCall={() => setIsInCall(false)}
+            contactName="Alice Johnson"
+          />
+        </div>
       ) : (
         <>
           <div
@@ -93,7 +95,7 @@ const Index = () => {
               />
           )}
 
-          <div className="flex-1 flex flex-col relative">
+          <div className="flex-1 flex flex-col relative px-2 md:px-4 max-w-full overflow-hidden">
               {isMobile && (
                   <button 
                       onClick={() => setSidebarOpen(true)}
@@ -103,13 +105,15 @@ const Index = () => {
                       <Menu className="h-5 w-5" />
                   </button>
               )}
-              <ChatArea 
-                activeChat={activeChat}
-                onStartCall={(type) => {
-                  setCallType(type);
-                  setIsInCall(true);
-                }}
-              />
+              <div className="flex-1 flex flex-col min-w-0 max-w-full">
+                <ChatArea 
+                  activeChat={activeChat}
+                  onStartCall={(type) => {
+                    setCallType(type);
+                    setIsInCall(true);
+                  }}
+                />
+              </div>
           </div>
         </>
       )}
