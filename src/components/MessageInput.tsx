@@ -63,7 +63,6 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
     setEncryptionMetadata(metadata);
     setShowEncryptedUpload(false);
     
-    // Auto-populate message with share instructions
     const shareMessage = `🔒 ENCRYPTED PAYLOAD DEPLOYED\n\nDecryption Key: ${metadata.shareCode}\n\n⚠️ CLASSIFIED - Share key securely with authorized personnel only`;
     setMessage(shareMessage);
   };
@@ -86,7 +85,6 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
 
   return (
     <>
-      {/* Encrypted Upload Overlay */}
       {showEncryptedUpload && (
         <EncryptedImageUpload
           onEncryptedImageReady={handleEncryptedImageReady}
@@ -94,57 +92,70 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
         />
       )}
 
-      <div className="border-t border-gray-700 bg-gray-800 w-full max-w-full overflow-hidden">
-        {/* Reply Preview */}
+      <div className="border-t border-gray-700/80 bg-gray-800/95 backdrop-blur-sm w-full max-w-full overflow-hidden">
         <ReplyPreview 
           replyingTo={replyingTo} 
           onCancelReply={onCancelReply || (() => {})} 
         />
 
-        <div className="p-3 md:p-4">
+        <div className="p-4 md:p-6 space-y-4">
           {attachment && (
-            <div className="mb-3 px-3 py-2 bg-black/80 border border-green-500/30 rounded-lg flex items-center justify-between animate-in fade-in-50 min-w-0">
-              <div className="flex items-center space-x-2 overflow-hidden min-w-0 flex-1">
+            <div className="px-4 py-3 bg-black/90 border border-green-500/40 rounded-xl flex items-center justify-between animate-in fade-in-50 duration-200 min-w-0 shadow-lg shadow-green-500/10">
+              <div className="flex items-center space-x-3 overflow-hidden min-w-0 flex-1">
                 {isEncryptedFile ? (
-                  <Terminal className="w-4 h-4 text-red-500 flex-shrink-0 animate-pulse" />
+                  <div className="p-2 bg-red-500/20 rounded-lg">
+                    <Terminal className="w-4 h-4 text-red-400 animate-pulse" />
+                  </div>
                 ) : (
-                  <FileText className="w-4 h-4 text-gray-300 flex-shrink-0" />
+                  <div className="p-2 bg-gray-600/40 rounded-lg">
+                    <FileText className="w-4 h-4 text-gray-300" />
+                  </div>
                 )}
-                <span className="text-xs text-white truncate font-mono min-w-0">
-                  {isEncryptedFile ? `[ENCRYPTED]: ${encryptionMetadata?.originalName || 'PAYLOAD'}` : `[FILE]: ${attachment.name}`}
-                </span>
+                <div className="min-w-0 flex-1">
+                  <span className="text-sm text-white font-medium font-mono block truncate">
+                    {isEncryptedFile ? `[ENCRYPTED]: ${encryptionMetadata?.originalName || 'PAYLOAD'}` : `${attachment.name}`}
+                  </span>
+                  <span className="text-xs text-gray-400 font-mono">
+                    {(attachment.size / 1024 / 1024).toFixed(2)} MB
+                  </span>
+                </div>
               </div>
               <button 
                 onClick={() => {
                   setAttachment(null);
                   setEncryptionMetadata(null);
-                  setMessage(''); // Clear auto-generated message when removing encrypted file
+                  setMessage('');
                 }} 
-                className="p-1 text-gray-300 hover:text-white rounded-full hover:bg-gray-600 transition-colors flex-shrink-0 ml-2"
+                className="p-2 text-gray-400 hover:text-white hover:bg-gray-600/50 rounded-lg transition-all duration-200 flex-shrink-0 ml-3"
+                aria-label="Remove attachment"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
           )}
           
-          <div className="flex items-end space-x-2 w-full">
+          <div className="flex items-end space-x-3 w-full">
             <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
             
-            <button 
-              onClick={() => fileInputRef.current?.click()} 
-              className="p-2.5 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-colors flex-shrink-0"
-              title="Attach File"
-            >
-              <Paperclip className="w-5 h-5" />
-            </button>
-            
-            <button 
-              onClick={() => setShowEncryptedUpload(true)} 
-              className="p-2.5 text-red-500 hover:text-red-400 hover:bg-gray-700 rounded-lg transition-colors flex-shrink-0 animate-pulse"
-              title="Encrypt Image"
-            >
-              <Lock className="w-5 h-5" />
-            </button>
+            <div className="flex space-x-2">
+              <button 
+                onClick={() => fileInputRef.current?.click()} 
+                className="p-3 text-gray-300 hover:text-white hover:bg-gray-700/80 rounded-xl transition-all duration-200 flex-shrink-0 min-h-[48px] min-w-[48px] flex items-center justify-center hover:scale-105 active:scale-95"
+                title="Attach File"
+                aria-label="Attach file"
+              >
+                <Paperclip className="w-5 h-5" />
+              </button>
+              
+              <button 
+                onClick={() => setShowEncryptedUpload(true)} 
+                className="p-3 text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded-xl transition-all duration-200 flex-shrink-0 min-h-[48px] min-w-[48px] flex items-center justify-center hover:scale-105 active:scale-95"
+                title="Encrypt Image"
+                aria-label="Encrypt and attach image"
+              >
+                <Lock className="w-5 h-5 animate-pulse" />
+              </button>
+            </div>
             
             <div className="flex-1 relative min-w-0">
               <textarea
@@ -152,17 +163,20 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
-                className="w-full px-3 py-2.5 bg-black/90 border border-green-500/50 rounded-lg text-green-400 placeholder-green-600/70 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-400 pr-10 text-sm font-mono resize-none min-h-[44px] max-h-24 shadow-inner shadow-green-500/20 caret-green-400"
-                rows={message.split('\n').length > 1 ? Math.min(message.split('\n').length, 3) : 1}
+                className="w-full px-4 py-3 bg-black/95 border border-green-500/60 rounded-xl text-green-400 placeholder-green-600/60 focus:outline-none focus:ring-2 focus:ring-green-500/80 focus:border-green-400/80 pr-12 text-sm font-mono resize-none min-h-[48px] max-h-32 shadow-inner shadow-green-500/10 caret-green-400 transition-all duration-200"
+                rows={message.split('\n').length > 1 ? Math.min(message.split('\n').length, 4) : 1}
                 style={{ 
                   fontFamily: "'Fira Code', 'Source Code Pro', 'Consolas', 'Monaco', 'Courier New', monospace",
-                  letterSpacing: '0.25px'
+                  letterSpacing: '0.3px',
+                  lineHeight: '1.5'
                 }}
+                aria-label="Message input"
               />
-              <div className="absolute right-2 top-2">
+              <div className="absolute right-3 top-3">
                 <button 
                   onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                  className="p-1 text-green-400 hover:text-green-300 transition-colors"
+                  className="p-1.5 text-green-400 hover:text-green-300 hover:bg-green-500/20 rounded-lg transition-all duration-200"
+                  aria-label="Add emoji"
                 >
                   <Smile className="w-4 h-4" />
                 </button>
@@ -176,15 +190,16 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
             
             <button
               onClick={handleSend}
-              className="p-2.5 bg-green-500 hover:bg-green-600 rounded-full text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 shadow-lg shadow-green-500/30"
+              className="p-3 bg-green-500 hover:bg-green-600 rounded-xl text-black transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 shadow-lg shadow-green-500/30 min-h-[48px] min-w-[48px] flex items-center justify-center hover:scale-105 active:scale-95 disabled:hover:scale-100"
               disabled={!message.trim() && !attachment}
+              aria-label="Send message"
             >
               <Send className="w-5 h-5" />
             </button>
           </div>
           
-          <div className="flex items-center justify-center mt-2">
-            <div className="flex items-center space-x-1 text-xs text-green-500 font-mono">
+          <div className="flex items-center justify-center pt-2">
+            <div className="flex items-center space-x-2 text-xs text-green-500/80 font-mono bg-green-500/10 px-3 py-1.5 rounded-full border border-green-500/20">
               <Shield className="w-3 h-3 flex-shrink-0 animate-pulse" />
               <span className="text-center">QUANTUM_ENCRYPTED_CHANNEL_ACTIVE</span>
             </div>

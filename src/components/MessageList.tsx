@@ -27,8 +27,6 @@ export const MessageList = ({
     const scrollToBottom = () => {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
-    // A small timeout allows the DOM to update before we scroll,
-    // ensuring we scroll to the very bottom, especially after an action.
     const timer = setTimeout(scrollToBottom, 100);
     return () => clearTimeout(timer);
   }, [messages]);
@@ -36,7 +34,7 @@ export const MessageList = ({
   const getStatusIcon = (status: Message['status']) => {
     switch (status) {
       case 'sending':
-        return <Clock className="w-3 h-3 text-gray-400" />;
+        return <Clock className="w-3 h-3 text-gray-400 animate-pulse" />;
       case 'sent':
         return <Check className="w-3 h-3 text-gray-400" />;
       case 'delivered':
@@ -47,31 +45,42 @@ export const MessageList = ({
   };
 
   return (
-    <div className="flex-1 overflow-y-auto px-4 py-6 max-w-4xl mx-auto w-full">
-      <div className="space-y-4">
-        {/* Encryption Notice */}
-        <div className="flex items-center justify-center py-6">
-          <div className="bg-black/90 border border-green-500/50 px-4 py-2 rounded-full flex items-center space-x-2 shadow-lg shadow-green-500/20">
-            <Lock className="w-4 h-4 text-green-500 animate-pulse" />
-            <span className="text-xs text-green-500 font-mono">QUANTUM_ENCRYPTION_PROTOCOL_ACTIVE</span>
+    <div className="flex-1 overflow-y-auto px-4 py-8 max-w-5xl mx-auto w-full">
+      <div className="space-y-6">
+        {/* Enhanced Encryption Notice */}
+        <div className="flex items-center justify-center py-8">
+          <div className="bg-black/95 border border-green-500/60 px-6 py-3 rounded-2xl flex items-center space-x-3 shadow-2xl shadow-green-500/20 backdrop-blur-sm">
+            <div className="relative">
+              <Lock className="w-5 h-5 text-green-500 animate-pulse" />
+              <div className="absolute inset-0 bg-green-500/20 rounded-full animate-ping"></div>
+            </div>
+            <span className="text-sm text-green-500 font-mono font-medium tracking-wide">
+              QUANTUM_ENCRYPTION_PROTOCOL_ACTIVE
+            </span>
           </div>
         </div>
 
         {/* Messages */}
         {messages.map((message, index) => {
           const showUsername = index === 0 || messages[index - 1].sender !== message.sender;
+          const isConsecutive = index > 0 && messages[index - 1].sender === message.sender;
           
           return (
-            <div key={message.id} className="space-y-1">
+            <div key={message.id} className={`space-y-2 ${isConsecutive ? 'mt-2' : 'mt-6'}`}>
               {showUsername && (
                 <div className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'}`}>
-                  <span className="text-xs text-green-400 px-2 font-mono">
-                    [{contactNames[message.sender]}]
-                  </span>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs text-green-400/80 px-3 py-1 bg-green-500/10 rounded-full font-mono border border-green-500/20">
+                      [{contactNames[message.sender]}]
+                    </span>
+                    <span className="text-xs text-gray-500 font-mono">
+                      {message.timestamp}
+                    </span>
+                  </div>
                 </div>
               )}
               
-              <div className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'} group`}>
                 <MessageContextMenu
                   onReply={onReply}
                   messageId={message.id}
@@ -81,43 +90,59 @@ export const MessageList = ({
                   contactName={contactName}
                 >
                   <div
-                    className={`max-w-[85%] sm:max-w-[75%] lg:max-w-xl px-4 py-3 rounded-2xl cursor-pointer select-none border ${
+                    className={`max-w-[85%] sm:max-w-[75%] lg:max-w-2xl px-5 py-4 rounded-2xl cursor-pointer select-none border transition-all duration-200 hover:scale-[1.02] ${
                       message.sender === 'me'
-                        ? 'bg-black/90 text-green-400 border-green-500/50 shadow-lg shadow-green-500/20'
-                        : 'bg-gray-800/90 text-gray-100 border-gray-600/50 shadow-lg'
+                        ? 'bg-black/95 text-green-400 border-green-500/60 shadow-xl shadow-green-500/20 hover:shadow-green-500/30'
+                        : 'bg-gray-800/95 text-gray-100 border-gray-600/60 shadow-xl hover:shadow-lg'
                     }`}
                     style={{ 
                       fontFamily: "'Fira Code', 'Source Code Pro', 'Consolas', 'Monaco', 'Courier New', monospace",
-                      letterSpacing: '0.3px'
+                      letterSpacing: '0.4px'
                     }}
                   >
-                    {/* Reply indicator */}
+                    {/* Enhanced Reply indicator */}
                     {message.replyTo && (
-                      <div className="mb-2 p-2 bg-black/40 rounded-lg border-l-2 border-green-400">
-                        <p className="text-xs text-green-300 font-medium mb-1 font-mono">
-                          {'>'} {message.replyTo.sender}
+                      <div className="mb-3 p-3 bg-black/60 rounded-xl border-l-4 border-green-400 shadow-inner">
+                        <p className="text-xs text-green-300 font-semibold mb-2 font-mono flex items-center space-x-1">
+                          <span className="text-green-500">{'>'}</span>
+                          <span>{message.replyTo.sender}</span>
                         </p>
-                        <p className="text-xs opacity-80 truncate font-mono">
+                        <p className="text-xs opacity-90 truncate font-mono leading-relaxed">
                           {message.replyTo.messageText}
                         </p>
                       </div>
                     )}
                     
-                    {message.attachment && <AttachmentPreview attachment={message.attachment} />}
-                    {message.text && <p className="text-sm break-words font-mono leading-relaxed">{message.text}</p>}
-                    <div className="flex items-center justify-between mt-2 space-x-2">
-                      <div className="flex items-center space-x-1">
+                    {message.attachment && (
+                      <div className="mb-3">
+                        <AttachmentPreview attachment={message.attachment} />
+                      </div>
+                    )}
+                    
+                    {message.text && (
+                      <p className="text-sm break-words font-mono leading-relaxed whitespace-pre-wrap">
+                        {message.text}
+                      </p>
+                    )}
+                    
+                    <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-700/40">
+                      <div className="flex items-center space-x-2">
                         {message.encrypted && (
-                          <Shield className="w-3 h-3 text-green-300 opacity-70 animate-pulse" />
+                          <div className="flex items-center space-x-1">
+                            <Shield className="w-3 h-3 text-green-300/70 animate-pulse" />
+                            <span className="text-xs text-green-300/60 font-mono">ENCRYPTED</span>
+                          </div>
                         )}
-                        <span className={`text-xs font-mono ${
-                          message.sender === 'me' ? 'text-green-300/80' : 'text-gray-400'
-                        }`}>
-                          [{message.timestamp}]
-                        </span>
+                        {!showUsername && (
+                          <span className={`text-xs font-mono ${
+                            message.sender === 'me' ? 'text-green-300/60' : 'text-gray-500'
+                          }`}>
+                            {message.timestamp}
+                          </span>
+                        )}
                       </div>
                       {message.sender === 'me' && (
-                        <div className="flex-shrink-0">
+                        <div className="flex-shrink-0 opacity-70 group-hover:opacity-100 transition-opacity">
                           {getStatusIcon(message.status)}
                         </div>
                       )}
@@ -128,7 +153,7 @@ export const MessageList = ({
             </div>
           );
         })}
-        <div ref={messagesEndRef} />
+        <div ref={messagesEndRef} className="h-4" />
       </div>
     </div>
   );
