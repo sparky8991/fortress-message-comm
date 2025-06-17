@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -52,7 +51,7 @@ const Index = () => {
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="flex flex-col items-center space-y-4">
           <Loader2 className="w-12 h-12 text-green-500 animate-spin" />
-          <p className="text-green-400 font-mono text-sm">INITIALIZING_SECURE_CONNECTION...</p>
+          <p className="text-green-400 font-mono text-sm">INITIALIZING...</p>
         </div>
       </div>
     );
@@ -97,10 +96,10 @@ const Index = () => {
               {isMobile && (
                   <button 
                       onClick={() => setSidebarOpen(true)}
-                      className="fixed top-4 left-4 z-50 p-3 bg-gray-800/95 hover:bg-gray-700/95 rounded-xl text-white backdrop-blur-sm border border-gray-600/60 shadow-2xl transition-all duration-200 hover:scale-105 active:scale-95 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                      className="fixed top-3 left-3 z-50 p-2.5 bg-gray-800/95 hover:bg-gray-700/95 rounded-lg text-white backdrop-blur-sm border border-gray-600/60 shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 min-h-[40px] min-w-[40px] flex items-center justify-center"
                       aria-label="Open sidebar"
                   >
-                      <Menu className="h-5 w-5" />
+                      <Menu className="h-4 w-4" />
                   </button>
               )}
               <ChatArea 
