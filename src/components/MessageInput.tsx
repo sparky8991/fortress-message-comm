@@ -98,16 +98,16 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
           onCancelReply={onCancelReply || (() => {})} 
         />
 
-        <div className="p-3 md:p-4 space-y-3 mx-2 md:mx-0">
+        <div className="p-2.5 md:p-3 space-y-2.5 mx-2 md:mx-0">
           {attachment && (
             <div className="px-3 py-2 bg-black/90 border border-green-500/40 rounded-lg flex items-center justify-between animate-in fade-in-50 duration-200 min-w-0 shadow-lg shadow-green-500/10">
               <div className="flex items-center space-x-2 overflow-hidden min-w-0 flex-1">
                 {isEncryptedFile ? (
-                  <div className="p-1.5 bg-red-500/20 rounded">
+                  <div className="p-1 bg-red-500/20 rounded">
                     <Terminal className="w-3 h-3 text-red-400 animate-pulse" />
                   </div>
                 ) : (
-                  <div className="p-1.5 bg-gray-600/40 rounded">
+                  <div className="p-1 bg-gray-600/40 rounded">
                     <FileText className="w-3 h-3 text-gray-300" />
                   </div>
                 )}
@@ -126,7 +126,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                   setEncryptionMetadata(null);
                   setMessage('');
                 }} 
-                className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-600/50 rounded transition-all duration-200 flex-shrink-0 ml-2 min-h-[36px] min-w-[36px] flex items-center justify-center"
+                className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-600/50 rounded transition-all duration-200 flex-shrink-0 ml-2 min-h-[32px] min-w-[32px] flex items-center justify-center"
                 aria-label="Remove attachment"
               >
                 <X className="w-3 h-3" />
@@ -140,20 +140,20 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
             <div className="flex space-x-1 flex-shrink-0">
               <button 
                 onClick={() => fileInputRef.current?.click()} 
-                className="p-3 text-gray-300 hover:text-white hover:bg-gray-700/80 rounded-lg transition-all duration-200 flex-shrink-0 min-h-[48px] min-w-[48px] flex items-center justify-center hover:scale-105 active:scale-95"
+                className="p-2.5 text-gray-300 hover:text-white hover:bg-gray-700/80 rounded-lg transition-all duration-200 flex-shrink-0 min-h-[40px] min-w-[40px] flex items-center justify-center hover:scale-105 active:scale-95"
                 title="Attach File"
                 aria-label="Attach file"
               >
-                <Paperclip className="w-5 h-5" />
+                <Paperclip className="w-4 h-4" />
               </button>
               
               <button 
                 onClick={() => setShowEncryptedUpload(true)} 
-                className="p-3 text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded-lg transition-all duration-200 flex-shrink-0 min-h-[48px] min-w-[48px] flex items-center justify-center hover:scale-105 active:scale-95"
+                className="p-2.5 text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded-lg transition-all duration-200 flex-shrink-0 min-h-[40px] min-w-[40px] flex items-center justify-center hover:scale-105 active:scale-95"
                 title="Encrypt Image"
                 aria-label="Encrypt and attach image"
               >
-                <Lock className="w-5 h-5 animate-pulse" />
+                <Lock className="w-4 h-4 animate-pulse" />
               </button>
             </div>
             
@@ -163,22 +163,22 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
-                className="w-full px-4 py-3 bg-black/95 border border-green-500/60 rounded-lg text-green-400 placeholder-green-600/60 focus:outline-none focus:ring-2 focus:ring-green-500/80 focus:border-green-400/80 pr-12 text-base font-mono resize-none min-h-[48px] max-h-32 shadow-inner shadow-green-500/10 caret-green-400 transition-all duration-200"
-                rows={message.split('\n').length > 1 ? Math.min(message.split('\n').length, 4) : 1}
+                className="w-full px-3 py-2.5 bg-black/95 border border-green-500/60 rounded-lg text-green-400 placeholder-green-600/60 focus:outline-none focus:ring-2 focus:ring-green-500/80 focus:border-green-400/80 pr-10 text-sm font-mono resize-none min-h-[40px] max-h-28 shadow-inner shadow-green-500/10 caret-green-400 transition-all duration-200"
+                rows={message.split('\n').length > 1 ? Math.min(message.split('\n').length, 3) : 1}
                 style={{ 
                   fontFamily: "'Fira Code', 'Source Code Pro', 'Consolas', 'Monaco', 'Courier New', monospace",
-                  letterSpacing: '0.2px',
-                  lineHeight: '1.4'
+                  letterSpacing: '0.1px',
+                  lineHeight: '1.3'
                 }}
                 aria-label="Message input"
               />
-              <div className="absolute right-3 top-3">
+              <div className="absolute right-2.5 top-2.5">
                 <button 
                   onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                  className="p-2 text-green-400 hover:text-green-300 hover:bg-green-500/20 rounded transition-all duration-200 min-h-[32px] min-w-[32px] flex items-center justify-center"
+                  className="p-1.5 text-green-400 hover:text-green-300 hover:bg-green-500/20 rounded transition-all duration-200 min-h-[28px] min-w-[28px] flex items-center justify-center"
                   aria-label="Add emoji"
                 >
-                  <Smile className="w-5 h-5" />
+                  <Smile className="w-4 h-4" />
                 </button>
                 <EmojiPicker
                   onEmojiSelect={handleEmojiSelect}
@@ -190,16 +190,16 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
             
             <button
               onClick={handleSend}
-              className="p-3 bg-green-500 hover:bg-green-600 rounded-lg text-black transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 shadow-lg shadow-green-500/30 min-h-[48px] min-w-[48px] flex items-center justify-center hover:scale-105 active:scale-95 disabled:hover:scale-100 mr-2"
+              className="p-2.5 bg-green-500 hover:bg-green-600 rounded-lg text-black transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 shadow-lg shadow-green-500/30 min-h-[40px] min-w-[40px] flex items-center justify-center hover:scale-105 active:scale-95 disabled:hover:scale-100 mr-2"
               disabled={!message.trim() && !attachment}
               aria-label="Send message"
             >
-              <Send className="w-5 h-5" />
+              <Send className="w-4 h-4" />
             </button>
           </div>
           
           <div className="flex items-center justify-center pt-1">
-            <div className="flex items-center space-x-2 text-xs text-green-500/80 font-mono bg-green-500/10 px-3 py-1.5 rounded-full border border-green-500/20">
+            <div className="flex items-center space-x-1.5 text-xs text-green-500/80 font-mono bg-green-500/10 px-2.5 py-1 rounded-full border border-green-500/20">
               <Shield className="w-3 h-3 flex-shrink-0 animate-pulse" />
               <span className="text-center font-medium">END-TO-END ENCRYPTED</span>
             </div>

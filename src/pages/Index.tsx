@@ -99,10 +99,10 @@ const Index = () => {
               {isMobile && (
                   <button 
                       onClick={() => setSidebarOpen(true)}
-                      className="fixed top-4 left-4 z-50 p-3 bg-gray-800/95 hover:bg-gray-700/95 rounded-xl text-white backdrop-blur-sm border border-gray-600/60 shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 min-h-[48px] min-w-[48px] flex items-center justify-center"
+                      className="fixed top-3 left-3 z-50 p-2.5 bg-gray-800/95 hover:bg-gray-700/95 rounded-xl text-white backdrop-blur-sm border border-gray-600/60 shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 min-h-[40px] min-w-[40px] flex items-center justify-center"
                       aria-label="Open sidebar"
                   >
-                      <Menu className="h-5 w-5" />
+                      <Menu className="h-4 w-4" />
                   </button>
               )}
               <div className="flex-1 flex flex-col min-w-0 max-w-full">
