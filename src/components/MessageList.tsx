@@ -49,13 +49,13 @@ export const MessageList = ({
       <div className="space-y-4">
         {/* Enhanced Encryption Notice */}
         <div className="flex items-center justify-center py-6">
-          <div className="bg-black/95 border border-green-500/60 px-4 py-2 rounded-xl flex items-center space-x-2 shadow-2xl shadow-green-500/20 backdrop-blur-sm">
+          <div className="bg-black/95 border border-green-500/60 px-4 py-3 rounded-xl flex items-center space-x-3 shadow-2xl shadow-green-500/20 backdrop-blur-sm">
             <div className="relative">
-              <Lock className="w-4 h-4 text-green-500 animate-pulse" />
+              <Lock className="w-5 h-5 text-green-500 animate-pulse" />
               <div className="absolute inset-0 bg-green-500/20 rounded-full animate-ping"></div>
             </div>
-            <span className="text-xs text-green-500 font-mono font-medium tracking-wide">
-              ENCRYPTED_CHANNEL
+            <span className="text-sm text-green-500 font-mono font-semibold tracking-wide">
+              ENCRYPTED_CHANNEL_ACTIVE
             </span>
           </div>
         </div>
@@ -66,14 +66,14 @@ export const MessageList = ({
           const isConsecutive = index > 0 && messages[index - 1].sender === message.sender;
           
           return (
-            <div key={message.id} className={`space-y-1.5 ${isConsecutive ? 'mt-1' : 'mt-4'}`}>
+            <div key={message.id} className={`space-y-2 ${isConsecutive ? 'mt-2' : 'mt-6'}`}>
               {showUsername && (
                 <div className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'}`}>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-xs text-green-400/80 px-2 py-0.5 bg-green-500/10 rounded-full font-mono border border-green-500/20">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-sm text-green-400/90 px-3 py-1 bg-green-500/15 rounded-full font-mono border border-green-500/30 font-medium">
                       {contactNames[message.sender]}
                     </span>
-                    <span className="text-xs text-gray-500 font-mono">
+                    <span className="text-xs text-gray-400 font-mono">
                       {message.timestamp}
                     </span>
                   </div>
@@ -90,7 +90,7 @@ export const MessageList = ({
                   contactName={contactName}
                 >
                   <div
-                    className={`max-w-[85%] sm:max-w-[75%] lg:max-w-xl px-3 py-2.5 rounded-xl cursor-pointer select-none border transition-all duration-200 hover:scale-[1.01] ${
+                    className={`max-w-[85%] sm:max-w-[75%] lg:max-w-xl px-4 py-3 rounded-xl cursor-pointer select-none border transition-all duration-200 hover:scale-[1.01] ${
                       message.sender === 'me'
                         ? 'bg-black/95 text-green-400 border-green-500/60 shadow-lg shadow-green-500/20 hover:shadow-green-500/30'
                         : 'bg-gray-800/95 text-gray-100 border-gray-600/60 shadow-lg hover:shadow-lg'
@@ -102,7 +102,7 @@ export const MessageList = ({
                   >
                     {/* Reply indicator */}
                     {message.replyTo && (
-                      <div className="mb-2 p-2 bg-black/60 rounded-lg border-l-2 border-green-400 shadow-inner">
+                      <div className="mb-3 p-3 bg-black/60 rounded-lg border-l-2 border-green-400 shadow-inner">
                         <p className="text-xs text-green-300 font-semibold mb-1 font-mono flex items-center space-x-1">
                           <span className="text-green-500">{'>'}</span>
                           <span>{message.replyTo.sender}</span>
@@ -114,7 +114,7 @@ export const MessageList = ({
                     )}
                     
                     {message.attachment && (
-                      <div className="mb-2">
+                      <div className="mb-3">
                         <AttachmentPreview attachment={message.attachment} />
                       </div>
                     )}
@@ -125,17 +125,17 @@ export const MessageList = ({
                       </p>
                     )}
                     
-                    <div className="flex items-center justify-between mt-2 pt-1.5 border-t border-gray-700/40">
-                      <div className="flex items-center space-x-2">
+                    <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-700/40">
+                      <div className="flex items-center space-x-3">
                         {message.encrypted && (
-                          <div className="flex items-center space-x-1">
-                            <Shield className="w-2.5 h-2.5 text-green-300/70 animate-pulse" />
-                            <span className="text-xs text-green-300/60 font-mono">ENCRYPTED</span>
+                          <div className="flex items-center space-x-1.5">
+                            <Shield className="w-3 h-3 text-green-400/80 animate-pulse" />
+                            <span className="text-xs text-green-400/70 font-mono font-medium">ENCRYPTED</span>
                           </div>
                         )}
                         {!showUsername && (
                           <span className={`text-xs font-mono ${
-                            message.sender === 'me' ? 'text-green-300/60' : 'text-gray-500'
+                            message.sender === 'me' ? 'text-green-300/60' : 'text-gray-400'
                           }`}>
                             {message.timestamp}
                           </span>
@@ -150,10 +150,17 @@ export const MessageList = ({
                   </div>
                 </MessageContextMenu>
               </div>
+              
+              {/* Subtle separator for consecutive messages */}
+              {isConsecutive && index < messages.length - 1 && messages[index + 1].sender === message.sender && (
+                <div className="flex justify-center">
+                  <div className="w-1 h-1 bg-gray-600/30 rounded-full"></div>
+                </div>
+              )}
             </div>
           );
         })}
-        <div ref={messagesEndRef} className="h-2" />
+        <div ref={messagesEndRef} className="h-4" />
       </div>
     </div>
   );
