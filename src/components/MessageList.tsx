@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import { Shield, Lock, Check, CheckCheck, Clock } from 'lucide-react';
 import { AttachmentPreview } from './AttachmentPreview';
@@ -47,7 +46,7 @@ export const MessageList = ({
   };
 
   return (
-    <div className="flex-1 overflow-y-auto px-2 md:px-3 py-2 md:py-4 max-w-5xl mx-auto w-full">
+    <div className="px-2 md:px-3 py-2 md:py-4 max-w-5xl mx-auto w-full">
       <div className="space-y-3 md:space-y-4">
         {/* Enhanced Encryption Notice */}
         <div className="flex items-center justify-center py-3 md:py-6">
@@ -164,7 +163,7 @@ export const MessageList = ({
             </div>
           );
         })}
-        <div ref={messagesEndRef} className="h-2 md:h-4" />
+        <div ref={messagesEndRef} className="h-8" />
       </div>
     </div>
   );

@@ -63,9 +63,9 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-black flex overflow-hidden h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-black">
       {isInCall ? (
-        <div className="w-full px-2 md:px-4">
+        <div className="w-full px-2 md:px-4 py-4">
           <CallInterface 
             callType={callType}
             onEndCall={() => setIsInCall(false)}
@@ -73,7 +73,7 @@ const Index = () => {
           />
         </div>
       ) : (
-        <>
+        <div className="flex w-full">
           {/* Sidebar */}
           <div
             className={cn(
@@ -97,20 +97,18 @@ const Index = () => {
               />
           )}
 
-          {/* Main chat area - adjusted padding to ensure header is visible */}
-          <div className="flex-1 flex flex-col relative overflow-hidden">
-              <div className="flex-1 flex flex-col min-w-0 max-w-full">
-                <ChatArea 
-                  activeChat={activeChat}
-                  onStartCall={(type) => {
-                    setCallType(type);
-                    setIsInCall(true);
-                  }}
-                  onToggleSidebar={() => setSidebarOpen(true)}
-                />
-              </div>
+          {/* Main chat area */}
+          <div className="flex-1 min-w-0">
+            <ChatArea 
+              activeChat={activeChat}
+              onStartCall={(type) => {
+                setCallType(type);
+                setIsInCall(true);
+              }}
+              onToggleSidebar={() => setSidebarOpen(true)}
+            />
           </div>
-        </>
+        </div>
       )}
     </div>
   );
