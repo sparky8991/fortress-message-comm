@@ -1,7 +1,8 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { Shield, LogIn, ShieldAlert } from 'lucide-react';
+import { Shield, Mail, Lock, ArrowRight } from 'lucide-react';
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -85,71 +86,90 @@ const AuthPage = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-md bg-gray-800 p-8 rounded-2xl border border-gray-700 shadow-2xl shadow-green-500/10">
-        <div className="flex flex-col items-center justify-center mb-6 text-center">
-          <div className="flex items-center justify-center space-x-3 mb-2">
-            <Shield className="w-8 h-8 text-green-500 flex-shrink-0" />
-            <h1 className="text-3xl font-bold text-white font-mono tracking-tight">SecureChat</h1>
+    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-green-500 rounded-2xl mb-6">
+            <Shield className="w-10 h-10 text-slate-900" />
           </div>
-          <p className="text-green-500 text-sm font-medium font-mono tracking-wide">MILITARY_GRADE_ENCRYPTION_ACTIVE</p>
+          <h1 className="text-4xl font-bold text-white mb-2">SecureChat</h1>
+          <p className="text-green-500 text-sm font-mono tracking-wider">MILITARY-GRADE ENCRYPTION</p>
         </div>
 
+        {/* Form */}
         <form onSubmit={handleAuth} className="space-y-6">
-          <input
-            type="email"
-            placeholder="EMAIL_ADDRESS"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-green-400 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 font-mono"
-          />
-          <input
-            type="password"
-            placeholder="PASSWORD"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-green-400 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 font-mono"
-          />
-          
+          {/* Email Input */}
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Mail className="h-5 w-5 text-green-500" />
+            </div>
+            <input
+              type="email"
+              placeholder="Enter Email Address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full pl-12 pr-4 py-4 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            />
+          </div>
+
+          {/* Password Input */}
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Lock className="h-5 w-5 text-green-500" />
+            </div>
+            <input
+              type="password"
+              placeholder="Enter Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full pl-12 pr-4 py-4 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            />
+          </div>
+
+          {/* Sign In Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex items-center justify-center py-3 px-4 bg-green-500 hover:bg-green-600 rounded-lg text-black font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-mono"
+            className="w-full flex items-center justify-center py-4 px-6 bg-green-500 hover:bg-green-600 rounded-xl text-slate-900 font-bold text-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <LogIn className="w-5 h-5 mr-2" />
-            {loading ? 'PROCESSING...' : isLogin ? 'SIGN_IN' : 'SIGN_UP'}
+            <ArrowRight className="w-6 h-6 mr-3" />
+            {loading ? 'PROCESSING...' : 'SIGN IN'}
           </button>
         </form>
 
+        {/* Success Message */}
         {success && (
-          <p className="mt-4 text-center text-green-400 bg-green-900/50 p-3 rounded-lg font-mono text-sm">{success}</p>
-        )}
-
-        {error && (
-          <div className="mt-6 bg-black border border-red-700 rounded-lg p-4 font-mono text-sm text-red-400/90 shadow-lg shadow-red-500/10">
-            <div className="flex items-center gap-x-2 border-b border-red-700/50 pb-2 mb-2">
-              <ShieldAlert className="w-5 h-5 text-red-500 flex-shrink-0" />
-              <span className="font-bold text-red-500">SYSTEM_ALERT: AUTHENTICATION_FAILURE</span>
-            </div>
-            <pre className="whitespace-pre-wrap text-xs">{error}</pre>
+          <div className="mt-6 p-4 bg-green-900/50 border border-green-700 rounded-xl">
+            <p className="text-green-400 text-sm font-mono">{success}</p>
           </div>
         )}
 
-        <p className="mt-6 text-center text-sm text-gray-400 font-mono">
-          {isLogin ? "DON'T_HAVE_ACCOUNT?" : 'ALREADY_HAVE_ACCOUNT?'}
-          <button
-            onClick={() => {
-              setIsLogin(!isLogin);
-              setError(null);
-              setSuccess(null);
-            }}
-            className="ml-2 font-medium text-green-500 hover:underline font-mono"
-          >
-            {isLogin ? 'SIGN_UP' : 'SIGN_IN'}
-          </button>
-        </p>
+        {/* Error Message */}
+        {error && (
+          <div className="mt-6 p-4 bg-red-900/50 border border-red-700 rounded-xl">
+            <pre className="text-red-400 text-xs font-mono whitespace-pre-wrap">{error}</pre>
+          </div>
+        )}
+
+        {/* Sign Up Link */}
+        <div className="mt-8 text-center">
+          <p className="text-slate-400">
+            Don't have an account?{' '}
+            <button
+              onClick={() => {
+                setIsLogin(!isLogin);
+                setError(null);
+                setSuccess(null);
+              }}
+              className="text-green-500 hover:text-green-400 font-medium transition-colors"
+            >
+              SIGN UP
+            </button>
+          </p>
+        </div>
       </div>
     </div>
   );
