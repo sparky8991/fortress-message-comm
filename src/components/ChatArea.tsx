@@ -11,9 +11,10 @@ import { useChatMessages } from '@/hooks/useChatMessages';
 interface ChatAreaProps {
   activeChat: string;
   onStartCall: (type: 'voice' | 'video') => void;
+  onToggleSidebar?: () => void;
 }
 
-export const ChatArea = ({ activeChat, onStartCall }: ChatAreaProps) => {
+export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaProps) => {
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
   const [notificationSettings, setNotificationSettings] = useState({
     unreadReminderEnabled: true,
@@ -41,6 +42,7 @@ export const ChatArea = ({ activeChat, onStartCall }: ChatAreaProps) => {
           contact={contact}
           onStartCall={onStartCall}
           onShowNotificationSettings={() => setShowNotificationSettings(true)}
+          onToggleSidebar={onToggleSidebar}
         />
       </div>
 

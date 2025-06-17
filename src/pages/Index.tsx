@@ -6,7 +6,7 @@ import { Sidebar } from '@/components/Sidebar';
 import { ChatArea } from '@/components/ChatArea';
 import { CallInterface } from '@/components/CallInterface';
 import { Session } from '@supabase/supabase-js';
-import { Loader2, Menu } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 
@@ -74,6 +74,7 @@ const Index = () => {
         </div>
       ) : (
         <>
+          {/* Sidebar */}
           <div
             className={cn(
                 'md:flex flex-col',
@@ -88,6 +89,7 @@ const Index = () => {
             />
           </div>
 
+          {/* Mobile overlay */}
           {isMobile && sidebarOpen && (
               <div 
                 className="fixed inset-0 bg-black/60 backdrop-blur-sm z-20 transition-opacity duration-300" 
@@ -95,16 +97,8 @@ const Index = () => {
               />
           )}
 
-          <div className="flex-1 flex flex-col relative px-2 md:px-4 max-w-full overflow-hidden">
-              {isMobile && (
-                  <button 
-                      onClick={() => setSidebarOpen(true)}
-                      className="fixed top-3 left-3 z-50 p-2.5 bg-gray-800/95 hover:bg-gray-700/95 rounded-xl text-white backdrop-blur-sm border border-gray-600/60 shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 min-h-[40px] min-w-[40px] flex items-center justify-center"
-                      aria-label="Open sidebar"
-                  >
-                      <Menu className="h-4 w-4" />
-                  </button>
-              )}
+          {/* Main chat area */}
+          <div className="flex-1 flex flex-col relative px-1 md:px-4 max-w-full overflow-hidden">
               <div className="flex-1 flex flex-col min-w-0 max-w-full">
                 <ChatArea 
                   activeChat={activeChat}
@@ -112,6 +106,7 @@ const Index = () => {
                     setCallType(type);
                     setIsInCall(true);
                   }}
+                  onToggleSidebar={() => setSidebarOpen(true)}
                 />
               </div>
           </div>
