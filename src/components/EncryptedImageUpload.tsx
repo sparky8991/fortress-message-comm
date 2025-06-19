@@ -63,8 +63,8 @@ export const EncryptedImageUpload = ({ onEncryptedImageReady, onCancel }: Encryp
   };
 
   return (
-    <div className="fixed inset-0 bg-black z-[9999] flex items-center justify-center">
-      <div className="bg-gray-900 border-2 border-green-500/50 w-full h-full flex flex-col justify-center p-12">
+    <div className="fixed top-0 left-0 w-screen h-screen bg-black z-[9999] overflow-hidden">
+      <div className="w-full h-full bg-gray-900 border-2 border-green-500/50 flex flex-col justify-center p-12">
         {/* Header */}
         <div className="flex items-center justify-between mb-12">
           <div className="flex items-center space-x-4">
