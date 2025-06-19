@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { MessageList } from './MessageList';
 import { NotificationSettings } from './NotificationSettings';
@@ -18,6 +17,7 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
   const [notificationSettings, setNotificationSettings] = useState({
     unreadReminderEnabled: true,
+    reminderTimerEnabled: true,
     unreadReminderTime: 5
   });
 

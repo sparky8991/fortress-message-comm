@@ -5,6 +5,7 @@ import { Message } from '@/constants/initialMessages';
 
 interface NotificationSettings {
   unreadReminderEnabled: boolean;
+  reminderTimerEnabled: boolean;
   unreadReminderTime: number; // in minutes
 }
 
@@ -12,7 +13,7 @@ export const useNotifications = (messages: Message[], settings: NotificationSett
   const [notifiedMessages, setNotifiedMessages] = useState<Set<string>>(new Set());
 
   const checkUnreadMessages = useCallback(() => {
-    if (!settings.unreadReminderEnabled) return;
+    if (!settings.unreadReminderEnabled || !settings.reminderTimerEnabled) return;
 
     const now = new Date();
     const unreadMessages = messages.filter(message => 

@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Bell, Settings, Clock } from 'lucide-react';
+import { Bell, Settings, Clock, Timer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,6 +14,7 @@ interface NotificationSettingsProps {
 
 export const NotificationSettings = ({ isOpen, onClose }: NotificationSettingsProps) => {
   const [unreadReminderEnabled, setUnreadReminderEnabled] = useState(true);
+  const [reminderTimerEnabled, setReminderTimerEnabled] = useState(true);
   const [unreadReminderTime, setUnreadReminderTime] = useState(5);
 
   if (!isOpen) return null;
@@ -47,6 +48,24 @@ export const NotificationSettings = ({ isOpen, onClose }: NotificationSettingsPr
             </div>
 
             {unreadReminderEnabled && (
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label className="text-white flex items-center space-x-2">
+                    <Timer className="w-4 h-4" />
+                    <span>Reminder Timer</span>
+                  </Label>
+                  <p className="text-sm text-gray-400">
+                    Enable time-based reminder notifications
+                  </p>
+                </div>
+                <Switch
+                  checked={reminderTimerEnabled}
+                  onCheckedChange={setReminderTimerEnabled}
+                />
+              </div>
+            )}
+
+            {unreadReminderEnabled && reminderTimerEnabled && (
               <div className="space-y-2">
                 <Label htmlFor="reminderTime" className="text-white flex items-center space-x-2">
                   <Clock className="w-4 h-4" />
