@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { MessageList } from './MessageList';
 import { NotificationSettings } from './NotificationSettings';
@@ -33,6 +34,10 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
   const contact = contactInfo[activeChat as keyof typeof contactInfo];
   
   useNotifications(currentMessages, notificationSettings);
+
+  const handleSaveNotificationSettings = (newSettings: typeof notificationSettings) => {
+    setNotificationSettings(newSettings);
+  };
 
   return (
     <div className="flex flex-col bg-gray-900 min-h-screen w-full">
@@ -70,6 +75,8 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
       <NotificationSettings
         isOpen={showNotificationSettings}
         onClose={() => setShowNotificationSettings(false)}
+        settings={notificationSettings}
+        onSave={handleSaveNotificationSettings}
       />
     </div>
   );

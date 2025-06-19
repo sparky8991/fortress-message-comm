@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { Bell, Settings, Clock, Timer } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Bell, Settings, Clock, Timer, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,12 +10,38 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 interface NotificationSettingsProps {
   isOpen: boolean;
   onClose: () => void;
+  settings: {
+    unreadReminderEnabled: boolean;
+    reminderTimerEnabled: boolean;
+    unreadReminderTime: number;
+  };
+  onSave: (settings: {
+    unreadReminderEnabled: boolean;
+    reminderTimerEnabled: boolean;
+    unreadReminderTime: number;
+  }) => void;
 }
 
-export const NotificationSettings = ({ isOpen, onClose }: NotificationSettingsProps) => {
-  const [unreadReminderEnabled, setUnreadReminderEnabled] = useState(true);
-  const [reminderTimerEnabled, setReminderTimerEnabled] = useState(true);
-  const [unreadReminderTime, setUnreadReminderTime] = useState(5);
+export const NotificationSettings = ({ isOpen, onClose, settings, onSave }: NotificationSettingsProps) => {
+  const [unreadReminderEnabled, setUnreadReminderEnabled] = useState(settings.unreadReminderEnabled);
+  const [reminderTimerEnabled, setReminderTimerEnabled] = useState(settings.reminderTimerEnabled);
+  const [unreadReminderTime, setUnreadReminderTime] = useState(settings.unreadReminderTime);
+
+  // Update local state when settings prop changes
+  useEffect(() => {
+    setUnreadReminderEnabled(settings.unreadReminderEnabled);
+    setReminderTimerEnabled(settings.reminderTimerEnabled);
+    setUnreadReminderTime(settings.unreadReminderTime);
+  }, [settings]);
+
+  const handleSave = () => {
+    onSave({
+      unreadReminderEnabled,
+      reminderTimerEnabled,
+      unreadReminderTime
+    });
+    onClose();
+  };
 
   if (!isOpen) return null;
 
@@ -36,7 +62,14 @@ export const NotificationSettings = ({ isOpen, onClose }: NotificationSettingsPr
           <CardContent className="space-y-6">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label className="text-white">Unread Message Reminders</Label>
+                <Label className="text-white flex items-center space-x-2">
+                  {unreadReminderEnabled ? (
+                    <Check className="w-4 h-4 text-green-500" />
+                  ) : (
+                    <X className="w-4 h-4 text-red-500" />
+                  )}
+                  <span>Unread Message Reminders</span>
+                </Label>
                 <p className="text-sm text-gray-400">
                   Get notified when messages haven't been read
                 </p>
@@ -51,7 +84,11 @@ export const NotificationSettings = ({ isOpen, onClose }: NotificationSettingsPr
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label className="text-white flex items-center space-x-2">
-                    <Timer className="w-4 h-4" />
+                    {reminderTimerEnabled ? (
+                      <Check className="w-4 h-4 text-green-500" />
+                    ) : (
+                      <X className="w-4 h-4 text-red-500" />
+                    )}
                     <span>Reminder Timer</span>
                   </Label>
                   <p className="text-sm text-gray-400">
@@ -90,7 +127,7 @@ export const NotificationSettings = ({ isOpen, onClose }: NotificationSettingsPr
               <Button variant="outline" onClick={onClose} className="border-gray-600 text-gray-300">
                 Cancel
               </Button>
-              <Button className="bg-green-600 hover:bg-green-700">
+              <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700">
                 Save Settings
               </Button>
             </div>
