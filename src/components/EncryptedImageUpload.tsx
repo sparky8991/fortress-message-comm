@@ -63,8 +63,8 @@ export const EncryptedImageUpload = ({ onEncryptedImageReady, onCancel }: Encryp
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-start justify-center pt-16 p-4 overflow-y-auto">
-      <div className="bg-gray-900 border-2 border-green-500/50 rounded-lg p-4 shadow-2xl w-full max-w-md animate-in fade-in-50 zoom-in-95">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-gray-900 border-2 border-green-500/50 rounded-lg p-4 shadow-2xl w-full max-w-md animate-in fade-in-50 zoom-in-95 my-4" style={{ marginTop: '10vh' }}>
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
