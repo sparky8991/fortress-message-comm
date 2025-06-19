@@ -63,23 +63,23 @@ export const EncryptedImageUpload = ({ onEncryptedImageReady, onCancel }: Encryp
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-gray-900 border-2 border-green-500/50 rounded-lg p-4 shadow-2xl w-full max-w-md animate-in fade-in-50 zoom-in-95 my-4" style={{ marginTop: '10vh' }}>
+    <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-8">
+      <div className="bg-gray-900 border-2 border-green-500/50 rounded-lg p-8 shadow-2xl w-full max-w-2xl min-h-[60vh] animate-in fade-in-50 zoom-in-95 flex flex-col justify-center">
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-2">
-            <Lock className="w-5 h-5 text-green-400" />
-            <h3 className="text-lg font-semibold text-white">ENCRYPT PAYLOAD</h3>
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center space-x-3">
+            <Lock className="w-8 h-8 text-green-400" />
+            <h3 className="text-2xl font-bold text-white">ENCRYPT PAYLOAD</h3>
           </div>
           <button
             onClick={onCancel}
-            className="p-1 text-gray-400 hover:text-white rounded-full hover:bg-gray-700 transition-colors"
+            className="p-2 text-gray-400 hover:text-white rounded-full hover:bg-gray-700 transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-6 h-6" />
           </button>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-8 flex-1">
           <FileSelector selectedFile={selectedFile} onFileSelect={setSelectedFile} />
           <PasswordDisplay 
             password={generatedPassword}
@@ -89,20 +89,20 @@ export const EncryptedImageUpload = ({ onEncryptedImageReady, onCancel }: Encryp
         </div>
 
         {/* Action Buttons */}
-        <div className="flex space-x-2 mt-6">
+        <div className="flex space-x-4 mt-8">
           <Button
             onClick={handleEncryptAndUpload}
             disabled={!selectedFile || isEncrypting}
-            className="flex-1 bg-green-600 hover:bg-green-700 text-white text-sm"
+            className="flex-1 bg-green-600 hover:bg-green-700 text-white text-lg py-6"
           >
             {isEncrypting ? (
               <>
-                <Lock className="w-4 h-4 mr-2 animate-spin" />
+                <Lock className="w-5 h-5 mr-3 animate-spin" />
                 ENCRYPTING...
               </>
             ) : (
               <>
-                <Shield className="w-4 h-4 mr-2" />
+                <Shield className="w-5 h-5 mr-3" />
                 ENCRYPT & DEPLOY
               </>
             )}
@@ -110,7 +110,7 @@ export const EncryptedImageUpload = ({ onEncryptedImageReady, onCancel }: Encryp
           <Button
             variant="outline"
             onClick={onCancel}
-            className="bg-gray-700 border-gray-600 text-white hover:bg-gray-600 text-sm"
+            className="bg-gray-700 border-gray-600 text-white hover:bg-gray-600 text-lg py-6 px-8"
           >
             ABORT
           </Button>
