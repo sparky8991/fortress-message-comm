@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Lock, Shield, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
@@ -62,8 +63,8 @@ export const EncryptedImageUpload = ({ onEncryptedImageReady, onCancel }: Encryp
     }
   };
 
-  return (
-    <div className="fixed top-0 left-0 w-screen h-screen bg-black z-[9999] overflow-hidden">
+  const modalContent = (
+    <div className="fixed inset-0 w-full h-full bg-black z-[10000] overflow-hidden">
       <div className="w-full h-full bg-gray-900 border-2 border-green-500/50 flex flex-col justify-center p-12">
         {/* Header */}
         <div className="flex items-center justify-between mb-12">
@@ -118,4 +119,6 @@ export const EncryptedImageUpload = ({ onEncryptedImageReady, onCancel }: Encryp
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };
