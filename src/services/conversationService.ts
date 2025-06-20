@@ -60,7 +60,11 @@ export const conversationService = {
       .order('last_message_at', { ascending: false, nullsFirst: false });
 
     if (error) throw error;
-    return data || [];
+    return (data || []).map(conv => ({
+      ...conv,
+      type: conv.type as 'direct' | 'group',
+      participants: conv.conversation_participants
+    }));
   },
 
   async getMessages(conversationId: string): Promise<DirectMessage[]> {
@@ -71,7 +75,10 @@ export const conversationService = {
       .order('sent_at', { ascending: true });
 
     if (error) throw error;
-    return data || [];
+    return (data || []).map(msg => ({
+      ...msg,
+      message_type: msg.message_type as 'text' | 'image' | 'file' | 'system'
+    }));
   },
 
   async sendMessage(
@@ -111,7 +118,10 @@ export const conversationService = {
       })
       .eq('id', conversationId);
 
-    return data;
+    return {
+      ...data,
+      message_type: data.message_type as 'text' | 'image' | 'file' | 'system'
+    };
   },
 
   async markMessageAsRead(messageId: string): Promise<void> {

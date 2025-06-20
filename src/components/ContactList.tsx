@@ -26,7 +26,8 @@ export const ContactList = ({
     const teamContacts = Object.entries(contactInfo).map(([id, contact]) => ({
       id,
       ...contact,
-      type: 'team'
+      type: 'team',
+      lastMessage: contact.lastMessage || 'No messages yet'
     }));
 
     const directConversations = conversations.map(conv => {
