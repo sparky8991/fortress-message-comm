@@ -8,6 +8,7 @@ import { CallInterface } from '@/components/CallInterface';
 import { Session } from '@supabase/supabase-js';
 import { Loader2 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useDirectMessages } from '@/hooks/useDirectMessages';
 import { cn } from '@/lib/utils';
 
 const Index = () => {
@@ -19,6 +20,7 @@ const Index = () => {
   const [callType, setCallType] = useState<'voice' | 'video'>('voice');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
+  const { activeConversation } = useDirectMessages();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -47,6 +49,20 @@ const Index = () => {
     }
   };
 
+  // Determine the current chat type and ID
+  const getCurrentChatInfo = () => {
+    if (activeConversation) {
+      return {
+        id: activeConversation,
+        type: 'direct' as const
+      };
+    }
+    return {
+      id: activeChat,
+      type: 'team' as const
+    };
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -61,6 +77,8 @@ const Index = () => {
   if (!session) {
     return null;
   }
+
+  const currentChat = getCurrentChatInfo();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-black">
@@ -84,7 +102,7 @@ const Index = () => {
             )}
           >
             <Sidebar 
-              activeChat={activeChat}
+              activeChat={currentChat.id}
               onChatSelect={handleChatSelect}
             />
           </div>
@@ -100,7 +118,7 @@ const Index = () => {
           {/* Main chat area */}
           <div className="flex-1 min-w-0">
             <ChatArea 
-              activeChat={activeChat}
+              activeChat={currentChat.id}
               onStartCall={(type) => {
                 setCallType(type);
                 setIsInCall(true);

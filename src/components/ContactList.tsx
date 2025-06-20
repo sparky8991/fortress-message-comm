@@ -1,136 +1,149 @@
 
-import React from 'react';
-import { Shield, Clock, Check, CheckCheck } from 'lucide-react';
-
-interface Contact {
-  id: string;
-  name: string;
-  avatar: string;
-  lastMessage: string;
-  timestamp: string;
-  unread: number;
-  online: boolean;
-  encrypted: boolean;
-  messageStatus: 'sent' | 'delivered' | 'read';
-}
+import React, { useState, useEffect } from 'react';
+import { Shield, MessageSquare, Users, Clock } from 'lucide-react';
+import { contactInfo } from '@/constants/contactInfo';
+import { useDirectMessages } from '@/hooks/useDirectMessages';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface ContactListProps {
   activeChat: string;
   onChatSelect: (chatId: string) => void;
   searchQuery: string;
+  includeDirectMessages?: boolean;
 }
 
-const contacts: Contact[] = [
-  {
-    id: 'alice-johnson',
-    name: 'Alice Johnson',
-    avatar: 'AJ',
-    lastMessage: 'The encrypted files have been sent securely',
-    timestamp: '2 min ago',
-    unread: 2,
-    online: true,
-    encrypted: true,
-    messageStatus: 'read'
-  },
-  {
-    id: 'bob-smith',
-    name: 'Bob Smith',
-    avatar: 'BS',
-    lastMessage: 'Roger that, mission parameters confirmed',
-    timestamp: '15 min ago',
-    unread: 0,
-    online: true,
-    encrypted: true,
-    messageStatus: 'delivered'
-  },
-  {
-    id: 'team-alpha',
-    name: 'Team Alpha',
-    avatar: 'TA',
-    lastMessage: 'Secure channel established for tomorrow',
-    timestamp: '1 hour ago',
-    unread: 5,
-    online: false,
-    encrypted: true,
-    messageStatus: 'sent'
-  },
-  {
-    id: 'sarah-wilson',
-    name: 'Sarah Wilson',
-    avatar: 'SW',
-    lastMessage: 'Encryption keys updated successfully',
-    timestamp: '3 hours ago',
-    unread: 0,
-    online: false,
-    encrypted: true,
-    messageStatus: 'read'
-  }
-];
+export const ContactList = ({ 
+  activeChat, 
+  onChatSelect, 
+  searchQuery,
+  includeDirectMessages = false 
+}: ContactListProps) => {
+  const { conversations, switchToConversation } = useDirectMessages();
+  const [filteredContacts, setFilteredContacts] = useState<any[]>([]);
 
-export const ContactList = ({ activeChat, onChatSelect, searchQuery }: ContactListProps) => {
-  const filteredContacts = contacts.filter(contact =>
-    contact.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    contact.lastMessage.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Filter contacts based on search query
+  useEffect(() => {
+    const teamContacts = Object.entries(contactInfo).map(([id, contact]) => ({
+      id,
+      ...contact,
+      type: 'team'
+    }));
 
-  const getMessageStatusIcon = (status: Contact['messageStatus']) => {
-    switch (status) {
-      case 'sent':
-        return <Check className="w-4 h-4 text-gray-400" />;
-      case 'delivered':
-        return <CheckCheck className="w-4 h-4 text-gray-400" />;
-      case 'read':
-        return <CheckCheck className="w-4 h-4 text-green-500" />;
+    const directConversations = conversations.map(conv => {
+      const otherParticipant = conv.participants?.find(p => p.user_id !== conv.id);
+      const profile = otherParticipant?.profiles;
+      
+      return {
+        id: conv.id,
+        name: profile?.full_name || profile?.username || `User #${profile?.user_number}`,
+        status: 'online',
+        lastMessage: conv.last_message_preview || 'No messages yet',
+        time: conv.last_message_at ? new Date(conv.last_message_at).toLocaleTimeString([], { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        }) : '',
+        avatar: profile?.avatar_url || '',
+        type: 'direct',
+        conversationId: conv.id
+      };
+    });
+
+    let allContacts = [...teamContacts];
+    if (includeDirectMessages) {
+      allContacts = [...directConversations, ...teamContacts];
+    }
+
+    if (searchQuery.trim()) {
+      const filtered = allContacts.filter(contact =>
+        contact.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        contact.lastMessage?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredContacts(filtered);
+    } else {
+      setFilteredContacts(allContacts);
+    }
+  }, [searchQuery, conversations, includeDirectMessages]);
+
+  const handleContactClick = (contact: any) => {
+    if (contact.type === 'direct') {
+      switchToConversation(contact.conversationId);
+      onChatSelect(contact.conversationId);
+    } else {
+      onChatSelect(contact.id);
     }
   };
 
-  return (
-    <div className="overflow-y-auto">
-      {filteredContacts.map((contact) => (
-        <div
-          key={contact.id}
-          onClick={() => onChatSelect(contact.id)}
-          className={`p-4 border-b border-gray-700 cursor-pointer transition-colors hover:bg-gray-750 ${
-            activeChat === contact.id ? 'bg-gray-750 border-l-4 border-l-green-500' : ''
-          }`}
-        >
-          <div className="flex items-center space-x-3">
-            {/* Avatar */}
-            <div className="relative">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center text-white font-bold">
-                {contact.avatar}
-              </div>
-              {contact.online && (
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-gray-800 rounded-full"></div>
-              )}
-            </div>
+  const getContactInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+  };
 
-            {/* Content */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between mb-1">
-                <div className="flex items-center space-x-2">
-                  <h3 className="font-medium text-white truncate">{contact.name}</h3>
-                  {contact.encrypted && (
-                    <Shield className="w-3 h-3 text-green-500" />
-                  )}
+  return (
+    <div className="p-2">
+      {filteredContacts.length === 0 ? (
+        <div className="text-center py-8 text-gray-400">
+          <MessageSquare className="w-12 h-12 mx-auto mb-2 opacity-50" />
+          <p className="text-sm">No contacts found</p>
+        </div>
+      ) : (
+        <div className="space-y-1">
+          {filteredContacts.map((contact) => (
+            <div
+              key={contact.id}
+              onClick={() => handleContactClick(contact)}
+              className={`p-3 rounded-lg cursor-pointer transition-colors group ${
+                activeChat === contact.id || activeChat === contact.conversationId
+                  ? 'bg-green-500/20 border-l-2 border-green-500'
+                  : 'hover:bg-gray-700/50'
+              }`}
+            >
+              <div className="flex items-center space-x-3">
+                <div className="relative">
+                  <Avatar className="w-10 h-10">
+                    <AvatarImage src={contact.avatar} />
+                    <AvatarFallback className="bg-gray-600 text-white text-sm">
+                      {getContactInitials(contact.name)}
+                    </AvatarFallback>
+                  </Avatar>
+                  
+                  {/* Status indicator */}
+                  <div className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-gray-800 ${
+                    contact.status === 'online' ? 'bg-green-500' : 
+                    contact.status === 'away' ? 'bg-yellow-500' : 'bg-gray-500'
+                  }`} />
                 </div>
-                <div className="flex items-center space-x-1">
-                  {getMessageStatusIcon(contact.messageStatus)}
-                  <span className="text-xs text-gray-400">{contact.timestamp}</span>
+                
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <h3 className="font-medium text-white truncate">{contact.name}</h3>
+                      <div className="flex items-center space-x-1">
+                        {contact.type === 'direct' ? (
+                          <MessageSquare className="w-3 h-3 text-blue-400" />
+                        ) : (
+                          <Users className="w-3 h-3 text-purple-400" />
+                        )}
+                        <Shield className="w-3 h-3 text-green-400" />
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      {contact.time && (
+                        <span className="text-xs text-gray-400 flex items-center">
+                          <Clock className="w-3 h-3 mr-1" />
+                          {contact.time}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <p className="text-sm text-gray-400 truncate mt-1">
+                    {contact.lastMessage}
+                  </p>
                 </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-gray-300 truncate">{contact.lastMessage}</p>
-                {contact.unread > 0 && (
-                  <span className="ml-2 bg-green-500 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center">
-                    {contact.unread}
-                  </span>
-                )}
               </div>
             </div>
-          </div>
+          ))}
         </div>
-      ))}
+      )}
     </div>
   );
 };

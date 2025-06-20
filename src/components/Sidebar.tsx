@@ -1,11 +1,14 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Settings, Shield, Lock, Users, LogOut, MessageSquare, MoreVertical, User as UserIcon } from 'lucide-react';
+import { Search, Settings, Shield, Lock, Users, LogOut, MessageSquare, MoreVertical, User as UserIcon, UserPlus } from 'lucide-react';
 import { ContactList } from './ContactList';
 import { SecurityPanel } from './SecurityPanel';
+import { UserSearchDialog } from './UserSearchDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { TeamList } from './TeamList';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useDirectMessages } from '@/hooks/useDirectMessages';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +16,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { Button } from '@/components/ui/button';
 
 interface SidebarProps {
   activeChat: string;
@@ -22,12 +26,19 @@ interface SidebarProps {
 export const Sidebar = ({ activeChat, onChatSelect }: SidebarProps) => {
   const [activeTab, setActiveTab] = useState<'chats' | 'teams' | 'security'>('chats');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showUserSearch, setShowUserSearch] = useState(false);
   const isMobile = useIsMobile();
   const navigate = useNavigate();
+  const { switchToConversation } = useDirectMessages();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate('/auth');
+  };
+
+  const handleStartConversation = (conversationId: string) => {
+    switchToConversation(conversationId);
+    onChatSelect(conversationId);
   };
 
   return (
@@ -71,17 +82,27 @@ export const Sidebar = ({ activeChat, onChatSelect }: SidebarProps) => {
           </div>
         </div>
         
-        {/* Search with fine-tuned padding */}
+        {/* Search with new user button */}
         <div className="pt-5 pb-1">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-3 h-3 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
-            />
+          <div className="flex space-x-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-3 h-3 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+              />
+            </div>
+            <Button
+              onClick={() => setShowUserSearch(true)}
+              size="sm"
+              className="bg-green-600 hover:bg-green-700 text-black px-2"
+              title="Start new conversation"
+            >
+              <UserPlus className="w-4 h-4" />
+            </Button>
           </div>
         </div>
       </div>
@@ -130,10 +151,10 @@ export const Sidebar = ({ activeChat, onChatSelect }: SidebarProps) => {
             activeChat={activeChat}
             onChatSelect={onChatSelect}
             searchQuery={searchQuery}
+            includeDirectMessages={true}
           />
         ) : activeTab === 'teams' ? (
           <TeamList onTeamSelect={(teamId) => {
-            // Team selection is now handled internally by TeamList component
             console.log('Team selected:', teamId);
           }} />
         ) : (
@@ -151,6 +172,13 @@ export const Sidebar = ({ activeChat, onChatSelect }: SidebarProps) => {
           <span>Logout</span>
         </button>
       </div>
+
+      {/* User Search Dialog */}
+      <UserSearchDialog
+        isOpen={showUserSearch}
+        onClose={() => setShowUserSearch(false)}
+        onStartConversation={handleStartConversation}
+      />
     </div>
   );
 };

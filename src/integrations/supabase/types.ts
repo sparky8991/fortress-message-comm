@@ -9,6 +9,166 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      conversation_notifications: {
+        Row: {
+          conversation_id: string
+          created_at: string
+          id: string
+          message_preview: string | null
+          read: boolean
+          type: string
+          user_id: string
+        }
+        Insert: {
+          conversation_id: string
+          created_at?: string
+          id?: string
+          message_preview?: string | null
+          read?: boolean
+          type: string
+          user_id: string
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          message_preview?: string | null
+          read?: boolean
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_notifications_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversation_participants: {
+        Row: {
+          conversation_id: string
+          id: string
+          is_active: boolean
+          joined_at: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          conversation_id: string
+          id?: string
+          is_active?: boolean
+          joined_at?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          conversation_id?: string
+          id?: string
+          is_active?: boolean
+          joined_at?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_participants_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversations: {
+        Row: {
+          created_at: string
+          id: string
+          last_message_at: string | null
+          last_message_preview: string | null
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_message_at?: string | null
+          last_message_preview?: string | null
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_message_at?: string | null
+          last_message_preview?: string | null
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      direct_messages: {
+        Row: {
+          attachment_name: string | null
+          attachment_type: string | null
+          attachment_url: string | null
+          content: string
+          conversation_id: string
+          encrypted: boolean
+          id: string
+          message_type: string
+          read_at: string | null
+          reply_to_id: string | null
+          sender_id: string
+          sent_at: string
+        }
+        Insert: {
+          attachment_name?: string | null
+          attachment_type?: string | null
+          attachment_url?: string | null
+          content: string
+          conversation_id: string
+          encrypted?: boolean
+          id?: string
+          message_type?: string
+          read_at?: string | null
+          reply_to_id?: string | null
+          sender_id: string
+          sent_at?: string
+        }
+        Update: {
+          attachment_name?: string | null
+          attachment_type?: string | null
+          attachment_url?: string | null
+          content?: string
+          conversation_id?: string
+          encrypted?: boolean
+          id?: string
+          message_type?: string
+          read_at?: string | null
+          reply_to_id?: string | null
+          sender_id?: string
+          sent_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "direct_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "direct_messages_reply_to_id_fkey"
+            columns: ["reply_to_id"]
+            isOneToOne: false
+            referencedRelation: "direct_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ghost_messages: {
         Row: {
           created_at: string
@@ -282,9 +442,23 @@ export type Database = {
         }
         Returns: string
       }
+      find_or_create_direct_conversation: {
+        Args: { other_user_id: string }
+        Returns: string
+      }
       join_ghost_session: {
         Args: { p_session_id: string }
         Returns: boolean
+      }
+      search_users: {
+        Args: { search_term: string }
+        Returns: {
+          id: string
+          username: string
+          full_name: string
+          user_number: number
+          avatar_url: string
+        }[]
       }
     }
     Enums: {
