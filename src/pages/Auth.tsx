@@ -2,16 +2,31 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { Shield, Mail, Lock, ArrowRight } from 'lucide-react';
+import { Shield, Mail, Lock, ArrowRight, User, UserCheck } from 'lucide-react';
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [callSign, setCallSign] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  const validateSignupForm = () => {
+    if (!firstName.trim()) return "First name is required";
+    if (!lastName.trim()) return "Last name is required";
+    if (!callSign.trim()) return "Call sign is required";
+    if (!email.trim()) return "Email is required";
+    if (!password.trim()) return "Password is required";
+    if (password !== confirmPassword) return "Passwords do not match";
+    if (password.length < 6) return "Password must be at least 6 characters";
+    return null;
+  };
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,11 +40,24 @@ const AuthPage = () => {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         authError = error;
       } else {
+        // Validate signup form
+        const validationError = validateSignupForm();
+        if (validationError) {
+          setError(`// ERROR_CODE: VALIDATION_ERROR\n${validationError}`);
+          setLoading(false);
+          return;
+        }
+
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/`,
+            data: {
+              first_name: firstName.trim(),
+              last_name: lastName.trim(),
+              call_sign: callSign.trim(),
+            },
           },
         });
         authError = error;
@@ -68,6 +96,9 @@ const AuthPage = () => {
         } else if (errorMessage.includes("Unable to validate email address")) {
             errorCode = "INVALID_EMAIL_FORMAT";
             detailedMessage = "Registration failed. The provided email address is not valid.";
+        } else if (errorMessage.includes("duplicate key value violates unique constraint")) {
+          errorCode = "CALL_SIGN_TAKEN";
+          detailedMessage = "Registration failed. This call sign is already taken. Please choose a different one.";
         }
       }
       
@@ -75,6 +106,17 @@ const AuthPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const resetForm = () => {
+    setEmail('');
+    setPassword('');
+    setConfirmPassword('');
+    setFirstName('');
+    setLastName('');
+    setCallSign('');
+    setError(null);
+    setSuccess(null);
   };
 
   React.useEffect(() => {
@@ -109,6 +151,56 @@ const AuthPage = () => {
 
         {/* Form */}
         <form onSubmit={handleAuth} className="space-y-6">
+          {/* Signup-only fields */}
+          {!isLogin && (
+            <>
+              {/* First Name Input */}
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <User className="h-5 w-5 text-green-500" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Enter First Name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required={!isLogin}
+                  className="w-full pl-12 pr-4 py-4 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                />
+              </div>
+
+              {/* Last Name Input */}
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <User className="h-5 w-5 text-green-500" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Enter Last Name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required={!isLogin}
+                  className="w-full pl-12 pr-4 py-4 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                />
+              </div>
+
+              {/* Call Sign Input */}
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <UserCheck className="h-5 w-5 text-green-500" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Enter Call Sign"
+                  value={callSign}
+                  onChange={(e) => setCallSign(e.target.value)}
+                  required={!isLogin}
+                  className="w-full pl-12 pr-4 py-4 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                />
+              </div>
+            </>
+          )}
+
           {/* Email Input */}
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -138,6 +230,23 @@ const AuthPage = () => {
               className="w-full pl-12 pr-4 py-4 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             />
           </div>
+
+          {/* Confirm Password Input - Signup only */}
+          {!isLogin && (
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Lock className="h-5 w-5 text-green-500" />
+              </div>
+              <input
+                type="password"
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required={!isLogin}
+                className="w-full pl-12 pr-4 py-4 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              />
+            </div>
+          )}
 
           {/* Submit Button */}
           <button
@@ -171,8 +280,7 @@ const AuthPage = () => {
             <button
               onClick={() => {
                 setIsLogin(!isLogin);
-                setError(null);
-                setSuccess(null);
+                resetForm();
               }}
               className="text-green-500 hover:text-green-400 font-medium transition-colors"
             >
