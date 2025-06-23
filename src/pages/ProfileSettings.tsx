@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -6,13 +5,14 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Loader2, User, KeyRound, ChevronLeft } from 'lucide-react';
+import { Loader2, User, KeyRound, ChevronLeft, Lock, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
 const ProfileSettingsPage = () => {
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
+    const [updatingPassword, setUpdatingPassword] = useState(false);
     const [checkingCallSign, setCheckingCallSign] = useState(false);
     const [profile, setProfile] = useState<{
         first_name: string | null;
@@ -26,6 +26,15 @@ const ProfileSettingsPage = () => {
     const [callSign, setCallSign] = useState('');
     const [bio, setBio] = useState('');
     const [callSignError, setCallSignError] = useState('');
+
+    // Password change states
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [passwordError, setPasswordError] = useState('');
 
     const { toast } = useToast();
     const navigate = useNavigate();
@@ -111,9 +120,81 @@ const ProfileSettingsPage = () => {
         return () => clearTimeout(timeoutId);
     };
 
-    useEffect(() => {
-        fetchProfile();
-    }, [fetchProfile]);
+    const validatePassword = () => {
+        if (!currentPassword) {
+            setPasswordError('Current password is required');
+            return false;
+        }
+        if (!newPassword) {
+            setPasswordError('New password is required');
+            return false;
+        }
+        if (newPassword.length < 6) {
+            setPasswordError('New password must be at least 6 characters long');
+            return false;
+        }
+        if (newPassword !== confirmPassword) {
+            setPasswordError('New password and confirmation do not match');
+            return false;
+        }
+        if (currentPassword === newPassword) {
+            setPasswordError('New password must be different from current password');
+            return false;
+        }
+        setPasswordError('');
+        return true;
+    };
+
+    const handlePasswordChange = async (e: React.FormEvent) => {
+        e.preventDefault();
+        
+        if (!validatePassword()) {
+            return;
+        }
+
+        setUpdatingPassword(true);
+        try {
+            // First verify current password by signing in
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user?.email) {
+                throw new Error('User email not found');
+            }
+
+            // Verify current password
+            const { error: signInError } = await supabase.auth.signInWithPassword({
+                email: user.email,
+                password: currentPassword
+            });
+
+            if (signInError) {
+                throw new Error('Current password is incorrect');
+            }
+
+            // Update password
+            const { error: updateError } = await supabase.auth.updateUser({
+                password: newPassword
+            });
+
+            if (updateError) {
+                throw updateError;
+            }
+
+            // Clear password fields
+            setCurrentPassword('');
+            setNewPassword('');
+            setConfirmPassword('');
+            setPasswordError('');
+            
+            toast({ title: 'Success', description: 'Your password has been updated successfully.' });
+        } catch (error: any) {
+            const errorCode = "PASSWORD_UPDATE_FAILED";
+            console.error(`// ERROR_CODE: ${errorCode}\nError updating password:`, error);
+            setPasswordError(error.message);
+            toast({ title: 'Password Update Failed', description: `${error.message} (Code: ${errorCode})`, variant: 'destructive' });
+        } finally {
+            setUpdatingPassword(false);
+        }
+    };
 
     const handleUpdateProfile = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -167,11 +248,13 @@ const ProfileSettingsPage = () => {
 
     return (
         <div className="min-h-screen bg-gray-900 text-white p-4 sm:p-6 lg:p-8">
-            <div className="max-w-2xl mx-auto">
+            <div className="max-w-2xl mx-auto space-y-6">
                 <Button variant="ghost" onClick={() => navigate('/')} className="mb-4 text-gray-300 hover:bg-gray-700 hover:text-white">
                     <ChevronLeft className="w-4 h-4 mr-2" />
                     Back to App
                 </Button>
+
+                {/* Profile Information Card */}
                 <Card className="bg-gray-800 border-gray-700">
                     <CardHeader>
                         <CardTitle className="text-2xl flex items-center text-white">
@@ -258,6 +341,101 @@ const ProfileSettingsPage = () => {
                                 >
                                     {updating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                     Save Changes
+                                </Button>
+                            </CardFooter>
+                        </form>
+                    </CardContent>
+                </Card>
+
+                {/* Password Change Card */}
+                <Card className="bg-gray-800 border-gray-700">
+                    <CardHeader>
+                        <CardTitle className="text-xl flex items-center text-white">
+                            <Lock className="mr-3 w-5 h-5 text-green-500"/>
+                            Change Password
+                        </CardTitle>
+                        <CardDescription className="text-gray-400">
+                            Update your account password for security.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <form onSubmit={handlePasswordChange} className="space-y-6">
+                            <div>
+                                <Label htmlFor="currentPassword" className="text-gray-300">Current Password</Label>
+                                <div className="relative">
+                                    <Input 
+                                        id="currentPassword" 
+                                        type={showCurrentPassword ? 'text' : 'password'}
+                                        value={currentPassword} 
+                                        onChange={e => setCurrentPassword(e.target.value)} 
+                                        className="mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white pr-10" 
+                                        placeholder="Enter your current password"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                                    >
+                                        {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <Label htmlFor="newPassword" className="text-gray-300">New Password</Label>
+                                <div className="relative">
+                                    <Input 
+                                        id="newPassword" 
+                                        type={showNewPassword ? 'text' : 'password'}
+                                        value={newPassword} 
+                                        onChange={e => setNewPassword(e.target.value)} 
+                                        className="mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white pr-10" 
+                                        placeholder="Enter your new password"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowNewPassword(!showNewPassword)}
+                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                                    >
+                                        {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                    </button>
+                                </div>
+                                <p className="text-xs text-gray-500 mt-2">Password must be at least 6 characters long.</p>
+                            </div>
+
+                            <div>
+                                <Label htmlFor="confirmPassword" className="text-gray-300">Confirm New Password</Label>
+                                <div className="relative">
+                                    <Input 
+                                        id="confirmPassword" 
+                                        type={showConfirmPassword ? 'text' : 'password'}
+                                        value={confirmPassword} 
+                                        onChange={e => setConfirmPassword(e.target.value)} 
+                                        className="mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white pr-10" 
+                                        placeholder="Confirm your new password"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                                    >
+                                        {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                    </button>
+                                </div>
+                            </div>
+
+                            {passwordError && (
+                                <p className="text-red-400 text-sm">{passwordError}</p>
+                            )}
+                            
+                            <CardFooter className="p-0 pt-4 flex justify-end">
+                                <Button 
+                                    type="submit" 
+                                    disabled={updatingPassword || !currentPassword || !newPassword || !confirmPassword} 
+                                    className="bg-green-600 hover:bg-green-700 text-white font-bold"
+                                >
+                                    {updatingPassword && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                    Update Password
                                 </Button>
                             </CardFooter>
                         </form>
