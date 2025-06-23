@@ -15,7 +15,7 @@ const Index = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const isMobile = useIsMobile();
-  const [activeChat, setActiveChat] = useState('alice-johnson');
+  const [activeChat, setActiveChat] = useState<string | null>(null); // Changed to null
   const [isInCall, setIsInCall] = useState(false);
   const [callType, setCallType] = useState<'voice' | 'video'>('voice');
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -57,10 +57,13 @@ const Index = () => {
         type: 'direct' as const
       };
     }
-    return {
-      id: activeChat,
-      type: 'team' as const
-    };
+    if (activeChat) {
+      return {
+        id: activeChat,
+        type: 'team' as const
+      };
+    }
+    return null; // No active chat
   };
 
   if (loading) {
@@ -87,7 +90,7 @@ const Index = () => {
           <CallInterface 
             callType={callType}
             onEndCall={() => setIsInCall(false)}
-            contactName="Alice Johnson"
+            contactName="Contact"
           />
         </div>
       ) : (
@@ -102,7 +105,7 @@ const Index = () => {
             )}
           >
             <Sidebar 
-              activeChat={currentChat.id}
+              activeChat={currentChat?.id || ''}
               onChatSelect={handleChatSelect}
             />
           </div>
@@ -118,7 +121,7 @@ const Index = () => {
           {/* Main chat area */}
           <div className="flex-1 min-w-0">
             <ChatArea 
-              activeChat={currentChat.id}
+              activeChat={currentChat?.id || ''}
               onStartCall={(type) => {
                 setCallType(type);
                 setIsInCall(true);

@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Shield, MessageSquare, Users, Clock } from 'lucide-react';
-import { contactInfo } from '@/constants/contactInfo';
+import { MessageSquare, Clock } from 'lucide-react';
 import { useDirectMessages } from '@/hooks/useDirectMessages';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
@@ -23,34 +22,27 @@ export const ContactList = ({
 
   // Filter contacts based on search query
   useEffect(() => {
-    const teamContacts = Object.entries(contactInfo).map(([id, contact]) => ({
-      id,
-      ...contact,
-      type: 'team',
-      lastMessage: 'No messages yet'
-    }));
+    let allContacts: any[] = [];
 
-    const directConversations = conversations.map(conv => {
-      const otherParticipant = conv.participants?.find(p => p.user_id !== conv.id);
-      
-      return {
-        id: conv.id,
-        name: `Direct Chat ${conv.id.substring(0, 8)}`,
-        status: 'online',
-        lastMessage: conv.last_message_preview || 'No messages yet',
-        time: conv.last_message_at ? new Date(conv.last_message_at).toLocaleTimeString([], { 
-          hour: '2-digit', 
-          minute: '2-digit' 
-        }) : '',
-        avatar: '',
-        type: 'direct',
-        conversationId: conv.id
-      };
-    });
-
-    let allContacts = [...teamContacts];
     if (includeDirectMessages) {
-      allContacts = [...directConversations, ...teamContacts];
+      const directConversations = conversations.map(conv => {
+        const otherParticipant = conv.participants?.find(p => p.user_id !== conv.id);
+        
+        return {
+          id: conv.id,
+          name: `Direct Chat ${conv.id.substring(0, 8)}`,
+          status: 'online',
+          lastMessage: conv.last_message_preview || 'No messages yet',
+          time: conv.last_message_at ? new Date(conv.last_message_at).toLocaleTimeString([], { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+          }) : '',
+          avatar: '',
+          type: 'direct',
+          conversationId: conv.id
+        };
+      });
+      allContacts = [...directConversations];
     }
 
     if (searchQuery.trim()) {
@@ -82,7 +74,12 @@ export const ContactList = ({
       {filteredContacts.length === 0 ? (
         <div className="text-center py-8 text-gray-400">
           <MessageSquare className="w-12 h-12 mx-auto mb-2 opacity-50" />
-          <p className="text-sm">No contacts found</p>
+          <p className="text-sm">
+            {includeDirectMessages 
+              ? "No conversations yet. Search for users to start chatting!" 
+              : "No contacts found"
+            }
+          </p>
         </div>
       ) : (
         <div className="space-y-1">
@@ -117,12 +114,7 @@ export const ContactList = ({
                     <div className="flex items-center space-x-2">
                       <h3 className="font-medium text-white truncate">{contact.name}</h3>
                       <div className="flex items-center space-x-1">
-                        {contact.type === 'direct' ? (
-                          <MessageSquare className="w-3 h-3 text-blue-400" />
-                        ) : (
-                          <Users className="w-3 h-3 text-purple-400" />
-                        )}
-                        <Shield className="w-3 h-3 text-green-400" />
+                        <MessageSquare className="w-3 h-3 text-blue-400" />
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
