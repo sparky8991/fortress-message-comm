@@ -98,65 +98,77 @@ export const useDirectMessages = () => {
 
   // Set up real-time subscriptions
   useEffect(() => {
-    // Clean up existing channel if it exists
-    if (channelRef.current) {
-      supabase.removeChannel(channelRef.current);
-      channelRef.current = null;
-    }
-
-    // Create new channel with a unique name to avoid conflicts
-    const channelName = `direct-messages-${Date.now()}`;
-    const channel = supabase.channel(channelName);
-
-    // Configure the channel before subscribing
-    channel
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'direct_messages'
-        },
-        (payload) => {
-          const newMessage = payload.new as DirectMessage;
-          
-          // Only add message if it's for the active conversation
-          if (newMessage.conversation_id === activeConversation) {
-            setMessages(prev => [...prev, newMessage]);
-          }
-          
-          // Refresh conversations to update last message info
-          loadConversations();
+    const setupRealtime = async () => {
+      // Clean up existing channel if it exists
+      if (channelRef.current) {
+        try {
+          await supabase.removeChannel(channelRef.current);
+        } catch (error) {
+          console.error('Error removing channel:', error);
         }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'conversation_notifications'
-        },
-        (payload) => {
-          const notification = payload.new as any;
-          if (notification.type === 'new_chat') {
-            toast({
-              title: '🔒 NEW SECURE CHANNEL',
-              description: 'Someone started a conversation with you.',
-            });
+        channelRef.current = null;
+      }
+
+      // Create new channel with a unique name to avoid conflicts
+      const channelName = `direct-messages-${Date.now()}-${Math.random()}`;
+      const channel = supabase.channel(channelName);
+
+      // Configure the channel before subscribing
+      channel
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'direct_messages'
+          },
+          (payload) => {
+            const newMessage = payload.new as DirectMessage;
+            
+            // Only add message if it's for the active conversation
+            if (newMessage.conversation_id === activeConversation) {
+              setMessages(prev => [...prev, newMessage]);
+            }
+            
+            // Refresh conversations to update last message info
             loadConversations();
           }
-        }
-      );
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'conversation_notifications'
+          },
+          (payload) => {
+            const notification = payload.new as any;
+            if (notification.type === 'new_chat') {
+              toast({
+                title: '🔒 NEW SECURE CHANNEL',
+                description: 'Someone started a conversation with you.',
+              });
+              loadConversations();
+            }
+          }
+        );
 
-    // Subscribe to the channel only once
-    channel.subscribe((status) => {
-      console.log('Channel subscription status:', status);
-      if (status === 'SUBSCRIBED') {
-        console.log('Successfully subscribed to real-time updates');
+      // Subscribe to the channel only once
+      try {
+        await channel.subscribe((status) => {
+          console.log('Channel subscription status:', status);
+          if (status === 'SUBSCRIBED') {
+            console.log('Successfully subscribed to real-time updates');
+          }
+        });
+
+        channelRef.current = channel;
+      } catch (error) {
+        console.error('Error subscribing to channel:', error);
       }
-    });
+    };
 
-    channelRef.current = channel;
+    setupRealtime();
 
     return () => {
       if (channelRef.current) {
