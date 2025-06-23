@@ -97,6 +97,16 @@ const AuthPage = () => {
           <p className="text-green-500 text-sm font-mono tracking-wider">MILITARY-GRADE ENCRYPTION</p>
         </div>
 
+        {/* Dynamic Page Title */}
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold text-white">
+            {isLogin ? "Let's Get Logged In" : "Let's Get Signed Up"}
+          </h2>
+          <p className="text-slate-400 text-sm mt-2">
+            {isLogin ? "Access your secure account" : "Create your secure account"}
+          </p>
+        </div>
+
         {/* Form */}
         <form onSubmit={handleAuth} className="space-y-6">
           {/* Email Input */}
@@ -129,14 +139,14 @@ const AuthPage = () => {
             />
           </div>
 
-          {/* Sign In Button */}
+          {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
             className="w-full flex items-center justify-center py-4 px-6 bg-green-500 hover:bg-green-600 rounded-xl text-slate-900 font-bold text-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ArrowRight className="w-6 h-6 mr-3" />
-            {loading ? 'PROCESSING...' : 'SIGN IN'}
+            {loading ? 'PROCESSING...' : (isLogin ? 'SIGN IN' : 'SIGN UP')}
           </button>
         </form>
 
@@ -154,10 +164,10 @@ const AuthPage = () => {
           </div>
         )}
 
-        {/* Sign Up Link */}
+        {/* Toggle Link */}
         <div className="mt-8 text-center">
           <p className="text-slate-400">
-            Don't have an account?{' '}
+            {isLogin ? "Don't have an account?" : "Already have an account?"}{' '}
             <button
               onClick={() => {
                 setIsLogin(!isLogin);
@@ -166,7 +176,7 @@ const AuthPage = () => {
               }}
               className="text-green-500 hover:text-green-400 font-medium transition-colors"
             >
-              SIGN UP
+              {isLogin ? 'SIGN UP' : 'SIGN IN'}
             </button>
           </p>
         </div>
