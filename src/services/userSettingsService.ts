@@ -47,11 +47,11 @@ export const userSettingsService = {
         throw error;
       }
 
-      // Cast the Json types to our interfaces
+      // Cast the Json types to our interfaces using unknown first
       return {
-        notification_settings: data.notification_settings as NotificationSettings,
-        security_settings: data.security_settings as SecuritySettings,
-        appearance_settings: data.appearance_settings as AppearanceSettings,
+        notification_settings: data.notification_settings as unknown as NotificationSettings,
+        security_settings: data.security_settings as unknown as SecuritySettings,
+        appearance_settings: data.appearance_settings as unknown as AppearanceSettings,
       };
     } catch (error) {
       console.error('Error fetching user settings:', error);
@@ -92,11 +92,11 @@ export const userSettingsService = {
 
       if (error) throw error;
 
-      // Cast the Json types to our interfaces
+      // Cast the Json types to our interfaces using unknown first
       return {
-        notification_settings: data.notification_settings as NotificationSettings,
-        security_settings: data.security_settings as SecuritySettings,
-        appearance_settings: data.appearance_settings as AppearanceSettings,
+        notification_settings: data.notification_settings as unknown as NotificationSettings,
+        security_settings: data.security_settings as unknown as SecuritySettings,
+        appearance_settings: data.appearance_settings as unknown as AppearanceSettings,
       };
     } catch (error) {
       console.error('Error creating default settings:', error);
