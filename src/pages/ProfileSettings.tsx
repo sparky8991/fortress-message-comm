@@ -39,39 +39,134 @@ const ProfileSettingsPage = () => {
     const { toast } = useToast();
     const navigate = useNavigate();
 
+    const createProfileIfNotExists = async (userId: string) => {
+        try {
+            console.log('Creating profile for user:', userId);
+            const { error } = await supabase
+                .from('profiles')
+                .insert({
+                    id: userId,
+                    first_name: null,
+                    last_name: null,
+                    call_sign: null,
+                    bio: null
+                });
+
+            if (error) {
+                console.error('Error creating profile:', error);
+                return false;
+            }
+            console.log('Profile created successfully');
+            return true;
+        } catch (error) {
+            console.error('Error in createProfileIfNotExists:', error);
+            return false;
+        }
+    };
+
     const fetchProfile = useCallback(async () => {
+        console.log('Starting fetchProfile...');
         setLoading(true);
         try {
-            const { data: { user } } = await supabase.auth.getUser();
+            const { data: { user }, error: userError } = await supabase.auth.getUser();
+            console.log('User data:', user);
+            
+            if (userError) {
+                console.error('Error getting user:', userError);
+                throw userError;
+            }
+            
             if (!user) {
+                console.log('No user found, redirecting to auth');
                 toast({ title: 'Not authenticated', description: 'Please log in to view your profile.', variant: 'destructive' });
                 navigate('/auth');
                 return;
             }
 
+            console.log('Fetching profile for user ID:', user.id);
             const { data, error } = await supabase
                 .from('profiles')
                 .select('first_name, last_name, call_sign, bio, user_number')
                 .eq('id', user.id)
-                .single();
+                .maybeSingle();
 
-            if (error) throw error;
-            
-            if (data) {
-                setProfile(data);
-                setFirstName(data.first_name || '');
-                setLastName(data.last_name || '');
-                setCallSign(data.call_sign || '');
-                setBio(data.bio || '');
+            console.log('Profile query result - data:', data, 'error:', error);
+
+            if (error) {
+                console.error('Error fetching profile:', error);
+                throw error;
             }
+            
+            if (!data) {
+                console.log('No profile found, creating one...');
+                const created = await createProfileIfNotExists(user.id);
+                if (created) {
+                    // Retry fetching after creation
+                    const { data: newData, error: retryError } = await supabase
+                        .from('profiles')
+                        .select('first_name, last_name, call_sign, bio, user_number')
+                        .eq('id', user.id)
+                        .maybeSingle();
+                    
+                    if (retryError) {
+                        console.error('Error fetching profile after creation:', retryError);
+                        throw retryError;
+                    }
+                    
+                    console.log('Profile fetched after creation:', newData);
+                    setProfile(newData || {
+                        first_name: null,
+                        last_name: null,
+                        call_sign: null,
+                        bio: null,
+                        user_number: null
+                    });
+                } else {
+                    // Set default empty profile if creation failed
+                    setProfile({
+                        first_name: null,
+                        last_name: null,
+                        call_sign: null,
+                        bio: null,
+                        user_number: null
+                    });
+                }
+            } else {
+                console.log('Profile found:', data);
+                setProfile(data);
+            }
+
+            // Set form values with fallbacks
+            setFirstName(profile?.first_name || '');
+            setLastName(profile?.last_name || '');
+            setCallSign(profile?.call_sign || '');
+            setBio(profile?.bio || '');
+
         } catch (error: any) {
             const errorCode = "PROFILE_FETCH_FAILED";
-            console.error(`// ERROR_CODE: ${errorCode}\nError fetching profile:`, error);
-            toast({ title: 'Error', description: `Failed to load profile data. (Code: ${errorCode})`, variant: 'destructive' });
+            console.error(`// ERROR_CODE: ${errorCode}\nError in fetchProfile:`, error);
+            toast({ 
+                title: 'Error', 
+                description: `Failed to load profile data. Please try refreshing the page. (Code: ${errorCode})`, 
+                variant: 'destructive' 
+            });
+            
+            // Set default values to prevent UI issues
+            setProfile({
+                first_name: null,
+                last_name: null,
+                call_sign: null,
+                bio: null,
+                user_number: null
+            });
+            setFirstName('');
+            setLastName('');
+            setCallSign('');
+            setBio('');
         } finally {
             setLoading(false);
         }
-    }, [toast, navigate]);
+    }, [toast, navigate, profile?.first_name, profile?.last_name, profile?.call_sign, profile?.bio]);
 
     const checkCallSignAvailability = useCallback(async (newCallSign: string) => {
         if (!newCallSign.trim() || newCallSign === profile?.call_sign) {
@@ -89,7 +184,7 @@ const ProfileSettingsPage = () => {
                 .select('id')
                 .eq('call_sign', newCallSign.trim())
                 .neq('id', user.id)
-                .single();
+                .maybeSingle();
 
             if (error && error.code !== 'PGRST116') {
                 console.error('Error checking call sign:', error);
@@ -241,6 +336,20 @@ const ProfileSettingsPage = () => {
             setUpdating(false);
         }
     };
+
+    useEffect(() => {
+        fetchProfile();
+    }, []);
+
+    // Update form values when profile changes
+    useEffect(() => {
+        if (profile) {
+            setFirstName(profile.first_name || '');
+            setLastName(profile.last_name || '');
+            setCallSign(profile.call_sign || '');
+            setBio(profile.bio || '');
+        }
+    }, [profile]);
 
     if (loading) {
         return <div className="min-h-screen bg-gray-900 flex items-center justify-center"><Loader2 className="w-12 h-12 text-green-500 animate-spin" /></div>;
