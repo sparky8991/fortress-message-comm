@@ -8,359 +8,362 @@ import { Label } from '@/components/ui/label';
 import { Loader2, User, KeyRound, ChevronLeft, Lock, Eye, EyeOff, Mail } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-
 const ProfileSettingsPage = () => {
-    const [loading, setLoading] = useState(true);
-    const [updating, setUpdating] = useState(false);
-    const [updatingPassword, setUpdatingPassword] = useState(false);
-    const [checkingCallSign, setCheckingCallSign] = useState(false);
-    const [profile, setProfile] = useState<{
-        first_name: string | null;
-        last_name: string | null;
-        call_sign: string | null;
-        bio: string | null;
-        user_number: number | null;
-    } | null>(null);
-    const [userEmail, setUserEmail] = useState<string>('');
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [callSign, setCallSign] = useState('');
-    const [bio, setBio] = useState('');
-    const [callSignError, setCallSignError] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
+  const [updatingPassword, setUpdatingPassword] = useState(false);
+  const [checkingCallSign, setCheckingCallSign] = useState(false);
+  const [profile, setProfile] = useState<{
+    first_name: string | null;
+    last_name: string | null;
+    call_sign: string | null;
+    bio: string | null;
+    user_number: number | null;
+  } | null>(null);
+  const [userEmail, setUserEmail] = useState<string>('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [callSign, setCallSign] = useState('');
+  const [bio, setBio] = useState('');
+  const [callSignError, setCallSignError] = useState('');
 
-    // Password change states
-    const [currentPassword, setCurrentPassword] = useState('');
-    const [newPassword, setNewPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-    const [showNewPassword, setShowNewPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [passwordError, setPasswordError] = useState('');
-
-    const { toast } = useToast();
-    const navigate = useNavigate();
-
-    const createProfileIfNotExists = async (userId: string) => {
-        try {
-            console.log('Creating profile for user:', userId);
-            const { error } = await supabase
-                .from('profiles')
-                .insert({
-                    id: userId,
-                    first_name: null,
-                    last_name: null,
-                    call_sign: null,
-                    bio: null
-                });
-
-            if (error) {
-                console.error('Error creating profile:', error);
-                return false;
-            }
-            console.log('Profile created successfully');
-            return true;
-        } catch (error) {
-            console.error('Error in createProfileIfNotExists:', error);
-            return false;
-        }
-    };
-
-    const fetchProfile = useCallback(async () => {
-        console.log('Starting fetchProfile...');
-        setLoading(true);
-        try {
-            const { data: { user }, error: userError } = await supabase.auth.getUser();
-            console.log('User data:', user);
-            
-            if (userError) {
-                console.error('Error getting user:', userError);
-                throw userError;
-            }
-            
-            if (!user) {
-                console.log('No user found, redirecting to auth');
-                toast({ title: 'Not authenticated', description: 'Please log in to view your profile.', variant: 'destructive' });
-                navigate('/auth');
-                return;
-            }
-
-            // Set user email
-            setUserEmail(user.email || '');
-
-            console.log('Fetching profile for user ID:', user.id);
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('first_name, last_name, call_sign, bio, user_number')
-                .eq('id', user.id)
-                .maybeSingle();
-
-            console.log('Profile query result - data:', data, 'error:', error);
-
-            if (error) {
-                console.error('Error fetching profile:', error);
-                throw error;
-            }
-            
-            if (!data) {
-                console.log('No profile found, creating one...');
-                const created = await createProfileIfNotExists(user.id);
-                if (created) {
-                    // Retry fetching after creation
-                    const { data: newData, error: retryError } = await supabase
-                        .from('profiles')
-                        .select('first_name, last_name, call_sign, bio, user_number')
-                        .eq('id', user.id)
-                        .maybeSingle();
-                    
-                    if (retryError) {
-                        console.error('Error fetching profile after creation:', retryError);
-                        throw retryError;
-                    }
-                    
-                    console.log('Profile fetched after creation:', newData);
-                    setProfile(newData || {
-                        first_name: null,
-                        last_name: null,
-                        call_sign: null,
-                        bio: null,
-                        user_number: null
-                    });
-                } else {
-                    // Set default empty profile if creation failed
-                    setProfile({
-                        first_name: null,
-                        last_name: null,
-                        call_sign: null,
-                        bio: null,
-                        user_number: null
-                    });
-                }
-            } else {
-                console.log('Profile found:', data);
-                setProfile(data);
-            }
-
-            // Set form values with fallbacks
-            setFirstName(profile?.first_name || '');
-            setLastName(profile?.last_name || '');
-            setCallSign(profile?.call_sign || '');
-            setBio(profile?.bio || '');
-
-        } catch (error: any) {
-            const errorCode = "PROFILE_FETCH_FAILED";
-            console.error(`// ERROR_CODE: ${errorCode}\nError in fetchProfile:`, error);
-            toast({ 
-                title: 'Error', 
-                description: `Failed to load profile data. Please try refreshing the page. (Code: ${errorCode})`, 
-                variant: 'destructive' 
-            });
-            
-            // Set default values to prevent UI issues
-            setProfile({
-                first_name: null,
-                last_name: null,
-                call_sign: null,
-                bio: null,
-                user_number: null
-            });
-            setFirstName('');
-            setLastName('');
-            setCallSign('');
-            setBio('');
-        } finally {
-            setLoading(false);
-        }
-    }, [toast, navigate, profile?.first_name, profile?.last_name, profile?.call_sign, profile?.bio]);
-
-    const checkCallSignAvailability = useCallback(async (newCallSign: string) => {
-        if (!newCallSign.trim() || newCallSign === profile?.call_sign) {
-            setCallSignError('');
-            return;
-        }
-
-        setCheckingCallSign(true);
-        try {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) return;
-
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('id')
-                .eq('call_sign', newCallSign.trim())
-                .neq('id', user.id)
-                .maybeSingle();
-
-            if (error && error.code !== 'PGRST116') {
-                console.error('Error checking call sign:', error);
-                return;
-            }
-
-            if (data) {
-                setCallSignError('This call sign is already taken. Please choose another one.');
-            } else {
-                setCallSignError('');
-            }
-        } catch (error) {
-            console.error('Error checking call sign availability:', error);
-        } finally {
-            setCheckingCallSign(false);
-        }
-    }, [profile?.call_sign]);
-
-    const handleCallSignChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newCallSign = e.target.value;
-        setCallSign(newCallSign);
-        
-        // Debounce the availability check
-        const timeoutId = setTimeout(() => {
-            checkCallSignAvailability(newCallSign);
-        }, 500);
-
-        return () => clearTimeout(timeoutId);
-    };
-
-    const validatePassword = () => {
-        if (!currentPassword) {
-            setPasswordError('Current password is required');
-            return false;
-        }
-        if (!newPassword) {
-            setPasswordError('New password is required');
-            return false;
-        }
-        if (newPassword.length < 6) {
-            setPasswordError('New password must be at least 6 characters long');
-            return false;
-        }
-        if (newPassword !== confirmPassword) {
-            setPasswordError('New password and confirmation do not match');
-            return false;
-        }
-        if (currentPassword === newPassword) {
-            setPasswordError('New password must be different from current password');
-            return false;
-        }
-        setPasswordError('');
-        return true;
-    };
-
-    const handlePasswordChange = async (e: React.FormEvent) => {
-        e.preventDefault();
-        
-        if (!validatePassword()) {
-            return;
-        }
-
-        setUpdatingPassword(true);
-        try {
-            // First verify current password by signing in
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user?.email) {
-                throw new Error('User email not found');
-            }
-
-            // Verify current password
-            const { error: signInError } = await supabase.auth.signInWithPassword({
-                email: user.email,
-                password: currentPassword
-            });
-
-            if (signInError) {
-                throw new Error('Current password is incorrect');
-            }
-
-            // Update password
-            const { error: updateError } = await supabase.auth.updateUser({
-                password: newPassword
-            });
-
-            if (updateError) {
-                throw updateError;
-            }
-
-            // Clear password fields
-            setCurrentPassword('');
-            setNewPassword('');
-            setConfirmPassword('');
-            setPasswordError('');
-            
-            toast({ title: 'Success', description: 'Your password has been updated successfully.' });
-        } catch (error: any) {
-            const errorCode = "PASSWORD_UPDATE_FAILED";
-            console.error(`// ERROR_CODE: ${errorCode}\nError updating password:`, error);
-            setPasswordError(error.message);
-            toast({ title: 'Password Update Failed', description: `${error.message} (Code: ${errorCode})`, variant: 'destructive' });
-        } finally {
-            setUpdatingPassword(false);
-        }
-    };
-
-    const handleUpdateProfile = async (e: React.FormEvent) => {
-        e.preventDefault();
-        
-        if (callSignError) {
-            toast({ title: 'Validation Error', description: 'Please fix the call sign error before saving.', variant: 'destructive' });
-            return;
-        }
-
-        setUpdating(true);
-        try {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) throw new Error("User not found");
-
-            // Compute full name from first and last name
-            const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
-
-            const { error } = await supabase
-                .from('profiles')
-                .update({ 
-                    first_name: firstName.trim() || null,
-                    last_name: lastName.trim() || null,
-                    full_name: fullName || null,
-                    call_sign: callSign.trim() || null,
-                    username: callSign.trim() || null, // Keep username in sync with call_sign
-                    bio: bio.trim() || null
-                })
-                .eq('id', user.id);
-
-            if (error) {
-                if (error.message.includes('duplicate key value violates unique constraint "profiles_call_sign_key"')) {
-                     throw new Error("This call sign is already taken. Please choose another one.");
-                }
-                throw error;
-            }
-            
-            toast({ title: 'Success', description: 'Your profile has been updated.' });
-            await fetchProfile(); // Refresh profile data
-        } catch (error: any) {
-            const errorCode = "PROFILE_UPDATE_FAILED";
-            console.error(`// ERROR_CODE: ${errorCode}\nError updating profile:`, error);
-            toast({ title: 'Update Failed', description: `${error.message} (Code: ${errorCode})`, variant: 'destructive' });
-        } finally {
-            setUpdating(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchProfile();
-    }, []);
-
-    // Update form values when profile changes
-    useEffect(() => {
-        if (profile) {
-            setFirstName(profile.first_name || '');
-            setLastName(profile.last_name || '');
-            setCallSign(profile.call_sign || '');
-            setBio(profile.bio || '');
-        }
-    }, [profile]);
-
-    if (loading) {
-        return <div className="min-h-screen bg-gray-900 flex items-center justify-center"><Loader2 className="w-12 h-12 text-green-500 animate-spin" /></div>;
+  // Password change states
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
+  const {
+    toast
+  } = useToast();
+  const navigate = useNavigate();
+  const createProfileIfNotExists = async (userId: string) => {
+    try {
+      console.log('Creating profile for user:', userId);
+      const {
+        error
+      } = await supabase.from('profiles').insert({
+        id: userId,
+        first_name: null,
+        last_name: null,
+        call_sign: null,
+        bio: null
+      });
+      if (error) {
+        console.error('Error creating profile:', error);
+        return false;
+      }
+      console.log('Profile created successfully');
+      return true;
+    } catch (error) {
+      console.error('Error in createProfileIfNotExists:', error);
+      return false;
     }
+  };
+  const fetchProfile = useCallback(async () => {
+    console.log('Starting fetchProfile...');
+    setLoading(true);
+    try {
+      const {
+        data: {
+          user
+        },
+        error: userError
+      } = await supabase.auth.getUser();
+      console.log('User data:', user);
+      if (userError) {
+        console.error('Error getting user:', userError);
+        throw userError;
+      }
+      if (!user) {
+        console.log('No user found, redirecting to auth');
+        toast({
+          title: 'Not authenticated',
+          description: 'Please log in to view your profile.',
+          variant: 'destructive'
+        });
+        navigate('/auth');
+        return;
+      }
 
-    return (
-        <div className="min-h-screen bg-gray-900 text-white p-4 sm:p-6 lg:p-8">
+      // Set user email
+      setUserEmail(user.email || '');
+      console.log('Fetching profile for user ID:', user.id);
+      const {
+        data,
+        error
+      } = await supabase.from('profiles').select('first_name, last_name, call_sign, bio, user_number').eq('id', user.id).maybeSingle();
+      console.log('Profile query result - data:', data, 'error:', error);
+      if (error) {
+        console.error('Error fetching profile:', error);
+        throw error;
+      }
+      if (!data) {
+        console.log('No profile found, creating one...');
+        const created = await createProfileIfNotExists(user.id);
+        if (created) {
+          // Retry fetching after creation
+          const {
+            data: newData,
+            error: retryError
+          } = await supabase.from('profiles').select('first_name, last_name, call_sign, bio, user_number').eq('id', user.id).maybeSingle();
+          if (retryError) {
+            console.error('Error fetching profile after creation:', retryError);
+            throw retryError;
+          }
+          console.log('Profile fetched after creation:', newData);
+          setProfile(newData || {
+            first_name: null,
+            last_name: null,
+            call_sign: null,
+            bio: null,
+            user_number: null
+          });
+        } else {
+          // Set default empty profile if creation failed
+          setProfile({
+            first_name: null,
+            last_name: null,
+            call_sign: null,
+            bio: null,
+            user_number: null
+          });
+        }
+      } else {
+        console.log('Profile found:', data);
+        setProfile(data);
+      }
+
+      // Set form values with fallbacks
+      setFirstName(profile?.first_name || '');
+      setLastName(profile?.last_name || '');
+      setCallSign(profile?.call_sign || '');
+      setBio(profile?.bio || '');
+    } catch (error: any) {
+      const errorCode = "PROFILE_FETCH_FAILED";
+      console.error(`// ERROR_CODE: ${errorCode}\nError in fetchProfile:`, error);
+      toast({
+        title: 'Error',
+        description: `Failed to load profile data. Please try refreshing the page. (Code: ${errorCode})`,
+        variant: 'destructive'
+      });
+
+      // Set default values to prevent UI issues
+      setProfile({
+        first_name: null,
+        last_name: null,
+        call_sign: null,
+        bio: null,
+        user_number: null
+      });
+      setFirstName('');
+      setLastName('');
+      setCallSign('');
+      setBio('');
+    } finally {
+      setLoading(false);
+    }
+  }, [toast, navigate, profile?.first_name, profile?.last_name, profile?.call_sign, profile?.bio]);
+  const checkCallSignAvailability = useCallback(async (newCallSign: string) => {
+    if (!newCallSign.trim() || newCallSign === profile?.call_sign) {
+      setCallSignError('');
+      return;
+    }
+    setCheckingCallSign(true);
+    try {
+      const {
+        data: {
+          user
+        }
+      } = await supabase.auth.getUser();
+      if (!user) return;
+      const {
+        data,
+        error
+      } = await supabase.from('profiles').select('id').eq('call_sign', newCallSign.trim()).neq('id', user.id).maybeSingle();
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error checking call sign:', error);
+        return;
+      }
+      if (data) {
+        setCallSignError('This call sign is already taken. Please choose another one.');
+      } else {
+        setCallSignError('');
+      }
+    } catch (error) {
+      console.error('Error checking call sign availability:', error);
+    } finally {
+      setCheckingCallSign(false);
+    }
+  }, [profile?.call_sign]);
+  const handleCallSignChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newCallSign = e.target.value;
+    setCallSign(newCallSign);
+
+    // Debounce the availability check
+    const timeoutId = setTimeout(() => {
+      checkCallSignAvailability(newCallSign);
+    }, 500);
+    return () => clearTimeout(timeoutId);
+  };
+  const validatePassword = () => {
+    if (!currentPassword) {
+      setPasswordError('Current password is required');
+      return false;
+    }
+    if (!newPassword) {
+      setPasswordError('New password is required');
+      return false;
+    }
+    if (newPassword.length < 6) {
+      setPasswordError('New password must be at least 6 characters long');
+      return false;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError('New password and confirmation do not match');
+      return false;
+    }
+    if (currentPassword === newPassword) {
+      setPasswordError('New password must be different from current password');
+      return false;
+    }
+    setPasswordError('');
+    return true;
+  };
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validatePassword()) {
+      return;
+    }
+    setUpdatingPassword(true);
+    try {
+      // First verify current password by signing in
+      const {
+        data: {
+          user
+        }
+      } = await supabase.auth.getUser();
+      if (!user?.email) {
+        throw new Error('User email not found');
+      }
+
+      // Verify current password
+      const {
+        error: signInError
+      } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: currentPassword
+      });
+      if (signInError) {
+        throw new Error('Current password is incorrect');
+      }
+
+      // Update password
+      const {
+        error: updateError
+      } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+      if (updateError) {
+        throw updateError;
+      }
+
+      // Clear password fields
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setPasswordError('');
+      toast({
+        title: 'Success',
+        description: 'Your password has been updated successfully.'
+      });
+    } catch (error: any) {
+      const errorCode = "PASSWORD_UPDATE_FAILED";
+      console.error(`// ERROR_CODE: ${errorCode}\nError updating password:`, error);
+      setPasswordError(error.message);
+      toast({
+        title: 'Password Update Failed',
+        description: `${error.message} (Code: ${errorCode})`,
+        variant: 'destructive'
+      });
+    } finally {
+      setUpdatingPassword(false);
+    }
+  };
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (callSignError) {
+      toast({
+        title: 'Validation Error',
+        description: 'Please fix the call sign error before saving.',
+        variant: 'destructive'
+      });
+      return;
+    }
+    setUpdating(true);
+    try {
+      const {
+        data: {
+          user
+        }
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not found");
+
+      // Compute full name from first and last name
+      const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
+      const {
+        error
+      } = await supabase.from('profiles').update({
+        first_name: firstName.trim() || null,
+        last_name: lastName.trim() || null,
+        full_name: fullName || null,
+        call_sign: callSign.trim() || null,
+        username: callSign.trim() || null,
+        // Keep username in sync with call_sign
+        bio: bio.trim() || null
+      }).eq('id', user.id);
+      if (error) {
+        if (error.message.includes('duplicate key value violates unique constraint "profiles_call_sign_key"')) {
+          throw new Error("This call sign is already taken. Please choose another one.");
+        }
+        throw error;
+      }
+      toast({
+        title: 'Success',
+        description: 'Your profile has been updated.'
+      });
+      await fetchProfile(); // Refresh profile data
+    } catch (error: any) {
+      const errorCode = "PROFILE_UPDATE_FAILED";
+      console.error(`// ERROR_CODE: ${errorCode}\nError updating profile:`, error);
+      toast({
+        title: 'Update Failed',
+        description: `${error.message} (Code: ${errorCode})`,
+        variant: 'destructive'
+      });
+    } finally {
+      setUpdating(false);
+    }
+  };
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  // Update form values when profile changes
+  useEffect(() => {
+    if (profile) {
+      setFirstName(profile.first_name || '');
+      setLastName(profile.last_name || '');
+      setCallSign(profile.call_sign || '');
+      setBio(profile.bio || '');
+    }
+  }, [profile]);
+  if (loading) {
+    return <div className="min-h-screen bg-gray-900 flex items-center justify-center"><Loader2 className="w-12 h-12 text-green-500 animate-spin" /></div>;
+  }
+  return <div className="min-h-screen bg-gray-900 text-white p-4 sm:p-6 lg:p-8">
             <div className="max-w-2xl mx-auto space-y-6">
                 <Button variant="ghost" onClick={() => navigate('/')} className="mb-4 text-gray-300 hover:bg-gray-700 hover:text-white">
                     <ChevronLeft className="w-4 h-4 mr-2" />
@@ -371,7 +374,7 @@ const ProfileSettingsPage = () => {
                 <Card className="bg-gray-800 border-gray-700">
                     <CardHeader>
                         <CardTitle className="text-2xl flex items-center text-white">
-                            <User className="mr-3 w-6 h-6 text-green-500"/>
+                            <User className="mr-3 w-6 h-6 text-green-500" />
                             Profile Settings
                         </CardTitle>
                         <CardDescription className="text-gray-400">
@@ -383,7 +386,7 @@ const ProfileSettingsPage = () => {
                             <div>
                                 <Label htmlFor="userNumber" className="text-gray-300">User Number</Label>
                                 <div className="flex items-center mt-2">
-                                    <KeyRound className="w-5 h-5 mr-3 text-green-500"/>
+                                    <KeyRound className="w-5 h-5 mr-3 text-green-500" />
                                     <span className="text-lg font-mono bg-gray-900/50 border border-gray-600 px-4 py-2 rounded-md">{profile?.user_number || 'N/A'}</span>
                                 </div>
                                 <p className="text-xs text-gray-500 mt-2">Your unique user ID.</p>
@@ -392,8 +395,8 @@ const ProfileSettingsPage = () => {
                             <div>
                                 <Label htmlFor="userEmail" className="text-gray-300">Email Address</Label>
                                 <div className="flex items-center mt-2">
-                                    <Mail className="w-5 h-5 mr-3 text-green-500"/>
-                                    <span className="text-lg bg-gray-900/50 border border-gray-600 px-4 py-2 rounded-md">{userEmail || 'N/A'}</span>
+                                    <Mail className="w-5 h-5 mr-3 text-green-500" />
+                                    <span className="text-lg bg-gray-900/50 border border-gray-600 px-4 py-2 rounded-md text-slate-50">{userEmail || 'N/A'}</span>
                                 </div>
                                 <p className="text-xs text-gray-500 mt-2">The email address used for your account login.</p>
                             </div>
@@ -401,66 +404,32 @@ const ProfileSettingsPage = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <Label htmlFor="firstName" className="text-gray-300">First Name</Label>
-                                    <Input 
-                                        id="firstName" 
-                                        value={firstName} 
-                                        onChange={e => setFirstName(e.target.value)} 
-                                        className="mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white" 
-                                        placeholder="E.g., John"
-                                    />
+                                    <Input id="firstName" value={firstName} onChange={e => setFirstName(e.target.value)} className="mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white" placeholder="E.g., John" />
                                 </div>
                                 <div>
                                     <Label htmlFor="lastName" className="text-gray-300">Last Name</Label>
-                                    <Input 
-                                        id="lastName" 
-                                        value={lastName} 
-                                        onChange={e => setLastName(e.target.value)} 
-                                        className="mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white" 
-                                        placeholder="E.g., Doe"
-                                    />
+                                    <Input id="lastName" value={lastName} onChange={e => setLastName(e.target.value)} className="mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white" placeholder="E.g., Doe" />
                                 </div>
                             </div>
                             
                             <div>
                                 <Label htmlFor="callSign" className="text-gray-300">Call Sign</Label>
                                 <div className="relative">
-                                    <Input 
-                                        id="callSign" 
-                                        value={callSign} 
-                                        onChange={handleCallSignChange} 
-                                        className={`mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white ${callSignError ? 'border-red-500' : ''}`}
-                                        placeholder="E.g., Maverick"
-                                    />
-                                    {checkingCallSign && (
-                                        <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 animate-spin text-gray-400" />
-                                    )}
+                                    <Input id="callSign" value={callSign} onChange={handleCallSignChange} className={`mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white ${callSignError ? 'border-red-500' : ''}`} placeholder="E.g., Maverick" />
+                                    {checkingCallSign && <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 animate-spin text-gray-400" />}
                                 </div>
-                                {callSignError && (
-                                    <p className="text-red-400 text-xs mt-2">{callSignError}</p>
-                                )}
+                                {callSignError && <p className="text-red-400 text-xs mt-2">{callSignError}</p>}
                                 <p className="text-xs text-gray-500 mt-2">This will be displayed to other users. Must be unique.</p>
                             </div>
                             
                             <div>
                                 <Label htmlFor="bio" className="text-gray-300">Bio</Label>
-                                <Textarea 
-                                    id="bio" 
-                                    value={bio} 
-                                    onChange={e => setBio(e.target.value)} 
-                                    maxLength={500} 
-                                    rows={4} 
-                                    className="mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white" 
-                                    placeholder="Tell us a little about yourself..."
-                                />
+                                <Textarea id="bio" value={bio} onChange={e => setBio(e.target.value)} maxLength={500} rows={4} className="mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white" placeholder="Tell us a little about yourself..." />
                                 <p className="text-xs text-gray-500 mt-2 text-right">{bio.length} / 500</p>
                             </div>
                             
                             <CardFooter className="p-0 pt-4 flex justify-end">
-                                <Button 
-                                    type="submit" 
-                                    disabled={updating || loading || !!callSignError || checkingCallSign} 
-                                    className="bg-green-600 hover:bg-green-700 text-white font-bold"
-                                >
+                                <Button type="submit" disabled={updating || loading || !!callSignError || checkingCallSign} className="bg-green-600 hover:bg-green-700 text-white font-bold">
                                     {updating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                     Save Changes
                                 </Button>
@@ -473,7 +442,7 @@ const ProfileSettingsPage = () => {
                 <Card className="bg-gray-800 border-gray-700">
                     <CardHeader>
                         <CardTitle className="text-xl flex items-center text-white">
-                            <Lock className="mr-3 w-5 h-5 text-green-500"/>
+                            <Lock className="mr-3 w-5 h-5 text-green-500" />
                             Change Password
                         </CardTitle>
                         <CardDescription className="text-gray-400">
@@ -485,19 +454,8 @@ const ProfileSettingsPage = () => {
                             <div>
                                 <Label htmlFor="currentPassword" className="text-gray-300">Current Password</Label>
                                 <div className="relative">
-                                    <Input 
-                                        id="currentPassword" 
-                                        type={showCurrentPassword ? 'text' : 'password'}
-                                        value={currentPassword} 
-                                        onChange={e => setCurrentPassword(e.target.value)} 
-                                        className="mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white pr-10" 
-                                        placeholder="Enter your current password"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300"
-                                    >
+                                    <Input id="currentPassword" type={showCurrentPassword ? 'text' : 'password'} value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} className="mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white pr-10" placeholder="Enter your current password" />
+                                    <button type="button" onClick={() => setShowCurrentPassword(!showCurrentPassword)} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300">
                                         {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                     </button>
                                 </div>
@@ -506,19 +464,8 @@ const ProfileSettingsPage = () => {
                             <div>
                                 <Label htmlFor="newPassword" className="text-gray-300">New Password</Label>
                                 <div className="relative">
-                                    <Input 
-                                        id="newPassword" 
-                                        type={showNewPassword ? 'text' : 'password'}
-                                        value={newPassword} 
-                                        onChange={e => setNewPassword(e.target.value)} 
-                                        className="mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white pr-10" 
-                                        placeholder="Enter your new password"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowNewPassword(!showNewPassword)}
-                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300"
-                                    >
+                                    <Input id="newPassword" type={showNewPassword ? 'text' : 'password'} value={newPassword} onChange={e => setNewPassword(e.target.value)} className="mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white pr-10" placeholder="Enter your new password" />
+                                    <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300">
                                         {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                     </button>
                                 </div>
@@ -528,34 +475,17 @@ const ProfileSettingsPage = () => {
                             <div>
                                 <Label htmlFor="confirmPassword" className="text-gray-300">Confirm New Password</Label>
                                 <div className="relative">
-                                    <Input 
-                                        id="confirmPassword" 
-                                        type={showConfirmPassword ? 'text' : 'password'}
-                                        value={confirmPassword} 
-                                        onChange={e => setConfirmPassword(e.target.value)} 
-                                        className="mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white pr-10" 
-                                        placeholder="Confirm your new password"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300"
-                                    >
+                                    <Input id="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white pr-10" placeholder="Confirm your new password" />
+                                    <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300">
                                         {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                     </button>
                                 </div>
                             </div>
 
-                            {passwordError && (
-                                <p className="text-red-400 text-sm">{passwordError}</p>
-                            )}
+                            {passwordError && <p className="text-red-400 text-sm">{passwordError}</p>}
                             
                             <CardFooter className="p-0 pt-4 flex justify-end">
-                                <Button 
-                                    type="submit" 
-                                    disabled={updatingPassword || !currentPassword || !newPassword || !confirmPassword} 
-                                    className="bg-green-600 hover:bg-green-700 text-white font-bold"
-                                >
+                                <Button type="submit" disabled={updatingPassword || !currentPassword || !newPassword || !confirmPassword} className="bg-green-600 hover:bg-green-700 text-white font-bold">
                                     {updatingPassword && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                     Update Password
                                 </Button>
@@ -564,8 +494,6 @@ const ProfileSettingsPage = () => {
                     </CardContent>
                 </Card>
             </div>
-        </div>
-    );
-}
-
+        </div>;
+};
 export default ProfileSettingsPage;
