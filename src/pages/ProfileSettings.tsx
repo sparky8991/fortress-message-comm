@@ -387,7 +387,7 @@ const ProfileSettingsPage = () => {
                                 <Label htmlFor="userNumber" className="text-gray-300">User Number</Label>
                                 <div className="flex items-center mt-2">
                                     <KeyRound className="w-5 h-5 mr-3 text-green-500" />
-                                    <span className="text-lg font-mono bg-gray-900/50 border border-gray-600 px-4 py-2 rounded-md">{profile?.user_number || 'N/A'}</span>
+                                    <span className="text-lg font-mono bg-gray-900/50 border border-gray-600 px-4 py-2 rounded-md text-slate-50">{profile?.user_number || 'N/A'}</span>
                                 </div>
                                 <p className="text-xs text-gray-500 mt-2">Your unique user ID.</p>
                             </div>
