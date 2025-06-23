@@ -104,9 +104,12 @@ export const useDirectMessages = () => {
       channelRef.current = null;
     }
 
-    // Create new channel
-    const channel = supabase
-      .channel('direct-messages')
+    // Create new channel with a unique name to avoid conflicts
+    const channelName = `direct-messages-${Date.now()}`;
+    const channel = supabase.channel(channelName);
+
+    // Configure the channel before subscribing
+    channel
       .on(
         'postgres_changes',
         {
@@ -145,8 +148,14 @@ export const useDirectMessages = () => {
         }
       );
 
-    // Subscribe to the channel
-    channel.subscribe();
+    // Subscribe to the channel only once
+    channel.subscribe((status) => {
+      console.log('Channel subscription status:', status);
+      if (status === 'SUBSCRIBED') {
+        console.log('Successfully subscribed to real-time updates');
+      }
+    });
+
     channelRef.current = channel;
 
     return () => {
