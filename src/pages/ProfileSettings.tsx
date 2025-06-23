@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Loader2, User, KeyRound, ChevronLeft, Lock, Eye, EyeOff } from 'lucide-react';
+import { Loader2, User, KeyRound, ChevronLeft, Lock, Eye, EyeOff, Mail } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -21,6 +21,7 @@ const ProfileSettingsPage = () => {
         bio: string | null;
         user_number: number | null;
     } | null>(null);
+    const [userEmail, setUserEmail] = useState<string>('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [callSign, setCallSign] = useState('');
@@ -82,6 +83,9 @@ const ProfileSettingsPage = () => {
                 navigate('/auth');
                 return;
             }
+
+            // Set user email
+            setUserEmail(user.email || '');
 
             console.log('Fetching profile for user ID:', user.id);
             const { data, error } = await supabase
@@ -383,6 +387,15 @@ const ProfileSettingsPage = () => {
                                     <span className="text-lg font-mono bg-gray-900/50 border border-gray-600 px-4 py-2 rounded-md">{profile?.user_number || 'N/A'}</span>
                                 </div>
                                 <p className="text-xs text-gray-500 mt-2">Your unique user ID.</p>
+                            </div>
+
+                            <div>
+                                <Label htmlFor="userEmail" className="text-gray-300">Email Address</Label>
+                                <div className="flex items-center mt-2">
+                                    <Mail className="w-5 h-5 mr-3 text-green-500"/>
+                                    <span className="text-lg bg-gray-900/50 border border-gray-600 px-4 py-2 rounded-md">{userEmail || 'N/A'}</span>
+                                </div>
+                                <p className="text-xs text-gray-500 mt-2">The email address used for your account login.</p>
                             </div>
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
