@@ -47,13 +47,7 @@ export const conversationService = {
           user_id,
           joined_at,
           role,
-          is_active,
-          profiles (
-            username,
-            full_name,
-            user_number,
-            avatar_url
-          )
+          is_active
         )
       `)
       .eq('conversation_participants.is_active', true)
@@ -63,7 +57,12 @@ export const conversationService = {
     return (data || []).map(conv => ({
       ...conv,
       type: conv.type as 'direct' | 'group',
-      participants: conv.conversation_participants
+      participants: conv.conversation_participants?.map((p: any) => ({
+        user_id: p.user_id,
+        joined_at: p.joined_at,
+        role: p.role,
+        is_active: p.is_active
+      })) || []
     }));
   },
 

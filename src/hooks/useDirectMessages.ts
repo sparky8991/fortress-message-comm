@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { conversationService, DirectMessage, Conversation } from '@/services/conversationService';
 import { toast } from '@/hooks/use-toast';
@@ -9,6 +9,7 @@ export const useDirectMessages = () => {
   const [activeConversation, setActiveConversation] = useState<string | null>(null);
   const [messages, setMessages] = useState<DirectMessage[]>([]);
   const [loading, setLoading] = useState(false);
+  const channelRef = useRef<any>(null);
 
   // Load conversations
   const loadConversations = async () => {
@@ -97,6 +98,13 @@ export const useDirectMessages = () => {
 
   // Set up real-time subscriptions
   useEffect(() => {
+    // Clean up existing channel if it exists
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+      channelRef.current = null;
+    }
+
+    // Create new channel
     const channel = supabase
       .channel('direct-messages')
       .on(
@@ -135,11 +143,17 @@ export const useDirectMessages = () => {
             loadConversations();
           }
         }
-      )
-      .subscribe();
+      );
+
+    // Subscribe to the channel
+    channel.subscribe();
+    channelRef.current = channel;
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
     };
   }, [activeConversation]);
 

@@ -27,23 +27,22 @@ export const ContactList = ({
       id,
       ...contact,
       type: 'team',
-      lastMessage: contact.lastMessage || 'No messages yet'
+      lastMessage: 'No messages yet'
     }));
 
     const directConversations = conversations.map(conv => {
       const otherParticipant = conv.participants?.find(p => p.user_id !== conv.id);
-      const profile = otherParticipant?.profiles;
       
       return {
         id: conv.id,
-        name: profile?.full_name || profile?.username || `User #${profile?.user_number}`,
+        name: `Direct Chat ${conv.id.substring(0, 8)}`,
         status: 'online',
         lastMessage: conv.last_message_preview || 'No messages yet',
         time: conv.last_message_at ? new Date(conv.last_message_at).toLocaleTimeString([], { 
           hour: '2-digit', 
           minute: '2-digit' 
         }) : '',
-        avatar: profile?.avatar_url || '',
+        avatar: '',
         type: 'direct',
         conversationId: conv.id
       };
