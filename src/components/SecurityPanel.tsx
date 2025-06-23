@@ -1,8 +1,55 @@
 
-import React from 'react';
-import { Shield, Key, Lock, Eye, EyeOff, Fingerprint, Smartphone, Wifi } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Shield, Key, Lock, Eye, EyeOff, Fingerprint, Smartphone, Wifi, Loader2 } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { useUserSettings } from '@/hooks/useUserSettings';
 
 export const SecurityPanel = () => {
+  const { settings: userSettings, updateSecuritySettings, loading } = useUserSettings();
+  const [autoDeleteMessages, setAutoDeleteMessages] = useState(true);
+  const [screenshotProtection, setScreenshotProtection] = useState(true);
+  const [biometricLock, setBiometricLock] = useState(true);
+  const [autoDeleteTimer, setAutoDeleteTimer] = useState(24);
+  const [hasChanges, setHasChanges] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  // Load settings from database when available
+  useEffect(() => {
+    if (userSettings?.security_settings) {
+      const securitySettings = userSettings.security_settings;
+      setAutoDeleteMessages(securitySettings.autoDeleteMessages);
+      setScreenshotProtection(securitySettings.screenshotProtection);
+      setBiometricLock(securitySettings.biometricLock);
+      setAutoDeleteTimer(securitySettings.autoDeleteTimer);
+      setHasChanges(false);
+    }
+  }, [userSettings]);
+
+  const handleSettingChange = (setter: (value: any) => void, value: any) => {
+    setter(value);
+    setHasChanges(true);
+  };
+
+  const handleSaveSettings = async () => {
+    setSaving(true);
+    try {
+      await updateSecuritySettings({
+        autoDeleteMessages,
+        screenshotProtection,
+        biometricLock,
+        autoDeleteTimer
+      });
+      setHasChanges(false);
+    } catch (error) {
+      console.error('Failed to save security settings:', error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className="p-4 space-y-6">
       {/* Security Status */}
@@ -10,6 +57,7 @@ export const SecurityPanel = () => {
         <div className="flex items-center space-x-3 mb-3">
           <Shield className="w-6 h-6 text-green-500" />
           <h3 className="text-lg font-semibold text-white">Security Status</h3>
+          {loading && <Loader2 className="w-4 h-4 animate-spin text-green-500" />}
         </div>
         <div className="space-y-2">
           <div className="flex items-center justify-between">
@@ -27,12 +75,24 @@ export const SecurityPanel = () => {
         </div>
       </div>
 
-      {/* Encryption Settings */}
+      {/* Security Settings */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-white flex items-center space-x-2">
-          <Key className="w-5 h-5" />
-          <span>Encryption Settings</span>
-        </h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-white flex items-center space-x-2">
+            <Key className="w-5 h-5" />
+            <span>Security Settings</span>
+          </h3>
+          {hasChanges && (
+            <Button 
+              onClick={handleSaveSettings} 
+              disabled={saving || loading}
+              className="bg-green-600 hover:bg-green-700 text-sm"
+            >
+              {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              Save Changes
+            </Button>
+          )}
+        </div>
         
         <div className="space-y-3">
           <div className="flex items-center justify-between p-3 bg-gray-800 rounded-lg">
@@ -40,13 +100,33 @@ export const SecurityPanel = () => {
               <Lock className="w-5 h-5 text-green-500" />
               <div>
                 <p className="text-white font-medium">Auto-delete Messages</p>
-                <p className="text-gray-400 text-sm">Messages deleted after 24 hours</p>
+                <p className="text-gray-400 text-sm">Messages deleted after {autoDeleteTimer} hours</p>
               </div>
             </div>
-            <div className="w-10 h-6 bg-green-500 rounded-full p-1">
-              <div className="w-4 h-4 bg-white rounded-full ml-auto"></div>
-            </div>
+            <Switch
+              checked={autoDeleteMessages}
+              onCheckedChange={(checked) => handleSettingChange(setAutoDeleteMessages, checked)}
+              disabled={loading}
+            />
           </div>
+
+          {autoDeleteMessages && (
+            <div className="ml-8 p-3 bg-gray-700 rounded-lg">
+              <Label htmlFor="autoDeleteTimer" className="text-white text-sm">
+                Auto-delete timer (hours)
+              </Label>
+              <Input
+                id="autoDeleteTimer"
+                type="number"
+                min="1"
+                max="168"
+                value={autoDeleteTimer}
+                onChange={(e) => handleSettingChange(setAutoDeleteTimer, Number(e.target.value))}
+                className="mt-2 bg-gray-600 border-gray-500 text-white"
+                disabled={loading}
+              />
+            </div>
+          )}
 
           <div className="flex items-center justify-between p-3 bg-gray-800 rounded-lg">
             <div className="flex items-center space-x-3">
@@ -56,9 +136,11 @@ export const SecurityPanel = () => {
                 <p className="text-gray-400 text-sm">Prevent screenshots in chats</p>
               </div>
             </div>
-            <div className="w-10 h-6 bg-green-500 rounded-full p-1">
-              <div className="w-4 h-4 bg-white rounded-full ml-auto"></div>
-            </div>
+            <Switch
+              checked={screenshotProtection}
+              onCheckedChange={(checked) => handleSettingChange(setScreenshotProtection, checked)}
+              disabled={loading}
+            />
           </div>
 
           <div className="flex items-center justify-between p-3 bg-gray-800 rounded-lg">
@@ -69,9 +151,11 @@ export const SecurityPanel = () => {
                 <p className="text-gray-400 text-sm">Require fingerprint to open</p>
               </div>
             </div>
-            <div className="w-10 h-6 bg-green-500 rounded-full p-1">
-              <div className="w-4 h-4 bg-white rounded-full ml-auto"></div>
-            </div>
+            <Switch
+              checked={biometricLock}
+              onCheckedChange={(checked) => handleSettingChange(setBiometricLock, checked)}
+              disabled={loading}
+            />
           </div>
         </div>
       </div>

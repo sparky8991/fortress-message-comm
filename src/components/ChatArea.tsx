@@ -1,8 +1,8 @@
-
 import React, { useState } from 'react';
 import { MessageList } from './MessageList';
 import { NotificationSettings } from './NotificationSettings';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useUserSettings } from '@/hooks/useUserSettings';
 import { ChatHeader } from './ChatHeader';
 import { MessageInput } from './MessageInput';
 import { contactInfo } from '@/constants/contactInfo';
@@ -16,7 +16,10 @@ interface ChatAreaProps {
 
 export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaProps) => {
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
-  const [notificationSettings, setNotificationSettings] = useState({
+  const { settings: userSettings } = useUserSettings();
+  
+  // Fallback settings for backward compatibility
+  const [fallbackSettings, setFallbackSettings] = useState({
     unreadReminderEnabled: true,
     reminderTimerEnabled: true,
     unreadReminderTime: 5
@@ -33,10 +36,15 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
 
   const contact = contactInfo[activeChat as keyof typeof contactInfo];
   
-  useNotifications(currentMessages, notificationSettings);
+  // Use settings from database if available, otherwise use fallback
+  const currentNotificationSettings = userSettings?.notification_settings || fallbackSettings;
+  
+  useNotifications(currentMessages, currentNotificationSettings);
 
-  const handleSaveNotificationSettings = (newSettings: typeof notificationSettings) => {
-    setNotificationSettings(newSettings);
+  const handleSaveNotificationSettings = (newSettings: typeof fallbackSettings) => {
+    // This is now handled by the NotificationSettings component via the userSettings hook
+    // Keep this for backward compatibility
+    setFallbackSettings(newSettings);
   };
 
   return (
@@ -75,7 +83,7 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
       <NotificationSettings
         isOpen={showNotificationSettings}
         onClose={() => setShowNotificationSettings(false)}
-        settings={notificationSettings}
+        settings={currentNotificationSettings}
         onSave={handleSaveNotificationSettings}
       />
     </div>

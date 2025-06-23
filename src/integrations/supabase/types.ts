@@ -434,6 +434,36 @@ export type Database = {
           },
         ]
       }
+      user_settings: {
+        Row: {
+          appearance_settings: Json | null
+          created_at: string
+          id: string
+          notification_settings: Json | null
+          security_settings: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          appearance_settings?: Json | null
+          created_at?: string
+          id?: string
+          notification_settings?: Json | null
+          security_settings?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          appearance_settings?: Json | null
+          created_at?: string
+          id?: string
+          notification_settings?: Json | null
+          security_settings?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
