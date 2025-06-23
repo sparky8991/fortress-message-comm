@@ -47,7 +47,12 @@ export const userSettingsService = {
         throw error;
       }
 
-      return data;
+      // Cast the Json types to our interfaces
+      return {
+        notification_settings: data.notification_settings as NotificationSettings,
+        security_settings: data.security_settings as SecuritySettings,
+        appearance_settings: data.appearance_settings as AppearanceSettings,
+      };
     } catch (error) {
       console.error('Error fetching user settings:', error);
       return null;
@@ -87,7 +92,12 @@ export const userSettingsService = {
 
       if (error) throw error;
 
-      return data;
+      // Cast the Json types to our interfaces
+      return {
+        notification_settings: data.notification_settings as NotificationSettings,
+        security_settings: data.security_settings as SecuritySettings,
+        appearance_settings: data.appearance_settings as AppearanceSettings,
+      };
     } catch (error) {
       console.error('Error creating default settings:', error);
       throw error;
@@ -101,7 +111,7 @@ export const userSettingsService = {
 
       const { error } = await supabase
         .from('user_settings')
-        .update({ notification_settings: settings })
+        .update({ notification_settings: settings as any })
         .eq('user_id', user.id);
 
       if (error) throw error;
@@ -128,7 +138,7 @@ export const userSettingsService = {
 
       const { error } = await supabase
         .from('user_settings')
-        .update({ security_settings: settings })
+        .update({ security_settings: settings as any })
         .eq('user_id', user.id);
 
       if (error) throw error;
@@ -155,7 +165,7 @@ export const userSettingsService = {
 
       const { error } = await supabase
         .from('user_settings')
-        .update({ appearance_settings: settings })
+        .update({ appearance_settings: settings as any })
         .eq('user_id', user.id);
 
       if (error) throw error;
