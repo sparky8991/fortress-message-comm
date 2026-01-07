@@ -55,7 +55,7 @@ export const useDirectMessages = () => {
     if (!activeConversation || !content.trim()) return;
 
     try {
-      let attachmentUrl = null;
+      const attachmentUrl = null;
       let attachmentName = null;
       let attachmentType = null;
       let messageType: 'text' | 'image' | 'file' = 'text';
