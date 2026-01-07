@@ -178,9 +178,15 @@ export const useDirectMessages = () => {
     };
   }, [activeConversation]);
 
-  // Load conversations on mount
+  // Load conversations on mount (only if authenticated)
   useEffect(() => {
-    loadConversations();
+    const checkAuthAndLoad = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        loadConversations();
+      }
+    };
+    checkAuthAndLoad();
   }, []);
 
   return {
