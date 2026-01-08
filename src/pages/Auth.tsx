@@ -50,18 +50,50 @@ const AuthPage = () => {
     const userSnap = await getDoc(userRef);
 
     if (!userSnap.exists()) {
+      const displayName = userData.displayName || `${userData.firstName || ''} ${userData.lastName || ''}`.trim();
+      const callSign = userData.callSign || null;
+
       await setDoc(userRef, {
         id: userId,
         email: userData.email,
+        emailLower: userData.email?.toLowerCase() || null,
         firstName: userData.firstName || userData.displayName?.split(' ')[0] || '',
         lastName: userData.lastName || userData.displayName?.split(' ').slice(1).join(' ') || '',
+        displayName: displayName,
+        displayNameLower: displayName?.toLowerCase() || null,
         // Only set callSign if explicitly provided (email signup), not for Google sign-in
-        callSign: userData.callSign || null,
+        callSign: callSign,
+        callSignLower: callSign?.toLowerCase() || null,
         avatarUrl: userData.photoURL || null,
+        photoURL: userData.photoURL || null,
         createdAt: new Date().toISOString(),
         ghostModeActive: false,
         lastSeen: new Date().toISOString()
       });
+    } else {
+      // Update existing profile with searchable fields if missing
+      const existingData = userSnap.data();
+      const updates: any = {};
+
+      if (!existingData.emailLower && existingData.email) {
+        updates.emailLower = existingData.email.toLowerCase();
+      }
+      if (!existingData.displayNameLower && (existingData.displayName || userData.displayName)) {
+        const dn = existingData.displayName || userData.displayName;
+        updates.displayName = dn;
+        updates.displayNameLower = dn?.toLowerCase();
+      }
+      if (!existingData.callSignLower && existingData.callSign) {
+        updates.callSignLower = existingData.callSign.toLowerCase();
+      }
+      if (userData.photoURL && !existingData.photoURL) {
+        updates.photoURL = userData.photoURL;
+        updates.avatarUrl = userData.photoURL;
+      }
+
+      if (Object.keys(updates).length > 0) {
+        await setDoc(userRef, updates, { merge: true });
+      }
     }
   };
 

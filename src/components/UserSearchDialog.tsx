@@ -40,31 +40,42 @@ export const UserSearchDialog = ({ isOpen, onClose, onStartConversation }: UserS
     try {
       const profilesRef = collection(db, 'profiles');
       const searchLower = searchTerm.toLowerCase().trim();
+      const resultsMap = new Map<string, UserSearchResult>();
 
-      // Search by callSign (case-insensitive via searchable field)
-      const q = query(
-        profilesRef,
-        where('callSignLower', '>=', searchLower),
-        where('callSignLower', '<=', searchLower + '\uf8ff'),
-        limit(20)
-      );
-
-      const querySnapshot = await getDocs(q);
-      const results: UserSearchResult[] = [];
-
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        results.push({
-          id: doc.id,
-          username: data.callSign || data.email || 'Unknown',
-          full_name: `${data.firstName || ''} ${data.lastName || ''}`.trim(),
-          user_number: 0,
-          avatar_url: data.avatarUrl || ''
+      // Helper to add results without duplicates
+      const addResults = (snapshot: any) => {
+        snapshot.forEach((doc: any) => {
+          if (!resultsMap.has(doc.id)) {
+            const data = doc.data();
+            resultsMap.set(doc.id, {
+              id: doc.id,
+              username: data.callSign || data.displayName || data.email || 'Unknown',
+              full_name: data.displayName || `${data.firstName || ''} ${data.lastName || ''}`.trim(),
+              user_number: 0,
+              avatar_url: data.avatarUrl || data.photoURL || ''
+            });
+          }
         });
-      });
+      };
 
-      // If no results from callSign search, try email search
-      if (results.length === 0) {
+      // Try multiple search strategies
+
+      // 1. Search by callSignLower
+      try {
+        const callSignQuery = query(
+          profilesRef,
+          where('callSignLower', '>=', searchLower),
+          where('callSignLower', '<=', searchLower + '\uf8ff'),
+          limit(20)
+        );
+        const callSignSnapshot = await getDocs(callSignQuery);
+        addResults(callSignSnapshot);
+      } catch (e) {
+        console.log('callSignLower search failed, trying alternatives');
+      }
+
+      // 2. Search by email
+      try {
         const emailQuery = query(
           profilesRef,
           where('email', '>=', searchLower),
@@ -72,19 +83,52 @@ export const UserSearchDialog = ({ isOpen, onClose, onStartConversation }: UserS
           limit(20)
         );
         const emailSnapshot = await getDocs(emailQuery);
-        emailSnapshot.forEach((doc) => {
+        addResults(emailSnapshot);
+      } catch (e) {
+        console.log('email search failed');
+      }
+
+      // 3. Search by displayName (for Google auth users)
+      try {
+        const displayNameQuery = query(
+          profilesRef,
+          where('displayNameLower', '>=', searchLower),
+          where('displayNameLower', '<=', searchLower + '\uf8ff'),
+          limit(20)
+        );
+        const displayNameSnapshot = await getDocs(displayNameQuery);
+        addResults(displayNameSnapshot);
+      } catch (e) {
+        console.log('displayName search failed');
+      }
+
+      // 4. If still no results, get all profiles and filter client-side
+      if (resultsMap.size === 0) {
+        const allProfilesQuery = query(profilesRef, limit(50));
+        const allSnapshot = await getDocs(allProfilesQuery);
+        allSnapshot.forEach((doc) => {
           const data = doc.data();
-          results.push({
-            id: doc.id,
-            username: data.callSign || data.email || 'Unknown',
-            full_name: `${data.firstName || ''} ${data.lastName || ''}`.trim(),
-            user_number: 0,
-            avatar_url: data.avatarUrl || ''
-          });
+          const searchableText = [
+            data.callSign,
+            data.email,
+            data.displayName,
+            data.firstName,
+            data.lastName
+          ].filter(Boolean).join(' ').toLowerCase();
+
+          if (searchableText.includes(searchLower)) {
+            resultsMap.set(doc.id, {
+              id: doc.id,
+              username: data.callSign || data.displayName || data.email || 'Unknown',
+              full_name: data.displayName || `${data.firstName || ''} ${data.lastName || ''}`.trim(),
+              user_number: 0,
+              avatar_url: data.avatarUrl || data.photoURL || ''
+            });
+          }
         });
       }
 
-      setSearchResults(results);
+      setSearchResults(Array.from(resultsMap.values()));
     } catch (error) {
       console.error('Error searching users:', error);
       toast({
