@@ -1,11 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
-import { Shield, Key, Lock, Eye, EyeOff, Fingerprint, Smartphone, Wifi, Loader2 } from 'lucide-react';
+import { Shield, Key, Lock, Eye, EyeOff, Fingerprint, Smartphone, Wifi, Loader2, AlertTriangle, KeyRound } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useUserSettings } from '@/hooks/useUserSettings';
+import { PanicButton } from './PanicMode';
+import { PinSetup } from './ScreenLock';
 
 export const SecurityPanel = () => {
   const { settings: userSettings, updateSecuritySettings, loading } = useUserSettings();
@@ -15,6 +17,10 @@ export const SecurityPanel = () => {
   const [autoDeleteTimer, setAutoDeleteTimer] = useState(24);
   const [hasChanges, setHasChanges] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [showPinSetup, setShowPinSetup] = useState(false);
+  const [showPanicPinSetup, setShowPanicPinSetup] = useState(false);
+  const [pinEnabled, setPinEnabled] = useState(!!localStorage.getItem('securechat_pin'));
+  const [panicPinEnabled, setPanicPinEnabled] = useState(!!localStorage.getItem('securechat_panic_pin'));
 
   // Load settings from database when available
   useEffect(() => {
@@ -191,7 +197,7 @@ export const SecurityPanel = () => {
           <Wifi className="w-5 h-5" />
           <span>Network Security</span>
         </h3>
-        
+
         <div className="bg-gray-800 rounded-lg p-4">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
@@ -209,6 +215,114 @@ export const SecurityPanel = () => {
           </div>
         </div>
       </div>
+
+      {/* PIN Lock */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-white flex items-center space-x-2">
+          <KeyRound className="w-5 h-5" />
+          <span>App Lock</span>
+        </h3>
+
+        <div className="space-y-3">
+          <div className="flex items-center justify-between p-3 bg-gray-800 rounded-lg">
+            <div className="flex items-center space-x-3">
+              <Lock className="w-5 h-5 text-green-500" />
+              <div>
+                <p className="text-white font-medium">PIN Lock</p>
+                <p className="text-gray-400 text-sm">
+                  {pinEnabled ? 'PIN protection is enabled' : 'Require PIN to open app'}
+                </p>
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowPinSetup(true)}
+              className="border-green-600 text-green-400 hover:bg-green-600/20"
+            >
+              {pinEnabled ? 'Change' : 'Set Up'}
+            </Button>
+          </div>
+
+          <div className="flex items-center justify-between p-3 bg-gray-800 rounded-lg">
+            <div className="flex items-center space-x-3">
+              <AlertTriangle className="w-5 h-5 text-red-500" />
+              <div>
+                <p className="text-white font-medium">Panic PIN</p>
+                <p className="text-gray-400 text-sm">
+                  {panicPinEnabled ? 'Decoy PIN is set' : 'Set a PIN that wipes all data'}
+                </p>
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowPanicPinSetup(true)}
+              className="border-red-600 text-red-400 hover:bg-red-600/20"
+            >
+              {panicPinEnabled ? 'Change' : 'Set Up'}
+            </Button>
+          </div>
+
+          {pinEnabled && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                localStorage.removeItem('securechat_pin');
+                setPinEnabled(false);
+              }}
+              className="w-full text-gray-400 hover:text-red-400"
+            >
+              Disable PIN Lock
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Emergency Actions */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-white flex items-center space-x-2">
+          <AlertTriangle className="w-5 h-5 text-red-500" />
+          <span>Emergency</span>
+        </h3>
+
+        <div className="bg-red-900/20 border border-red-800/50 rounded-lg p-4">
+          <p className="text-gray-300 text-sm mb-4">
+            Use panic mode to immediately wipe all your messages, conversations, and local data.
+            This cannot be undone.
+          </p>
+          <PanicButton />
+        </div>
+      </div>
+
+      {/* PIN Setup Modal */}
+      {showPinSetup && (
+        <div className="fixed inset-0 z-50">
+          <PinSetup
+            mode={pinEnabled ? 'change' : 'setup'}
+            onComplete={() => {
+              setShowPinSetup(false);
+              setPinEnabled(true);
+            }}
+            onSkip={() => setShowPinSetup(false)}
+          />
+        </div>
+      )}
+
+      {/* Panic PIN Setup Modal */}
+      {showPanicPinSetup && (
+        <div className="fixed inset-0 z-50">
+          <PinSetup
+            mode="panic"
+            onComplete={() => {
+              setShowPanicPinSetup(false);
+              setPanicPinEnabled(true);
+            }}
+            onSkip={() => setShowPanicPinSetup(false)}
+          />
+        </div>
+      )}
     </div>
   );
 };
