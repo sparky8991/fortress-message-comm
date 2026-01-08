@@ -1,10 +1,11 @@
-# CLAUDE.md - AI Assistant Guide for Fortress Message Comm
+# CLAUDE.md - AI Assistant Guide for SecureChat
 
 ## Project Overview
 
-Fortress Message Comm is a secure team messaging application built with React, TypeScript, and Supabase. It features encrypted messaging, team collaboration, ghost mode sessions, and mobile support via Capacitor.
+SecureChat (Fortress Message Comm) is a secure team messaging application built with React, TypeScript, and Firebase. It features encrypted messaging, team collaboration, ghost mode sessions, and mobile support via Capacitor.
 
-**Lovable Project URL:** https://lovable.dev/projects/3262fb28-8730-4647-8a23-3e6a2d67e697
+**Built By:** Johnathan Carlson
+**Live URL:** https://fortress-message-comm.netlify.app
 
 ## Quick Reference
 
@@ -22,7 +23,7 @@ npm run preview    # Preview production build
 |----------|------------|
 | Frontend | React 18.3, TypeScript 5.5, Vite 5.4 |
 | UI | shadcn/ui, Radix UI, Tailwind CSS 3.4 |
-| Backend | Supabase (PostgreSQL + Auth + Realtime) |
+| Backend | Firebase (Firestore + Auth + Storage) |
 | State | TanStack React Query, React Hook Form, Zod |
 | Mobile | Capacitor 7.3 |
 | Icons | Lucide React |
