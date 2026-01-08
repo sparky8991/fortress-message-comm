@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Phone, Video, MoreVertical, Lock, Settings, User, Bell, Shield, LogOut, Info, MessageSquare, Phone as PhoneIcon } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useNavigate } from 'react-router-dom';
@@ -14,6 +14,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { PrivacySecuritySettings } from './PrivacySecuritySettings';
+import { CallSettingsDialog } from './CallSettingsDialog';
+import { ChatSettingsDialog } from './ChatSettingsDialog';
+import { AboutDialog } from './AboutDialog';
 
 interface ContactInfo {
   name: string;
@@ -32,6 +36,12 @@ export const ChatHeader = ({ contact, onStartCall, onShowNotificationSettings, o
   const isMobile = useIsMobile();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Dialog states
+  const [showPrivacySecurity, setShowPrivacySecurity] = useState(false);
+  const [showCallSettings, setShowCallSettings] = useState(false);
+  const [showChatSettings, setShowChatSettings] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -165,19 +175,28 @@ export const ChatHeader = ({ contact, onStartCall, onShowNotificationSettings, o
               <DropdownMenuSeparator className="bg-gray-700" />
 
               {/* Privacy & Security */}
-              <DropdownMenuItem className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer">
+              <DropdownMenuItem
+                onClick={() => setShowPrivacySecurity(true)}
+                className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer"
+              >
                 <Shield className="mr-2 h-4 w-4 text-purple-500" />
                 <span>Privacy & Security</span>
               </DropdownMenuItem>
 
               {/* Call Settings */}
-              <DropdownMenuItem className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer">
+              <DropdownMenuItem
+                onClick={() => setShowCallSettings(true)}
+                className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer"
+              >
                 <PhoneIcon className="mr-2 h-4 w-4 text-orange-500" />
                 <span>Call Settings</span>
               </DropdownMenuItem>
 
               {/* Chat Settings */}
-              <DropdownMenuItem className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer">
+              <DropdownMenuItem
+                onClick={() => setShowChatSettings(true)}
+                className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer"
+              >
                 <MessageSquare className="mr-2 h-4 w-4 text-cyan-500" />
                 <span>Chat Settings</span>
               </DropdownMenuItem>
@@ -185,7 +204,10 @@ export const ChatHeader = ({ contact, onStartCall, onShowNotificationSettings, o
               <DropdownMenuSeparator className="bg-gray-700" />
 
               {/* About */}
-              <DropdownMenuItem className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer">
+              <DropdownMenuItem
+                onClick={() => setShowAbout(true)}
+                className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer"
+              >
                 <Info className="mr-2 h-4 w-4 text-gray-400" />
                 <span>About SecureChat</span>
               </DropdownMenuItem>
@@ -204,6 +226,24 @@ export const ChatHeader = ({ contact, onStartCall, onShowNotificationSettings, o
           </DropdownMenu>
         </div>
       </div>
+
+      {/* Settings Dialogs */}
+      <PrivacySecuritySettings
+        isOpen={showPrivacySecurity}
+        onClose={() => setShowPrivacySecurity(false)}
+      />
+      <CallSettingsDialog
+        isOpen={showCallSettings}
+        onClose={() => setShowCallSettings(false)}
+      />
+      <ChatSettingsDialog
+        isOpen={showChatSettings}
+        onClose={() => setShowChatSettings(false)}
+      />
+      <AboutDialog
+        isOpen={showAbout}
+        onClose={() => setShowAbout(false)}
+      />
     </div>
   );
 };
