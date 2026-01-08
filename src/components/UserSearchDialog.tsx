@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { db } from '@/integrations/firebase/client';
-import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
+import { collection, query, getDocs, limit } from 'firebase/firestore';
 import { conversationService } from '@/services/conversationService';
 import { toast } from '@/hooks/use-toast';
 
@@ -40,95 +40,40 @@ export const UserSearchDialog = ({ isOpen, onClose, onStartConversation }: UserS
     try {
       const profilesRef = collection(db, 'profiles');
       const searchLower = searchTerm.toLowerCase().trim();
-      const resultsMap = new Map<string, UserSearchResult>();
+      const results: UserSearchResult[] = [];
 
-      // Helper to add results without duplicates
-      const addResults = (snapshot: any) => {
-        snapshot.forEach((doc: any) => {
-          if (!resultsMap.has(doc.id)) {
-            const data = doc.data();
-            resultsMap.set(doc.id, {
-              id: doc.id,
-              username: data.callSign || data.displayName || data.email || 'Unknown',
-              full_name: data.displayName || `${data.firstName || ''} ${data.lastName || ''}`.trim(),
-              user_number: 0,
-              avatar_url: data.avatarUrl || data.photoURL || ''
-            });
-          }
-        });
-      };
+      // Get all profiles and filter client-side (most reliable approach)
+      const allProfilesQuery = query(profilesRef, limit(100));
+      const snapshot = await getDocs(allProfilesQuery);
 
-      // Try multiple search strategies
+      snapshot.forEach((doc) => {
+        const data = doc.data();
 
-      // 1. Search by callSignLower
-      try {
-        const callSignQuery = query(
-          profilesRef,
-          where('callSignLower', '>=', searchLower),
-          where('callSignLower', '<=', searchLower + '\uf8ff'),
-          limit(20)
-        );
-        const callSignSnapshot = await getDocs(callSignQuery);
-        addResults(callSignSnapshot);
-      } catch (e) {
-        console.log('callSignLower search failed, trying alternatives');
-      }
+        // Build searchable text from all relevant fields
+        const searchableText = [
+          data.callSign,
+          data.callSignLower,
+          data.email,
+          data.emailLower,
+          data.displayName,
+          data.displayNameLower,
+          data.firstName,
+          data.lastName
+        ].filter(Boolean).join(' ').toLowerCase();
 
-      // 2. Search by email
-      try {
-        const emailQuery = query(
-          profilesRef,
-          where('email', '>=', searchLower),
-          where('email', '<=', searchLower + '\uf8ff'),
-          limit(20)
-        );
-        const emailSnapshot = await getDocs(emailQuery);
-        addResults(emailSnapshot);
-      } catch (e) {
-        console.log('email search failed');
-      }
+        // Check if search term matches any field
+        if (searchableText.includes(searchLower)) {
+          results.push({
+            id: doc.id,
+            username: data.callSign || data.displayName || data.email?.split('@')[0] || 'Unknown',
+            full_name: data.displayName || `${data.firstName || ''} ${data.lastName || ''}`.trim() || data.email || '',
+            user_number: 0,
+            avatar_url: data.avatarUrl || data.photoURL || ''
+          });
+        }
+      });
 
-      // 3. Search by displayName (for Google auth users)
-      try {
-        const displayNameQuery = query(
-          profilesRef,
-          where('displayNameLower', '>=', searchLower),
-          where('displayNameLower', '<=', searchLower + '\uf8ff'),
-          limit(20)
-        );
-        const displayNameSnapshot = await getDocs(displayNameQuery);
-        addResults(displayNameSnapshot);
-      } catch (e) {
-        console.log('displayName search failed');
-      }
-
-      // 4. If still no results, get all profiles and filter client-side
-      if (resultsMap.size === 0) {
-        const allProfilesQuery = query(profilesRef, limit(50));
-        const allSnapshot = await getDocs(allProfilesQuery);
-        allSnapshot.forEach((doc) => {
-          const data = doc.data();
-          const searchableText = [
-            data.callSign,
-            data.email,
-            data.displayName,
-            data.firstName,
-            data.lastName
-          ].filter(Boolean).join(' ').toLowerCase();
-
-          if (searchableText.includes(searchLower)) {
-            resultsMap.set(doc.id, {
-              id: doc.id,
-              username: data.callSign || data.displayName || data.email || 'Unknown',
-              full_name: data.displayName || `${data.firstName || ''} ${data.lastName || ''}`.trim(),
-              user_number: 0,
-              avatar_url: data.avatarUrl || data.photoURL || ''
-            });
-          }
-        });
-      }
-
-      setSearchResults(Array.from(resultsMap.values()));
+      setSearchResults(results);
     } catch (error) {
       console.error('Error searching users:', error);
       toast({
