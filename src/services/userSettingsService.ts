@@ -22,6 +22,13 @@ export interface AppearanceSettings {
   language: string;
 }
 
+export interface ThemeSettings {
+  accentColor: string; // hex color
+  bubbleStyle: 'rounded' | 'square' | 'minimal';
+  chatBackground: string; // predefined or hex color
+  fontStyle: 'mono' | 'sans' | 'serif';
+}
+
 export interface CallSettings {
   ringtoneEnabled: boolean;
   vibrationEnabled: boolean;
@@ -44,6 +51,7 @@ export interface UserSettings {
   appearance_settings: AppearanceSettings;
   call_settings?: CallSettings;
   chat_settings?: ChatSettings;
+  theme_settings?: ThemeSettings;
 }
 
 export const userSettingsService = {
@@ -106,6 +114,12 @@ export const userSettingsService = {
           showReadReceipts: true,
           messagePreview: true,
           mediaAutoDownload: true
+        },
+        theme_settings: {
+          accentColor: '#22c55e', // green-500
+          bubbleStyle: 'rounded',
+          chatBackground: 'default',
+          fontStyle: 'mono'
         }
       };
 
@@ -248,6 +262,32 @@ export const userSettingsService = {
       toast({
         title: 'Save Failed',
         description: 'Failed to save chat settings. Please try again.',
+        variant: 'destructive',
+      });
+      throw error;
+    }
+  },
+
+  async updateThemeSettings(settings: ThemeSettings): Promise<void> {
+    try {
+      const user = auth.currentUser;
+      if (!user) throw new Error('User not authenticated');
+
+      const settingsRef = doc(db, 'user_settings', user.uid);
+      await updateDoc(settingsRef, {
+        theme_settings: settings,
+        updated_at: serverTimestamp()
+      });
+
+      toast({
+        title: 'Theme Settings Saved',
+        description: 'Your theme preferences have been updated.',
+      });
+    } catch (error) {
+      console.error('Error updating theme settings:', error);
+      toast({
+        title: 'Save Failed',
+        description: 'Failed to save theme settings. Please try again.',
         variant: 'destructive',
       });
       throw error;

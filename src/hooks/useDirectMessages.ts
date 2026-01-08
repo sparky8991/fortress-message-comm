@@ -91,9 +91,22 @@ export const useDirectMessages = () => {
   };
 
   // Switch to a conversation
-  const switchToConversation = (conversationId: string) => {
+  const switchToConversation = async (conversationId: string) => {
     setActiveConversation(conversationId);
     loadMessages(conversationId);
+
+    // Mark conversation as read
+    await conversationService.markConversationAsRead(conversationId);
+
+    // Update local conversations to reflect read status
+    setConversations(prev => prev.map(conv =>
+      conv.id === conversationId ? { ...conv, unread_count: 0 } : conv
+    ));
+  };
+
+  // Get total unread count across all conversations
+  const getTotalUnreadCount = () => {
+    return conversations.reduce((total, conv) => total + (conv.unread_count || 0), 0);
   };
 
   // Set up real-time subscriptions for messages
@@ -167,6 +180,7 @@ export const useDirectMessages = () => {
     loading,
     sendMessage,
     switchToConversation,
-    loadConversations
+    loadConversations,
+    getTotalUnreadCount
   };
 };

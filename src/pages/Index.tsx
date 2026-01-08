@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, db } from '@/integrations/firebase/client';
 import { onAuthStateChanged, User } from 'firebase/auth';
@@ -7,6 +7,10 @@ import { doc, getDoc } from 'firebase/firestore';
 import { Sidebar } from '@/components/Sidebar';
 import { ChatArea } from '@/components/ChatArea';
 import { CallInterface } from '@/components/CallInterface';
+import { StatusBar } from '@/components/StatusBar';
+import { StatusViewer } from '@/components/StatusViewer';
+import { StatusCreator } from '@/components/StatusCreator';
+import { StatusUser } from '@/services/statusService';
 import { Loader2 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useDirectMessages } from '@/hooks/useDirectMessages';
@@ -20,8 +24,15 @@ const Index = () => {
   const [isInCall, setIsInCall] = useState(false);
   const [callType, setCallType] = useState<'voice' | 'video'>('voice');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [viewingStatus, setViewingStatus] = useState<StatusUser | null>(null);
+  const [showStatusCreator, setShowStatusCreator] = useState(false);
+  const [statusRefreshKey, setStatusRefreshKey] = useState(0);
   const navigate = useNavigate();
   const { activeConversation } = useDirectMessages();
+
+  const handleStatusCreated = useCallback(() => {
+    setStatusRefreshKey(prev => prev + 1);
+  }, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -108,42 +119,70 @@ const Index = () => {
           />
         </div>
       ) : (
-        <div className="flex w-full">
-          {/* Sidebar */}
-          <div
-            className={cn(
-                'md:flex flex-col',
-                'transition-all duration-300 ease-out',
-                'fixed md:static inset-y-0 left-0 z-30 w-80',
-                isMobile ? (sidebarOpen ? 'translate-x-0 flex shadow-2xl' : '-translate-x-full') : 'flex'
+        <>
+          <div className="flex w-full h-screen">
+            {/* Sidebar */}
+            <div
+              className={cn(
+                  'md:flex flex-col',
+                  'transition-all duration-300 ease-out',
+                  'fixed md:static inset-y-0 left-0 z-30 w-80',
+                  isMobile ? (sidebarOpen ? 'translate-x-0 flex shadow-2xl' : '-translate-x-full') : 'flex'
+              )}
+            >
+              <Sidebar
+                activeChat={currentChat?.id || ''}
+                onChatSelect={handleChatSelect}
+              />
+            </div>
+
+            {/* Mobile overlay */}
+            {isMobile && sidebarOpen && (
+                <div
+                  className="fixed inset-0 bg-black/60 backdrop-blur-sm z-20 transition-opacity duration-300"
+                  onClick={() => setSidebarOpen(false)}
+                />
             )}
-          >
-            <Sidebar 
-              activeChat={currentChat?.id || ''}
-              onChatSelect={handleChatSelect}
-            />
+
+            {/* Main content area */}
+            <div className="flex-1 min-w-0 flex flex-col">
+              {/* Status Bar */}
+              <StatusBar
+                key={statusRefreshKey}
+                onViewStatus={(statusUser) => setViewingStatus(statusUser)}
+                onCreateStatus={() => setShowStatusCreator(true)}
+              />
+
+              {/* Chat area */}
+              <div className="flex-1 min-h-0">
+                <ChatArea
+                  activeChat={currentChat?.id || ''}
+                  onStartCall={(type) => {
+                    setCallType(type);
+                    setIsInCall(true);
+                  }}
+                  onToggleSidebar={() => setSidebarOpen(true)}
+                />
+              </div>
+            </div>
           </div>
 
-          {/* Mobile overlay */}
-          {isMobile && sidebarOpen && (
-              <div 
-                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-20 transition-opacity duration-300" 
-                onClick={() => setSidebarOpen(false)} 
-              />
+          {/* Status Viewer */}
+          {viewingStatus && (
+            <StatusViewer
+              statusUser={viewingStatus}
+              onClose={() => setViewingStatus(null)}
+              onDeleted={handleStatusCreated}
+            />
           )}
 
-          {/* Main chat area */}
-          <div className="flex-1 min-w-0">
-            <ChatArea 
-              activeChat={currentChat?.id || ''}
-              onStartCall={(type) => {
-                setCallType(type);
-                setIsInCall(true);
-              }}
-              onToggleSidebar={() => setSidebarOpen(true)}
-            />
-          </div>
-        </div>
+          {/* Status Creator */}
+          <StatusCreator
+            isOpen={showStatusCreator}
+            onClose={() => setShowStatusCreator(false)}
+            onCreated={handleStatusCreated}
+          />
+        </>
       )}
     </div>
   );

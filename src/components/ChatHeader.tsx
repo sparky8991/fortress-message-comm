@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Phone, Video, MoreVertical, Lock, Settings, User, Bell, Shield, LogOut, Info, MessageSquare, Phone as PhoneIcon } from 'lucide-react';
+import { Phone, Video, MoreVertical, Lock, Settings, User, Bell, Shield, LogOut, Info, MessageSquare, Phone as PhoneIcon, Palette } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '@/integrations/firebase/client';
@@ -17,6 +17,7 @@ import {
 import { PrivacySecuritySettings } from './PrivacySecuritySettings';
 import { CallSettingsDialog } from './CallSettingsDialog';
 import { ChatSettingsDialog } from './ChatSettingsDialog';
+import { ThemeSettingsDialog } from './ThemeSettingsDialog';
 import { AboutDialog } from './AboutDialog';
 
 interface ContactInfo {
@@ -41,6 +42,7 @@ export const ChatHeader = ({ contact, onStartCall, onShowNotificationSettings, o
   const [showPrivacySecurity, setShowPrivacySecurity] = useState(false);
   const [showCallSettings, setShowCallSettings] = useState(false);
   const [showChatSettings, setShowChatSettings] = useState(false);
+  const [showThemeSettings, setShowThemeSettings] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
 
   const handleLogout = async () => {
@@ -201,6 +203,15 @@ export const ChatHeader = ({ contact, onStartCall, onShowNotificationSettings, o
                 <span>Chat Settings</span>
               </DropdownMenuItem>
 
+              {/* Theme Settings */}
+              <DropdownMenuItem
+                onClick={() => setShowThemeSettings(true)}
+                className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer"
+              >
+                <Palette className="mr-2 h-4 w-4 text-pink-500" />
+                <span>Theme Settings</span>
+              </DropdownMenuItem>
+
               <DropdownMenuSeparator className="bg-gray-700" />
 
               {/* About */}
@@ -239,6 +250,10 @@ export const ChatHeader = ({ contact, onStartCall, onShowNotificationSettings, o
       <ChatSettingsDialog
         isOpen={showChatSettings}
         onClose={() => setShowChatSettings(false)}
+      />
+      <ThemeSettingsDialog
+        isOpen={showThemeSettings}
+        onClose={() => setShowThemeSettings(false)}
       />
       <AboutDialog
         isOpen={showAbout}

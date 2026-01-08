@@ -1,7 +1,8 @@
 
 import React, { useState, useRef } from 'react';
-import { Send, Paperclip, Smile, FileText, X, Shield, Lock, Terminal } from 'lucide-react';
+import { Send, Paperclip, Smile, FileText, X, Shield, Lock, Terminal, ImageIcon } from 'lucide-react';
 import { EmojiPicker } from './EmojiPicker';
+import { GifPicker } from './GifPicker';
 import { EncryptedImageUpload } from './EncryptedImageUpload';
 import { ReplyPreview } from './ReplyPreview';
 import { toast } from '@/hooks/use-toast';
@@ -21,6 +22,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
   const [attachment, setAttachment] = useState<File | null>(null);
   const [encryptionMetadata, setEncryptionMetadata] = useState<any>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showGifPicker, setShowGifPicker] = useState(false);
   const [showEncryptedUpload, setShowEncryptedUpload] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -74,11 +76,19 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
     setAttachment(null);
     setEncryptionMetadata(null);
     setShowEmojiPicker(false);
+    setShowGifPicker(false);
     if (onCancelReply) onCancelReply();
   };
 
   const handleEmojiSelect = (emoji: string) => {
     setMessage(prev => prev + emoji);
+  };
+
+  const handleGifSelect = (gifUrl: string) => {
+    // Send GIF immediately as a message
+    onSendMessage(gifUrl, null, null, replyingTo);
+    setShowGifPicker(false);
+    if (onCancelReply) onCancelReply();
   };
 
   const isEncryptedFile = attachment?.name.includes('encrypted_') && attachment?.name.endsWith('.enc');
@@ -172,9 +182,23 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                 }}
                 aria-label="Message input"
               />
-              <div className="absolute right-2.5 top-2.5">
-                <button 
-                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+              <div className="absolute right-2.5 top-2.5 flex items-center space-x-1">
+                <button
+                  onClick={() => {
+                    setShowGifPicker(!showGifPicker);
+                    setShowEmojiPicker(false);
+                  }}
+                  className="p-1.5 text-purple-400 hover:text-purple-300 hover:bg-purple-500/20 rounded transition-all duration-200 min-h-[28px] min-w-[28px] flex items-center justify-center"
+                  aria-label="Add GIF"
+                  title="Send GIF"
+                >
+                  <ImageIcon className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => {
+                    setShowEmojiPicker(!showEmojiPicker);
+                    setShowGifPicker(false);
+                  }}
                   className="p-1.5 text-green-400 hover:text-green-300 hover:bg-green-500/20 rounded transition-all duration-200 min-h-[28px] min-w-[28px] flex items-center justify-center"
                   aria-label="Add emoji"
                 >
@@ -184,6 +208,11 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                   onEmojiSelect={handleEmojiSelect}
                   isOpen={showEmojiPicker}
                   onClose={() => setShowEmojiPicker(false)}
+                />
+                <GifPicker
+                  isOpen={showGifPicker}
+                  onClose={() => setShowGifPicker(false)}
+                  onGifSelect={handleGifSelect}
                 />
               </div>
             </div>

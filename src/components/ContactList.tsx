@@ -46,7 +46,8 @@ export const ContactList = ({
           }) : '',
           avatar: participantAvatar,
           type: 'direct',
-          conversationId: conv.id
+          conversationId: conv.id,
+          unreadCount: conv.unread_count || 0
         };
       });
       allContacts = [...directConversations];
@@ -125,6 +126,11 @@ export const ContactList = ({
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
+                      {contact.unreadCount > 0 && (
+                        <span className="min-w-[20px] h-5 px-1.5 bg-green-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                          {contact.unreadCount > 99 ? '99+' : contact.unreadCount}
+                        </span>
+                      )}
                       {contact.time && (
                         <span className="text-xs text-gray-400 flex items-center">
                           <Clock className="w-3 h-3 mr-1" />
