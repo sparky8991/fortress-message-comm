@@ -9,7 +9,6 @@ import {
   updateDoc,
   query,
   where,
-  orderBy,
   serverTimestamp,
   Timestamp
 } from 'firebase/firestore';
@@ -65,15 +64,20 @@ export const conversationService = {
 
     try {
       // Get conversations where current user is a participant
+      // Use single where clause to avoid needing composite index
       const participantsRef = collection(db, 'conversation_participants');
       const participantsQuery = query(
         participantsRef,
-        where('user_id', '==', user.uid),
-        where('is_active', '==', true)
+        where('user_id', '==', user.uid)
       );
       const participantsSnap = await getDocs(participantsQuery);
 
-      const conversationIds = participantsSnap.docs.map(doc => doc.data().conversation_id);
+      // Filter for active participants client-side
+      const activeParticipations = participantsSnap.docs.filter(doc =>
+        doc.data().is_active === true
+      );
+
+      const conversationIds = activeParticipations.map(doc => doc.data().conversation_id);
 
       if (conversationIds.length === 0) return [];
 
@@ -112,14 +116,14 @@ export const conversationService = {
   async getMessages(conversationId: string): Promise<DirectMessage[]> {
     try {
       const messagesRef = collection(db, 'direct_messages');
+      // Only use where clause to avoid needing composite index
       const messagesQuery = query(
         messagesRef,
-        where('conversation_id', '==', conversationId),
-        orderBy('sent_at', 'asc')
+        where('conversation_id', '==', conversationId)
       );
       const messagesSnap = await getDocs(messagesQuery);
 
-      return messagesSnap.docs.map(doc => {
+      const messages = messagesSnap.docs.map(doc => {
         const data = doc.data();
         return {
           id: doc.id,
@@ -136,6 +140,11 @@ export const conversationService = {
           reply_to_id: data.reply_to_id || null
         };
       });
+
+      // Sort client-side by sent_at ascending
+      return messages.sort((a, b) =>
+        new Date(a.sent_at).getTime() - new Date(b.sent_at).getTime()
+      );
     } catch (error) {
       console.error('Error getting messages:', error);
       throw error;
@@ -214,16 +223,21 @@ export const conversationService = {
 
   async getConversationParticipants(conversationId: string) {
     try {
+      // Use single where clause to avoid composite index
       const participantsRef = collection(db, 'conversation_participants');
       const participantsQuery = query(
         participantsRef,
-        where('conversation_id', '==', conversationId),
-        where('is_active', '==', true)
+        where('conversation_id', '==', conversationId)
       );
       const participantsSnap = await getDocs(participantsQuery);
 
+      // Filter for active participants client-side
+      const activeParticipantDocs = participantsSnap.docs.filter(doc =>
+        doc.data().is_active === true
+      );
+
       const participants = [];
-      for (const participantDoc of participantsSnap.docs) {
+      for (const participantDoc of activeParticipantDocs) {
         const data = participantDoc.data();
 
         // Get profile data
@@ -258,27 +272,37 @@ export const conversationService = {
 
     try {
       // Check for existing conversation
+      // Use single where clause to avoid composite index
       const participantsRef = collection(db, 'conversation_participants');
       const myParticipationsQuery = query(
         participantsRef,
-        where('user_id', '==', user.uid),
-        where('is_active', '==', true)
+        where('user_id', '==', user.uid)
       );
       const myParticipations = await getDocs(myParticipationsQuery);
 
-      for (const participation of myParticipations.docs) {
+      // Filter for active participations client-side
+      const activeParticipations = myParticipations.docs.filter(doc =>
+        doc.data().is_active === true
+      );
+
+      for (const participation of activeParticipations) {
         const convId = participation.data().conversation_id;
 
         // Check if the other user is also in this conversation
+        // Use single where clause to avoid composite index
         const otherQuery = query(
           participantsRef,
-          where('conversation_id', '==', convId),
-          where('user_id', '==', otherUserId),
-          where('is_active', '==', true)
+          where('conversation_id', '==', convId)
         );
         const otherSnap = await getDocs(otherQuery);
 
-        if (!otherSnap.empty) {
+        // Filter client-side for the other user who is active
+        const otherUserInConv = otherSnap.docs.find(doc => {
+          const data = doc.data();
+          return data.user_id === otherUserId && data.is_active === true;
+        });
+
+        if (otherUserInConv) {
           // Check if it's a direct conversation
           const convRef = doc(db, 'conversations', convId);
           const convSnap = await getDoc(convRef);

@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { auth, db } from '@/integrations/firebase/client';
 import { onAuthStateChanged } from 'firebase/auth';
-import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { conversationService, DirectMessage, Conversation } from '@/services/conversationService';
 import { toast } from '@/hooks/use-toast';
 
@@ -106,11 +106,11 @@ export const useDirectMessages = () => {
     }
 
     // Subscribe to messages for the active conversation
+    // Only use where clause to avoid needing composite index
     const messagesRef = collection(db, 'direct_messages');
     const messagesQuery = query(
       messagesRef,
-      where('conversation_id', '==', activeConversation),
-      orderBy('sent_at', 'asc')
+      where('conversation_id', '==', activeConversation)
     );
 
     const unsubscribe = onSnapshot(messagesQuery, (snapshot) => {
@@ -131,6 +131,10 @@ export const useDirectMessages = () => {
           reply_to_id: data.reply_to_id || null
         };
       });
+      // Sort client-side by sent_at ascending
+      newMessages.sort((a, b) =>
+        new Date(a.sent_at).getTime() - new Date(b.sent_at).getTime()
+      );
       setMessages(newMessages);
     }, (error) => {
       console.error('Error in messages subscription:', error);
