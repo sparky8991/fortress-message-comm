@@ -1,14 +1,15 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { Session } from '@supabase/supabase-js';
+import { auth, storage } from '@/integrations/firebase/client';
+import { onAuthStateChanged, User } from 'firebase/auth';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { toast } from '@/hooks/use-toast';
 import { Message, initialMessagesByChat } from '@/constants/initialMessages';
 import { contactNames } from '@/constants/contactInfo';
 
 export const useChatMessages = (activeChat: string) => {
   const [messagesByChat, setMessagesByChat] = useState(initialMessagesByChat);
-  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [replyingTo, setReplyingTo] = useState<{
     messageId: string;
     messageText: string;
@@ -18,9 +19,10 @@ export const useChatMessages = (activeChat: string) => {
   const currentMessages = messagesByChat[activeChat as keyof typeof messagesByChat] || [];
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
     });
+    return () => unsubscribe();
   }, []);
 
   const handleStartNewGroup = (contactName: string) => {
@@ -47,8 +49,8 @@ export const useChatMessages = (activeChat: string) => {
   };
 
   const handleSendMessage = async (messageText: string, attachmentFile: File | null, encryptionMetadata?: any, replyTo?: any) => {
-    if ((!messageText && !attachmentFile) || !session) return;
-    
+    if ((!messageText && !attachmentFile) || !user) return;
+
     console.log('Sending encrypted message:', messageText);
 
     let attachmentDetails: Message['attachment'] | undefined = undefined;
@@ -56,36 +58,26 @@ export const useChatMessages = (activeChat: string) => {
     if (attachmentFile) {
       const file = attachmentFile;
       const fileExt = file.name.split('.').pop();
-      const filePath = `${session.user.id}/${activeChat}/${Date.now()}.${fileExt}`;
-      
-      const { error: uploadError } = await supabase.storage
-          .from('chat_attachments')
-          .upload(filePath, file);
+      const filePath = `chat_attachments/${user.uid}/${activeChat}/${Date.now()}.${fileExt}`;
 
-      if (uploadError) {
-          console.error('Upload error:', uploadError);
-          toast({ title: "Upload Failed", description: uploadError.message, variant: "destructive" });
-          return;
+      try {
+        const storageRef = ref(storage, filePath);
+        await uploadBytes(storageRef, file);
+        const downloadURL = await getDownloadURL(storageRef);
+
+        attachmentDetails = {
+          name: file.name,
+          url: downloadURL,
+          type: file.type,
+          metadata: encryptionMetadata
+        };
+      } catch (error: any) {
+        console.error('Upload error:', error);
+        toast({ title: "Upload Failed", description: error.message, variant: "destructive" });
+        return;
       }
-      
-      const { data, error: signedUrlError } = await supabase.storage
-          .from('chat_attachments')
-          .createSignedUrl(filePath, 60 * 60 * 24 * 7); // 7 days validity for the link
-
-      if (signedUrlError) {
-          console.error('Signed URL error:', signedUrlError);
-          toast({ title: "Error creating link", description: signedUrlError.message, variant: "destructive" });
-          return;
-      }
-
-      attachmentDetails = { 
-        name: file.name, 
-        url: data.signedUrl, 
-        type: file.type,
-        metadata: encryptionMetadata // Include encryption metadata
-      };
     }
-      
+
     const newMessage: Message = {
       id: Date.now().toString(),
       text: messageText,

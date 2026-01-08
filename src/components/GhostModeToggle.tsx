@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { supabase } from '@/integrations/supabase/client';
+import { auth, db } from '@/integrations/firebase/client';
+import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Ghost, Eye, EyeOff } from 'lucide-react';
 
@@ -14,24 +15,22 @@ export const GhostModeToggle = () => {
   useEffect(() => {
     const fetchGhostModeStatus = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const user = auth.currentUser;
         if (!user) return;
 
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('ghost_mode_active')
-          .eq('id', user.id)
-          .single();
+        const profileRef = doc(db, 'profiles', user.uid);
+        const profileSnap = await getDoc(profileRef);
 
-        if (error) throw error;
-        setIsGhostMode(data?.ghost_mode_active || false);
+        if (profileSnap.exists()) {
+          setIsGhostMode(profileSnap.data().ghostModeActive || false);
+        }
       } catch (error: any) {
         const errorCode = "GHOST_MODE_FETCH_FAILED";
         console.error(`// ERROR_CODE: ${errorCode}\nError fetching ghost mode status:`, error);
         toast({
-            title: "Error",
-            description: `Could not load Ghost Mode status. (Code: ${errorCode})`,
-            variant: "destructive",
+          title: "Error",
+          description: `Could not load Ghost Mode status. (Code: ${errorCode})`,
+          variant: "destructive",
         });
       } finally {
         setLoading(false);
@@ -43,25 +42,21 @@ export const GhostModeToggle = () => {
 
   const toggleGhostMode = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = auth.currentUser;
       if (!user) return;
 
       const newGhostMode = !isGhostMode;
-      
-      const { error } = await supabase
-        .from('profiles')
-        .update({ 
-          ghost_mode_active: newGhostMode,
-          last_seen: newGhostMode ? new Date().toISOString() : null
-        })
-        .eq('id', user.id);
 
-      if (error) throw error;
+      const profileRef = doc(db, 'profiles', user.uid);
+      await updateDoc(profileRef, {
+        ghostModeActive: newGhostMode,
+        lastSeen: newGhostMode ? serverTimestamp() : null
+      });
 
       setIsGhostMode(newGhostMode);
       toast({
         title: newGhostMode ? "Ghost Mode Activated" : "Ghost Mode Deactivated",
-        description: newGhostMode 
+        description: newGhostMode
           ? "You appear offline to team members. You can still join ghost sessions."
           : "You're now visible to team members.",
       });

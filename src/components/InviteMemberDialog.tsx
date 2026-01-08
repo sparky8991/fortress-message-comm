@@ -1,17 +1,17 @@
 
 import React, { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { db } from '@/integrations/firebase/client';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Mail, Phone } from 'lucide-react';
-import { Database } from '@/integrations/supabase/types';
+import { Loader2, Mail, Phone, Copy, Check } from 'lucide-react';
 
-type TeamRole = Database['public']['Enums']['team_role'];
+type TeamRole = 'diamond_in_the_rough' | 'team_lead' | 'team_organizer' | 'team_user';
 
 interface InviteMemberDialogProps {
   isOpen: boolean;
@@ -20,44 +20,65 @@ interface InviteMemberDialogProps {
   teamName: string;
 }
 
-const sendInvitation = async (data: {
+// Generate a random invitation code
+const generateInviteCode = () => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let code = '';
+  for (let i = 0; i < 12; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+};
+
+const createInvitation = async (data: {
   teamId: string;
   teamName: string;
-  contact: string;
-  contactType: 'email' | 'phone';
+  email: string;
   role: TeamRole;
 }) => {
-  const { data: response, error } = await supabase.functions.invoke('send-invitation', {
-    body: data
+  const inviteCode = generateInviteCode();
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 7); // 7 days expiry
+
+  const invitationsRef = collection(db, 'team_invitations');
+  await addDoc(invitationsRef, {
+    team_id: data.teamId,
+    invitation_code: inviteCode,
+    email: data.email,
+    role: data.role,
+    status: 'pending',
+    expires_at: expiresAt,
+    created_at: serverTimestamp()
   });
-  
-  if (error) throw error;
-  return response;
+
+  return { inviteCode, email: data.email };
 };
 
 export const InviteMemberDialog = ({ isOpen, onOpenChange, teamId, teamName }: InviteMemberDialogProps) => {
-  const [contactType, setContactType] = useState<'email' | 'phone'>('email');
-  const [contact, setContact] = useState('');
+  const [email, setEmail] = useState('');
   const [role, setRole] = useState<TeamRole>('team_user');
+  const [inviteLink, setInviteLink] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
   const mutation = useMutation({
-    mutationFn: sendInvitation,
-    onSuccess: () => {
+    mutationFn: createInvitation,
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['team-invitations', teamId] });
+
+      const link = `${window.location.origin}/invite/${data.inviteCode}`;
+      setInviteLink(link);
+
       toast({
-        title: "Invitation Sent!",
-        description: `Team invitation has been sent successfully.`,
+        title: "Invitation Created!",
+        description: `Share the link with ${data.email} to invite them.`,
       });
-      onOpenChange(false);
-      setContact('');
-      setRole('team_user');
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast({
         title: "Error",
-        description: `Failed to send invitation: ${error.message}`,
+        description: `Failed to create invitation: ${error.message}`,
         variant: "destructive",
       });
     },
@@ -65,18 +86,8 @@ export const InviteMemberDialog = ({ isOpen, onOpenChange, teamId, teamName }: I
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!contact.trim()) {
-      toast({
-        title: "Invalid Contact",
-        description: "Please enter a valid email or phone number.",
-        variant: "destructive",
-      });
-      return;
-    }
 
-    // Basic validation
-    if (contactType === 'email' && !contact.includes('@')) {
+    if (!email.trim() || !email.includes('@')) {
       toast({
         title: "Invalid Email",
         description: "Please enter a valid email address.",
@@ -85,96 +96,116 @@ export const InviteMemberDialog = ({ isOpen, onOpenChange, teamId, teamName }: I
       return;
     }
 
-    if (contactType === 'phone' && !/^\+?[\d\s\-\(\)]+$/.test(contact)) {
-      toast({
-        title: "Invalid Phone",
-        description: "Please enter a valid phone number.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     mutation.mutate({
       teamId,
       teamName,
-      contact: contact.trim(),
-      contactType,
+      email: email.trim(),
       role
     });
   };
 
+  const handleCopyLink = async () => {
+    if (inviteLink) {
+      await navigator.clipboard.writeText(inviteLink);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      toast({
+        title: "Copied!",
+        description: "Invite link copied to clipboard.",
+      });
+    }
+  };
+
+  const handleClose = () => {
+    onOpenChange(false);
+    setEmail('');
+    setRole('team_user');
+    setInviteLink(null);
+    setCopied(false);
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="bg-gray-800 border-gray-700 text-white">
         <DialogHeader>
           <DialogTitle>Invite Team Member</DialogTitle>
           <DialogDescription className="text-gray-400">
-            Send an invitation to join "{teamName}" via email or SMS.
+            Create an invitation link to join "{teamName}".
           </DialogDescription>
         </DialogHeader>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="contactType">Contact Method</Label>
-            <Select value={contactType} onValueChange={(value: 'email' | 'phone') => setContactType(value)}>
-              <SelectTrigger className="bg-gray-700 border-gray-600">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-gray-700 border-gray-600">
-                <SelectItem value="email">
-                  <div className="flex items-center">
-                    <Mail className="w-4 h-4 mr-2" />
-                    Email
-                  </div>
-                </SelectItem>
-                <SelectItem value="phone">
-                  <div className="flex items-center">
-                    <Phone className="w-4 h-4 mr-2" />
-                    Phone Number
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="contact">
-              {contactType === 'email' ? 'Email Address' : 'Phone Number'}
-            </Label>
-            <Input
-              id="contact"
-              type={contactType === 'email' ? 'email' : 'tel'}
-              value={contact}
-              onChange={(e) => setContact(e.target.value)}
-              placeholder={contactType === 'email' ? 'user@example.com' : '+1234567890'}
-              className="bg-gray-700 border-gray-600 text-white"
-            />
-          </div>
+        {inviteLink ? (
+          <div className="space-y-4">
+            <div className="p-4 bg-gray-700 rounded-lg">
+              <Label className="text-gray-300 mb-2 block">Invitation Link</Label>
+              <div className="flex items-center space-x-2">
+                <Input
+                  value={inviteLink}
+                  readOnly
+                  className="bg-gray-600 border-gray-500 text-white text-sm"
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={handleCopyLink}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                </Button>
+              </div>
+              <p className="text-xs text-gray-400 mt-2">
+                Share this link with {email}. Expires in 7 days.
+              </p>
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="role">Role</Label>
-            <Select value={role} onValueChange={(value: TeamRole) => setRole(value)}>
-              <SelectTrigger className="bg-gray-700 border-gray-600">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-gray-700 border-gray-600">
-                <SelectItem value="team_user">Team User</SelectItem>
-                <SelectItem value="team_organizer">Team Organizer</SelectItem>
-                <SelectItem value="team_lead">Team Lead</SelectItem>
-              </SelectContent>
-            </Select>
+            <DialogFooter>
+              <Button type="button" onClick={handleClose} className="bg-green-500 hover:bg-green-600">
+                Done
+              </Button>
+            </DialogFooter>
           </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email Address</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="user@example.com"
+                  className="pl-10 bg-gray-700 border-gray-600 text-white"
+                />
+              </div>
+            </div>
 
-          <DialogFooter>
-            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={mutation.isPending} className="bg-green-500 hover:bg-green-600">
-              {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Send Invitation
-            </Button>
-          </DialogFooter>
-        </form>
+            <div className="space-y-2">
+              <Label htmlFor="role">Role</Label>
+              <Select value={role} onValueChange={(value: TeamRole) => setRole(value)}>
+                <SelectTrigger className="bg-gray-700 border-gray-600">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-700 border-gray-600">
+                  <SelectItem value="team_user">Team User</SelectItem>
+                  <SelectItem value="team_organizer">Team Organizer</SelectItem>
+                  <SelectItem value="team_lead">Team Lead</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <DialogFooter>
+              <Button type="button" variant="ghost" onClick={handleClose}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={mutation.isPending} className="bg-green-500 hover:bg-green-600">
+                {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Create Invitation
+              </Button>
+            </DialogFooter>
+          </form>
+        )}
       </DialogContent>
     </Dialog>
   );

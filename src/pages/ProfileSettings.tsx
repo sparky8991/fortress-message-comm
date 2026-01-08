@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { auth, db } from '@/integrations/firebase/client';
+import { onAuthStateChanged, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, query, where, getDocs } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -8,17 +10,17 @@ import { Label } from '@/components/ui/label';
 import { Loader2, User, KeyRound, ChevronLeft, Lock, Eye, EyeOff, Mail } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+
 const ProfileSettingsPage = () => {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [updatingPassword, setUpdatingPassword] = useState(false);
   const [checkingCallSign, setCheckingCallSign] = useState(false);
   const [profile, setProfile] = useState<{
-    first_name: string | null;
-    last_name: string | null;
-    call_sign: string | null;
+    firstName: string | null;
+    lastName: string | null;
+    callSign: string | null;
     bio: string | null;
-    user_number: number | null;
   } | null>(null);
   const [userEmail, setUserEmail] = useState<string>('');
   const [firstName, setFirstName] = useState('');
@@ -35,48 +37,38 @@ const ProfileSettingsPage = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordError, setPasswordError] = useState('');
-  const {
-    toast
-  } = useToast();
+
+  const { toast } = useToast();
   const navigate = useNavigate();
-  const createProfileIfNotExists = async (userId: string) => {
+
+  const createProfileIfNotExists = async (userId: string, email: string) => {
     try {
       console.log('Creating profile for user:', userId);
-      const {
-        error
-      } = await supabase.from('profiles').insert({
+      const profileRef = doc(db, 'profiles', userId);
+      await setDoc(profileRef, {
         id: userId,
-        first_name: null,
-        last_name: null,
-        call_sign: null,
-        bio: null
+        email: email,
+        firstName: null,
+        lastName: null,
+        callSign: null,
+        bio: null,
+        createdAt: serverTimestamp()
       });
-      if (error) {
-        console.error('Error creating profile:', error);
-        return false;
-      }
       console.log('Profile created successfully');
       return true;
     } catch (error) {
-      console.error('Error in createProfileIfNotExists:', error);
+      console.error('Error creating profile:', error);
       return false;
     }
   };
+
   const fetchProfile = useCallback(async () => {
     console.log('Starting fetchProfile...');
     setLoading(true);
     try {
-      const {
-        data: {
-          user
-        },
-        error: userError
-      } = await supabase.auth.getUser();
+      const user = auth.currentUser;
       console.log('User data:', user);
-      if (userError) {
-        console.error('Error getting user:', userError);
-        throw userError;
-      }
+
       if (!user) {
         console.log('No user found, redirecting to auth');
         toast({
@@ -88,59 +80,44 @@ const ProfileSettingsPage = () => {
         return;
       }
 
-      // Set user email
       setUserEmail(user.email || '');
-      console.log('Fetching profile for user ID:', user.id);
-      const {
-        data,
-        error
-      } = await supabase.from('profiles').select('first_name, last_name, call_sign, bio, user_number').eq('id', user.id).maybeSingle();
-      console.log('Profile query result - data:', data, 'error:', error);
-      if (error) {
-        console.error('Error fetching profile:', error);
-        throw error;
-      }
-      if (!data) {
+      console.log('Fetching profile for user ID:', user.uid);
+
+      const profileRef = doc(db, 'profiles', user.uid);
+      const profileSnap = await getDoc(profileRef);
+
+      if (!profileSnap.exists()) {
         console.log('No profile found, creating one...');
-        const created = await createProfileIfNotExists(user.id);
+        const created = await createProfileIfNotExists(user.uid, user.email || '');
         if (created) {
-          // Retry fetching after creation
-          const {
-            data: newData,
-            error: retryError
-          } = await supabase.from('profiles').select('first_name, last_name, call_sign, bio, user_number').eq('id', user.id).maybeSingle();
-          if (retryError) {
-            console.error('Error fetching profile after creation:', retryError);
-            throw retryError;
+          const newProfileSnap = await getDoc(profileRef);
+          if (newProfileSnap.exists()) {
+            const data = newProfileSnap.data();
+            setProfile({
+              firstName: data.firstName || null,
+              lastName: data.lastName || null,
+              callSign: data.callSign || null,
+              bio: data.bio || null
+            });
           }
-          console.log('Profile fetched after creation:', newData);
-          setProfile(newData || {
-            first_name: null,
-            last_name: null,
-            call_sign: null,
-            bio: null,
-            user_number: null
-          });
         } else {
-          // Set default empty profile if creation failed
           setProfile({
-            first_name: null,
-            last_name: null,
-            call_sign: null,
-            bio: null,
-            user_number: null
+            firstName: null,
+            lastName: null,
+            callSign: null,
+            bio: null
           });
         }
       } else {
+        const data = profileSnap.data();
         console.log('Profile found:', data);
-        setProfile(data);
+        setProfile({
+          firstName: data.firstName || null,
+          lastName: data.lastName || null,
+          callSign: data.callSign || null,
+          bio: data.bio || null
+        });
       }
-
-      // Set form values with fallbacks
-      setFirstName(profile?.first_name || '');
-      setLastName(profile?.last_name || '');
-      setCallSign(profile?.call_sign || '');
-      setBio(profile?.bio || '');
     } catch (error: any) {
       const errorCode = "PROFILE_FETCH_FAILED";
       console.error(`// ERROR_CODE: ${errorCode}\nError in fetchProfile:`, error);
@@ -150,44 +127,37 @@ const ProfileSettingsPage = () => {
         variant: 'destructive'
       });
 
-      // Set default values to prevent UI issues
       setProfile({
-        first_name: null,
-        last_name: null,
-        call_sign: null,
-        bio: null,
-        user_number: null
+        firstName: null,
+        lastName: null,
+        callSign: null,
+        bio: null
       });
-      setFirstName('');
-      setLastName('');
-      setCallSign('');
-      setBio('');
     } finally {
       setLoading(false);
     }
-  }, [toast, navigate, profile?.first_name, profile?.last_name, profile?.call_sign, profile?.bio]);
+  }, [toast, navigate]);
+
   const checkCallSignAvailability = useCallback(async (newCallSign: string) => {
-    if (!newCallSign.trim() || newCallSign === profile?.call_sign) {
+    if (!newCallSign.trim() || newCallSign === profile?.callSign) {
       setCallSignError('');
       return;
     }
     setCheckingCallSign(true);
     try {
-      const {
-        data: {
-          user
-        }
-      } = await supabase.auth.getUser();
+      const user = auth.currentUser;
       if (!user) return;
-      const {
-        data,
-        error
-      } = await supabase.from('profiles').select('id').eq('call_sign', newCallSign.trim()).neq('id', user.id).maybeSingle();
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error checking call sign:', error);
-        return;
-      }
-      if (data) {
+
+      const profilesRef = collection(db, 'profiles');
+      const q = query(
+        profilesRef,
+        where('callSign', '==', newCallSign.trim())
+      );
+      const querySnapshot = await getDocs(q);
+
+      const isTaken = querySnapshot.docs.some(doc => doc.id !== user.uid);
+
+      if (isTaken) {
         setCallSignError('This call sign is already taken. Please choose another one.');
       } else {
         setCallSignError('');
@@ -197,17 +167,18 @@ const ProfileSettingsPage = () => {
     } finally {
       setCheckingCallSign(false);
     }
-  }, [profile?.call_sign]);
+  }, [profile?.callSign]);
+
   const handleCallSignChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newCallSign = e.target.value;
     setCallSign(newCallSign);
 
-    // Debounce the availability check
     const timeoutId = setTimeout(() => {
       checkCallSignAvailability(newCallSign);
     }, 500);
     return () => clearTimeout(timeoutId);
   };
+
   const validatePassword = () => {
     if (!currentPassword) {
       setPasswordError('Current password is required');
@@ -232,6 +203,7 @@ const ProfileSettingsPage = () => {
     setPasswordError('');
     return true;
   };
+
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validatePassword()) {
@@ -239,38 +211,18 @@ const ProfileSettingsPage = () => {
     }
     setUpdatingPassword(true);
     try {
-      // First verify current password by signing in
-      const {
-        data: {
-          user
-        }
-      } = await supabase.auth.getUser();
+      const user = auth.currentUser;
       if (!user?.email) {
         throw new Error('User email not found');
       }
 
-      // Verify current password
-      const {
-        error: signInError
-      } = await supabase.auth.signInWithPassword({
-        email: user.email,
-        password: currentPassword
-      });
-      if (signInError) {
-        throw new Error('Current password is incorrect');
-      }
+      // Re-authenticate user before changing password
+      const credential = EmailAuthProvider.credential(user.email, currentPassword);
+      await reauthenticateWithCredential(user, credential);
 
       // Update password
-      const {
-        error: updateError
-      } = await supabase.auth.updateUser({
-        password: newPassword
-      });
-      if (updateError) {
-        throw updateError;
-      }
+      await updatePassword(user, newPassword);
 
-      // Clear password fields
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
@@ -282,16 +234,23 @@ const ProfileSettingsPage = () => {
     } catch (error: any) {
       const errorCode = "PASSWORD_UPDATE_FAILED";
       console.error(`// ERROR_CODE: ${errorCode}\nError updating password:`, error);
-      setPasswordError(error.message);
+
+      let errorMessage = error.message;
+      if (error.code === 'auth/wrong-password') {
+        errorMessage = 'Current password is incorrect';
+      }
+
+      setPasswordError(errorMessage);
       toast({
         title: 'Password Update Failed',
-        description: `${error.message} (Code: ${errorCode})`,
+        description: `${errorMessage} (Code: ${errorCode})`,
         variant: 'destructive'
       });
     } finally {
       setUpdatingPassword(false);
     }
   };
+
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     if (callSignError) {
@@ -304,37 +263,24 @@ const ProfileSettingsPage = () => {
     }
     setUpdating(true);
     try {
-      const {
-        data: {
-          user
-        }
-      } = await supabase.auth.getUser();
+      const user = auth.currentUser;
       if (!user) throw new Error("User not found");
 
-      // Compute full name from first and last name
-      const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
-      const {
-        error
-      } = await supabase.from('profiles').update({
-        first_name: firstName.trim() || null,
-        last_name: lastName.trim() || null,
-        full_name: fullName || null,
-        call_sign: callSign.trim() || null,
-        username: callSign.trim() || null,
-        // Keep username in sync with call_sign
-        bio: bio.trim() || null
-      }).eq('id', user.id);
-      if (error) {
-        if (error.message.includes('duplicate key value violates unique constraint "profiles_call_sign_key"')) {
-          throw new Error("This call sign is already taken. Please choose another one.");
-        }
-        throw error;
-      }
+      const profileRef = doc(db, 'profiles', user.uid);
+      await updateDoc(profileRef, {
+        firstName: firstName.trim() || null,
+        lastName: lastName.trim() || null,
+        callSign: callSign.trim() || null,
+        callSignLower: callSign.trim().toLowerCase() || null,
+        bio: bio.trim() || null,
+        updatedAt: serverTimestamp()
+      });
+
       toast({
         title: 'Success',
         description: 'Your profile has been updated.'
       });
-      await fetchProfile(); // Refresh profile data
+      await fetchProfile();
     } catch (error: any) {
       const errorCode = "PROFILE_UPDATE_FAILED";
       console.error(`// ERROR_CODE: ${errorCode}\nError updating profile:`, error);
@@ -347,153 +293,160 @@ const ProfileSettingsPage = () => {
       setUpdating(false);
     }
   };
-  useEffect(() => {
-    fetchProfile();
-  }, []);
 
-  // Update form values when profile changes
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        fetchProfile();
+      } else {
+        navigate('/auth');
+      }
+    });
+    return () => unsubscribe();
+  }, [fetchProfile, navigate]);
+
   useEffect(() => {
     if (profile) {
-      setFirstName(profile.first_name || '');
-      setLastName(profile.last_name || '');
-      setCallSign(profile.call_sign || '');
+      setFirstName(profile.firstName || '');
+      setLastName(profile.lastName || '');
+      setCallSign(profile.callSign || '');
       setBio(profile.bio || '');
     }
   }, [profile]);
+
   if (loading) {
-    return <div className="min-h-screen bg-gray-900 flex items-center justify-center"><Loader2 className="w-12 h-12 text-green-500 animate-spin" /></div>;
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <Loader2 className="w-12 h-12 text-green-500 animate-spin" />
+      </div>
+    );
   }
-  return <div className="min-h-screen bg-gray-900 text-white p-4 sm:p-6 lg:p-8">
-            <div className="max-w-2xl mx-auto space-y-6">
-                <Button variant="ghost" onClick={() => navigate('/')} className="mb-4 text-gray-300 hover:bg-gray-700 hover:text-white">
-                    <ChevronLeft className="w-4 h-4 mr-2" />
-                    Back to App
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white p-4 sm:p-6 lg:p-8">
+      <div className="max-w-2xl mx-auto space-y-6">
+        <Button variant="ghost" onClick={() => navigate('/')} className="mb-4 text-gray-300 hover:bg-gray-700 hover:text-white">
+          <ChevronLeft className="w-4 h-4 mr-2" />
+          Back to App
+        </Button>
+
+        {/* Profile Information Card */}
+        <Card className="bg-gray-800 border-gray-700">
+          <CardHeader>
+            <CardTitle className="text-2xl flex items-center text-white">
+              <User className="mr-3 w-6 h-6 text-green-500" />
+              Profile Settings
+            </CardTitle>
+            <CardDescription className="text-gray-400">
+              Manage your personal information. Your Call Sign is your unique identifier in SecureChat.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleUpdateProfile} className="space-y-6">
+              <div>
+                <Label htmlFor="userEmail" className="text-gray-300">Email Address</Label>
+                <div className="flex items-center mt-2">
+                  <Mail className="w-5 h-5 mr-3 text-green-500" />
+                  <span className="text-lg bg-gray-900/50 border border-gray-600 px-4 py-2 rounded-md text-slate-50">{userEmail || 'N/A'}</span>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">The email address used for your account login.</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <Label htmlFor="firstName" className="text-gray-300">First Name</Label>
+                  <Input id="firstName" value={firstName} onChange={e => setFirstName(e.target.value)} className="mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white" placeholder="E.g., John" />
+                </div>
+                <div>
+                  <Label htmlFor="lastName" className="text-gray-300">Last Name</Label>
+                  <Input id="lastName" value={lastName} onChange={e => setLastName(e.target.value)} className="mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white" placeholder="E.g., Doe" />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="callSign" className="text-gray-300">Call Sign</Label>
+                <div className="relative">
+                  <Input id="callSign" value={callSign} onChange={handleCallSignChange} className={`mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white ${callSignError ? 'border-red-500' : ''}`} placeholder="E.g., Maverick" />
+                  {checkingCallSign && <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 animate-spin text-gray-400" />}
+                </div>
+                {callSignError && <p className="text-red-400 text-xs mt-2">{callSignError}</p>}
+                <p className="text-xs text-gray-500 mt-2">This will be displayed to other users. Must be unique.</p>
+              </div>
+
+              <div>
+                <Label htmlFor="bio" className="text-gray-300">Bio</Label>
+                <Textarea id="bio" value={bio} onChange={e => setBio(e.target.value)} maxLength={500} rows={4} className="mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white" placeholder="Tell us a little about yourself..." />
+                <p className="text-xs text-gray-500 mt-2 text-right">{bio.length} / 500</p>
+              </div>
+
+              <CardFooter className="p-0 pt-4 flex justify-end">
+                <Button type="submit" disabled={updating || loading || !!callSignError || checkingCallSign} className="bg-green-600 hover:bg-green-700 text-white font-bold">
+                  {updating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Save Changes
                 </Button>
+              </CardFooter>
+            </form>
+          </CardContent>
+        </Card>
 
-                {/* Profile Information Card */}
-                <Card className="bg-gray-800 border-gray-700">
-                    <CardHeader>
-                        <CardTitle className="text-2xl flex items-center text-white">
-                            <User className="mr-3 w-6 h-6 text-green-500" />
-                            Profile Settings
-                        </CardTitle>
-                        <CardDescription className="text-gray-400">
-                            Manage your personal information. Your Call Sign is your unique identifier in SecureChat.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <form onSubmit={handleUpdateProfile} className="space-y-6">
-                            <div>
-                                <Label htmlFor="userNumber" className="text-gray-300">User Number</Label>
-                                <div className="flex items-center mt-2">
-                                    <KeyRound className="w-5 h-5 mr-3 text-green-500" />
-                                    <span className="text-lg font-mono bg-gray-900/50 border border-gray-600 px-4 py-2 rounded-md text-slate-50">{profile?.user_number || 'N/A'}</span>
-                                </div>
-                                <p className="text-xs text-gray-500 mt-2">Your unique user ID.</p>
-                            </div>
+        {/* Password Change Card */}
+        <Card className="bg-gray-800 border-gray-700">
+          <CardHeader>
+            <CardTitle className="text-xl flex items-center text-white">
+              <Lock className="mr-3 w-5 h-5 text-green-500" />
+              Change Password
+            </CardTitle>
+            <CardDescription className="text-gray-400">
+              Update your account password for security.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handlePasswordChange} className="space-y-6">
+              <div>
+                <Label htmlFor="currentPassword" className="text-gray-300">Current Password</Label>
+                <div className="relative">
+                  <Input id="currentPassword" type={showCurrentPassword ? 'text' : 'password'} value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} className="mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white pr-10" placeholder="Enter your current password" />
+                  <button type="button" onClick={() => setShowCurrentPassword(!showCurrentPassword)} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300">
+                    {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
 
-                            <div>
-                                <Label htmlFor="userEmail" className="text-gray-300">Email Address</Label>
-                                <div className="flex items-center mt-2">
-                                    <Mail className="w-5 h-5 mr-3 text-green-500" />
-                                    <span className="text-lg bg-gray-900/50 border border-gray-600 px-4 py-2 rounded-md text-slate-50">{userEmail || 'N/A'}</span>
-                                </div>
-                                <p className="text-xs text-gray-500 mt-2">The email address used for your account login.</p>
-                            </div>
-                            
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <Label htmlFor="firstName" className="text-gray-300">First Name</Label>
-                                    <Input id="firstName" value={firstName} onChange={e => setFirstName(e.target.value)} className="mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white" placeholder="E.g., John" />
-                                </div>
-                                <div>
-                                    <Label htmlFor="lastName" className="text-gray-300">Last Name</Label>
-                                    <Input id="lastName" value={lastName} onChange={e => setLastName(e.target.value)} className="mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white" placeholder="E.g., Doe" />
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <Label htmlFor="callSign" className="text-gray-300">Call Sign</Label>
-                                <div className="relative">
-                                    <Input id="callSign" value={callSign} onChange={handleCallSignChange} className={`mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white ${callSignError ? 'border-red-500' : ''}`} placeholder="E.g., Maverick" />
-                                    {checkingCallSign && <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 animate-spin text-gray-400" />}
-                                </div>
-                                {callSignError && <p className="text-red-400 text-xs mt-2">{callSignError}</p>}
-                                <p className="text-xs text-gray-500 mt-2">This will be displayed to other users. Must be unique.</p>
-                            </div>
-                            
-                            <div>
-                                <Label htmlFor="bio" className="text-gray-300">Bio</Label>
-                                <Textarea id="bio" value={bio} onChange={e => setBio(e.target.value)} maxLength={500} rows={4} className="mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white" placeholder="Tell us a little about yourself..." />
-                                <p className="text-xs text-gray-500 mt-2 text-right">{bio.length} / 500</p>
-                            </div>
-                            
-                            <CardFooter className="p-0 pt-4 flex justify-end">
-                                <Button type="submit" disabled={updating || loading || !!callSignError || checkingCallSign} className="bg-green-600 hover:bg-green-700 text-white font-bold">
-                                    {updating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                    Save Changes
-                                </Button>
-                            </CardFooter>
-                        </form>
-                    </CardContent>
-                </Card>
+              <div>
+                <Label htmlFor="newPassword" className="text-gray-300">New Password</Label>
+                <div className="relative">
+                  <Input id="newPassword" type={showNewPassword ? 'text' : 'password'} value={newPassword} onChange={e => setNewPassword(e.target.value)} className="mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white pr-10" placeholder="Enter your new password" />
+                  <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300">
+                    {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">Password must be at least 6 characters long.</p>
+              </div>
 
-                {/* Password Change Card */}
-                <Card className="bg-gray-800 border-gray-700">
-                    <CardHeader>
-                        <CardTitle className="text-xl flex items-center text-white">
-                            <Lock className="mr-3 w-5 h-5 text-green-500" />
-                            Change Password
-                        </CardTitle>
-                        <CardDescription className="text-gray-400">
-                            Update your account password for security.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <form onSubmit={handlePasswordChange} className="space-y-6">
-                            <div>
-                                <Label htmlFor="currentPassword" className="text-gray-300">Current Password</Label>
-                                <div className="relative">
-                                    <Input id="currentPassword" type={showCurrentPassword ? 'text' : 'password'} value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} className="mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white pr-10" placeholder="Enter your current password" />
-                                    <button type="button" onClick={() => setShowCurrentPassword(!showCurrentPassword)} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300">
-                                        {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                    </button>
-                                </div>
-                            </div>
+              <div>
+                <Label htmlFor="confirmPassword" className="text-gray-300">Confirm New Password</Label>
+                <div className="relative">
+                  <Input id="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white pr-10" placeholder="Confirm your new password" />
+                  <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300">
+                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
 
-                            <div>
-                                <Label htmlFor="newPassword" className="text-gray-300">New Password</Label>
-                                <div className="relative">
-                                    <Input id="newPassword" type={showNewPassword ? 'text' : 'password'} value={newPassword} onChange={e => setNewPassword(e.target.value)} className="mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white pr-10" placeholder="Enter your new password" />
-                                    <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300">
-                                        {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                    </button>
-                                </div>
-                                <p className="text-xs text-gray-500 mt-2">Password must be at least 6 characters long.</p>
-                            </div>
+              {passwordError && <p className="text-red-400 text-sm">{passwordError}</p>}
 
-                            <div>
-                                <Label htmlFor="confirmPassword" className="text-gray-300">Confirm New Password</Label>
-                                <div className="relative">
-                                    <Input id="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="mt-2 bg-gray-700 border-gray-600 focus:ring-green-500 text-white pr-10" placeholder="Confirm your new password" />
-                                    <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300">
-                                        {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                    </button>
-                                </div>
-                            </div>
-
-                            {passwordError && <p className="text-red-400 text-sm">{passwordError}</p>}
-                            
-                            <CardFooter className="p-0 pt-4 flex justify-end">
-                                <Button type="submit" disabled={updatingPassword || !currentPassword || !newPassword || !confirmPassword} className="bg-green-600 hover:bg-green-700 text-white font-bold">
-                                    {updatingPassword && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                    Update Password
-                                </Button>
-                            </CardFooter>
-                        </form>
-                    </CardContent>
-                </Card>
-            </div>
-        </div>;
+              <CardFooter className="p-0 pt-4 flex justify-end">
+                <Button type="submit" disabled={updatingPassword || !currentPassword || !newPassword || !confirmPassword} className="bg-green-600 hover:bg-green-700 text-white font-bold">
+                  {updatingPassword && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Update Password
+                </Button>
+              </CardFooter>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
 };
+
 export default ProfileSettingsPage;

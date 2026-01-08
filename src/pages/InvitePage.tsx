@@ -1,13 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { auth, db } from '@/integrations/firebase/client';
+import { collection, query, where, getDocs, doc, getDoc, updateDoc, addDoc, serverTimestamp } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Users, CheckCircle, XCircle } from 'lucide-react';
 
-interface InvitationResponse {
-  success: boolean;
-  message: string;
+interface Invitation {
+  id: string;
+  team_id: string;
+  invitation_code: string;
+  status: string;
+  expires_at: Date;
+  team?: {
+    id: string;
+    name: string;
+  };
 }
 
 export const InvitePage = () => {
@@ -16,7 +24,7 @@ export const InvitePage = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [accepting, setAccepting] = useState(false);
-  const [invitation, setInvitation] = useState<any>(null);
+  const [invitation, setInvitation] = useState<Invitation | null>(null);
   const [status, setStatus] = useState<'loading' | 'valid' | 'invalid' | 'accepted' | 'error'>('loading');
 
   useEffect(() => {
@@ -28,26 +36,54 @@ export const InvitePage = () => {
       }
 
       try {
-        const { data, error } = await supabase
-          .from('team_invitations')
-          .select(`
-            *,
-            teams (
-              id,
-              name
-            )
-          `)
-          .eq('invitation_code', inviteCode)
-          .eq('status', 'pending')
-          .gt('expires_at', new Date().toISOString())
-          .single();
+        // Query for the invitation
+        const invitationsRef = collection(db, 'team_invitations');
+        const q = query(
+          invitationsRef,
+          where('invitation_code', '==', inviteCode),
+          where('status', '==', 'pending')
+        );
+        const invitationSnap = await getDocs(q);
 
-        if (error || !data) {
+        if (invitationSnap.empty) {
           setStatus('invalid');
-        } else {
-          setInvitation(data);
-          setStatus('valid');
+          setLoading(false);
+          return;
         }
+
+        const invDoc = invitationSnap.docs[0];
+        const invData = invDoc.data();
+
+        // Check expiration
+        const expiresAt = invData.expires_at?.toDate?.() || new Date(invData.expires_at);
+        if (expiresAt < new Date()) {
+          setStatus('invalid');
+          setLoading(false);
+          return;
+        }
+
+        // Get team info
+        const teamRef = doc(db, 'teams', invData.team_id);
+        const teamSnap = await getDoc(teamRef);
+
+        if (!teamSnap.exists()) {
+          setStatus('invalid');
+          setLoading(false);
+          return;
+        }
+
+        setInvitation({
+          id: invDoc.id,
+          team_id: invData.team_id,
+          invitation_code: invData.invitation_code,
+          status: invData.status,
+          expires_at: expiresAt,
+          team: {
+            id: teamSnap.id,
+            name: teamSnap.data().name
+          }
+        });
+        setStatus('valid');
       } catch (error: any) {
         const errorCode = "INVITE_CHECK_FAILED";
         console.error(`// ERROR_CODE: ${errorCode}\nError checking invitation:`, error);
@@ -66,9 +102,9 @@ export const InvitePage = () => {
   }, [inviteCode, toast]);
 
   const handleAcceptInvitation = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    if (!session) {
+    const user = auth.currentUser;
+
+    if (!user) {
       toast({
         title: "Authentication Required",
         description: "Please sign in to accept the invitation.",
@@ -78,36 +114,59 @@ export const InvitePage = () => {
       return;
     }
 
-    setAccepting(true);
-    
-    try {
-      const { data, error } = await supabase.rpc('accept_team_invitation', {
-        invitation_code: inviteCode
+    if (!invitation) {
+      toast({
+        title: "Error",
+        description: "Invalid invitation.",
+        variant: "destructive",
       });
+      return;
+    }
 
-      if (error) {
-        const rpcError = new Error(error.message);
-        rpcError.name = "SupabaseRPCError";
-        throw rpcError;
-      };
+    setAccepting(true);
 
-      // Safely cast the response with proper type checking
-      const response = data as unknown as InvitationResponse;
+    try {
+      // Check if user is already a member
+      const membersRef = collection(db, 'team_members');
+      const memberQuery = query(
+        membersRef,
+        where('team_id', '==', invitation.team_id),
+        where('user_id', '==', user.uid)
+      );
+      const memberSnap = await getDocs(memberQuery);
 
-      if (response.success) {
-        setStatus('accepted');
+      if (!memberSnap.empty) {
         toast({
-          title: "Welcome to the team!",
-          description: response.message,
-        });
-        setTimeout(() => navigate('/'), 2000);
-      } else {
-        toast({
-          title: "Error",
-          description: response.message,
+          title: "Already a Member",
+          description: "You are already a member of this team.",
           variant: "destructive",
         });
+        setAccepting(false);
+        return;
       }
+
+      // Add user to team
+      await addDoc(membersRef, {
+        team_id: invitation.team_id,
+        user_id: user.uid,
+        role: 'team_user',
+        joined_at: serverTimestamp()
+      });
+
+      // Update invitation status
+      const invitationRef = doc(db, 'team_invitations', invitation.id);
+      await updateDoc(invitationRef, {
+        status: 'accepted',
+        accepted_by: user.uid,
+        accepted_at: serverTimestamp()
+      });
+
+      setStatus('accepted');
+      toast({
+        title: "Welcome to the team!",
+        description: `You've successfully joined ${invitation.team?.name}!`,
+      });
+      setTimeout(() => navigate('/'), 2000);
     } catch (error: any) {
       const errorCode = "INVITE_ACCEPT_FAILED";
       console.error(`// ERROR_CODE: ${errorCode}\nError accepting invitation:`, error);
@@ -137,9 +196,9 @@ export const InvitePage = () => {
             <Users className="w-16 h-16 text-green-500 mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-white mb-2">Team Invitation</h1>
             <p className="text-gray-400 mb-6">
-              You've been invited to join <span className="text-white font-semibold">{invitation?.teams?.name}</span>
+              You've been invited to join <span className="text-white font-semibold">{invitation?.team?.name}</span>
             </p>
-            <Button 
+            <Button
               onClick={handleAcceptInvitation}
               disabled={accepting}
               className="w-full bg-green-600 hover:bg-green-700"

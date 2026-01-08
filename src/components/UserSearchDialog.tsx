@@ -5,7 +5,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { supabase } from '@/integrations/supabase/client';
+import { db } from '@/integrations/firebase/client';
+import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
+import { conversationService } from '@/services/conversationService';
 import { toast } from '@/hooks/use-toast';
 
 interface UserSearchResult {
@@ -36,12 +38,53 @@ export const UserSearchDialog = ({ isOpen, onClose, onStartConversation }: UserS
 
     setIsSearching(true);
     try {
-      const { data, error } = await supabase.rpc('search_users', {
-        search_term: searchTerm.trim()
+      const profilesRef = collection(db, 'profiles');
+      const searchLower = searchTerm.toLowerCase().trim();
+
+      // Search by callSign (case-insensitive via searchable field)
+      const q = query(
+        profilesRef,
+        where('callSignLower', '>=', searchLower),
+        where('callSignLower', '<=', searchLower + '\uf8ff'),
+        limit(20)
+      );
+
+      const querySnapshot = await getDocs(q);
+      const results: UserSearchResult[] = [];
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        results.push({
+          id: doc.id,
+          username: data.callSign || data.email || 'Unknown',
+          full_name: `${data.firstName || ''} ${data.lastName || ''}`.trim(),
+          user_number: 0,
+          avatar_url: data.avatarUrl || ''
+        });
       });
 
-      if (error) throw error;
-      setSearchResults(data || []);
+      // If no results from callSign search, try email search
+      if (results.length === 0) {
+        const emailQuery = query(
+          profilesRef,
+          where('email', '>=', searchLower),
+          where('email', '<=', searchLower + '\uf8ff'),
+          limit(20)
+        );
+        const emailSnapshot = await getDocs(emailQuery);
+        emailSnapshot.forEach((doc) => {
+          const data = doc.data();
+          results.push({
+            id: doc.id,
+            username: data.callSign || data.email || 'Unknown',
+            full_name: `${data.firstName || ''} ${data.lastName || ''}`.trim(),
+            user_number: 0,
+            avatar_url: data.avatarUrl || ''
+          });
+        });
+      }
+
+      setSearchResults(results);
     } catch (error) {
       console.error('Error searching users:', error);
       toast({
@@ -57,14 +100,10 @@ export const UserSearchDialog = ({ isOpen, onClose, onStartConversation }: UserS
   const handleStartConversation = async (userId: string) => {
     setIsCreatingConversation(true);
     try {
-      const { data: conversationId, error } = await supabase.rpc('find_or_create_direct_conversation', {
-        other_user_id: userId
-      });
-
-      if (error) throw error;
+      const conversationId = await conversationService.findOrCreateDirectConversation(userId);
 
       toast({
-        title: '🔒 SECURE CHANNEL ESTABLISHED',
+        title: 'SECURE CHANNEL ESTABLISHED',
         description: 'Direct conversation initiated successfully.',
       });
 
@@ -112,7 +151,7 @@ export const UserSearchDialog = ({ isOpen, onClose, onStartConversation }: UserS
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
                 type="text"
-                placeholder="Search by username, name, or user number..."
+                placeholder="Search by call sign or email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -144,7 +183,6 @@ export const UserSearchDialog = ({ isOpen, onClose, onStartConversation }: UserS
                     </Avatar>
                     <div>
                       <p className="font-medium text-white">{getUserDisplayName(user)}</p>
-                      <p className="text-sm text-gray-400">User #{user.user_number}</p>
                       {user.full_name && user.username && (
                         <p className="text-xs text-gray-500">{user.full_name}</p>
                       )}

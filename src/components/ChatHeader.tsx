@@ -3,7 +3,8 @@ import React from 'react';
 import { Phone, Video, MoreVertical, Lock, Settings, User, Bell, Shield, LogOut, Info, MessageSquare, Phone as PhoneIcon } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { auth } from '@/integrations/firebase/client';
+import { signOut } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
 import {
   DropdownMenu,
@@ -34,14 +35,13 @@ export const ChatHeader = ({ contact, onStartCall, onShowNotificationSettings, o
 
   const handleLogout = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      
+      await signOut(auth);
+
       toast({
         title: "Logged out",
         description: "You have been successfully logged out."
       });
-      
+
       navigate('/auth');
     } catch (error: any) {
       console.error('Logout error:', error);
@@ -61,8 +61,8 @@ export const ChatHeader = ({ contact, onStartCall, onShowNotificationSettings, o
           <button
             onClick={isMobile ? onToggleSidebar : undefined}
             className={`w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center text-white font-bold text-lg flex-shrink-0 shadow-lg shadow-green-500/30 transition-all duration-200 ${
-              isMobile 
-                ? 'hover:scale-105 active:scale-95 cursor-pointer hover:shadow-green-500/40' 
+              isMobile
+                ? 'hover:scale-105 active:scale-95 cursor-pointer hover:shadow-green-500/40'
                 : 'cursor-default'
             }`}
             title={isMobile ? "Open sidebar" : undefined}
@@ -70,7 +70,7 @@ export const ChatHeader = ({ contact, onStartCall, onShowNotificationSettings, o
           >
             {contact?.avatar}
           </button>
-          
+
           <div className="min-w-0 flex-1">
             <h2 className="font-semibold text-white text-base truncate">{contact?.name}</h2>
             {isMobile ? (
@@ -94,7 +94,7 @@ export const ChatHeader = ({ contact, onStartCall, onShowNotificationSettings, o
             )}
           </div>
         </div>
-        
+
         <div className="flex items-center space-x-1 flex-shrink-0">
           <button
             onClick={() => onStartCall('voice')}
@@ -113,7 +113,7 @@ export const ChatHeader = ({ contact, onStartCall, onShowNotificationSettings, o
             <Video className="w-4 h-4" />
           </button>
           {!isMobile && (
-            <button 
+            <button
               onClick={onShowNotificationSettings}
               className="p-2 text-gray-300 hover:text-white hover:bg-gray-700/80 rounded-xl transition-all duration-200 min-h-[40px] min-w-[40px] flex items-center justify-center hover:scale-105 active:scale-95"
               title="Notification Settings"
@@ -122,11 +122,11 @@ export const ChatHeader = ({ contact, onStartCall, onShowNotificationSettings, o
               <Settings className="w-4 h-4" />
             </button>
           )}
-          
+
           {/* Settings Dropdown Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button 
+              <button
                 className="p-2 text-gray-300 hover:text-white hover:bg-gray-700/80 rounded-xl transition-all duration-200 min-h-[40px] min-w-[40px] flex items-center justify-center hover:scale-105 active:scale-95"
                 title="Settings Menu"
                 aria-label="Open settings menu"
@@ -134,8 +134,8 @@ export const ChatHeader = ({ contact, onStartCall, onShowNotificationSettings, o
                 <MoreVertical className="w-4 h-4" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent 
-              align="end" 
+            <DropdownMenuContent
+              align="end"
               className="w-56 bg-gray-800 border-gray-700 text-white shadow-xl"
               sideOffset={8}
             >
@@ -143,9 +143,9 @@ export const ChatHeader = ({ contact, onStartCall, onShowNotificationSettings, o
                 SETTINGS
               </DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-gray-700" />
-              
+
               {/* Profile Settings */}
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={() => navigate('/profile-settings')}
                 className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer"
               >
@@ -154,7 +154,7 @@ export const ChatHeader = ({ contact, onStartCall, onShowNotificationSettings, o
               </DropdownMenuItem>
 
               {/* Notification Settings - Always show, but different behavior */}
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={onShowNotificationSettings}
                 className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer"
               >
@@ -193,7 +193,7 @@ export const ChatHeader = ({ contact, onStartCall, onShowNotificationSettings, o
               <DropdownMenuSeparator className="bg-gray-700" />
 
               {/* Logout */}
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={handleLogout}
                 className="hover:bg-red-900/50 focus:bg-red-900/50 cursor-pointer text-red-400 hover:text-red-300"
               >
