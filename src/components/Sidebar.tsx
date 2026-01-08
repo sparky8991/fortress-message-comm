@@ -108,7 +108,10 @@ export const Sidebar = ({ activeChat, onChatSelect }: SidebarProps) => {
           <div className="flex items-center justify-between py-2 px-3 bg-gray-700/50 rounded-lg">
             <div className="flex items-center space-x-2 min-w-0">
               <UserIcon className="w-4 h-4 text-green-500 flex-shrink-0" />
-              <span className="text-sm text-white font-medium truncate">{callSign}</span>
+              <div className="min-w-0">
+                <span className="text-xs text-gray-400 block">Call Sign</span>
+                <span className="text-sm text-white font-medium truncate block">{callSign}</span>
+              </div>
             </div>
             <button
               onClick={() => setShowEditCallSign(true)}
