@@ -171,6 +171,7 @@ export const EditCallSignDialog = ({
       const profileRef = doc(db, 'profiles', user.uid);
       await updateDoc(profileRef, {
         callSign: newCallSign.trim(),
+        callSignLower: newCallSign.trim().toLowerCase(),
         callSignLastChanged: new Date().toISOString(),
         callSignChangesThisYear: newChangesThisYear,
         callSignChangeYear: currentYear

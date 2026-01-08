@@ -78,7 +78,8 @@ const CallSignSetup = () => {
     try {
       const profileRef = doc(db, 'profiles', user.uid);
       await updateDoc(profileRef, {
-        callSign: callSign.trim()
+        callSign: callSign.trim(),
+        callSignLower: callSign.trim().toLowerCase()
       });
 
       navigate('/');
