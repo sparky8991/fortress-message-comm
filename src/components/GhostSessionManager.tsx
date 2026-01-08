@@ -1,7 +1,8 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { auth, db } from '@/integrations/firebase/client';
+import { collection, query, where, getDocs, addDoc, updateDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,52 +19,116 @@ interface GhostSession {
   is_active: boolean;
   created_at: string;
   expires_at: string;
+  members?: { user_id: string; is_active: boolean }[];
 }
 
 interface GhostSessionManagerProps {
   teamId: string;
 }
 
-const fetchGhostSessions = async (teamId: string) => {
-  const { data, error } = await supabase
-    .from('ghost_sessions')
-    .select(`
-      *,
-      ghost_session_members (
-        user_id,
-        is_active
-      )
-    `)
-    .eq('team_id', teamId)
-    .eq('is_active', true)
-    .order('created_at', { ascending: false });
+const fetchGhostSessions = async (teamId: string): Promise<GhostSession[]> => {
+  const sessionsRef = collection(db, 'ghost_sessions');
+  const q = query(
+    sessionsRef,
+    where('team_id', '==', teamId),
+    where('is_active', '==', true)
+  );
+  const sessionsSnap = await getDocs(q);
 
-  if (error) throw error;
-  return data;
+  const sessions: GhostSession[] = [];
+
+  for (const sessionDoc of sessionsSnap.docs) {
+    const sessionData = sessionDoc.data();
+
+    // Get members for this session
+    const membersRef = collection(db, 'ghost_session_members');
+    const membersQuery = query(membersRef, where('session_id', '==', sessionDoc.id));
+    const membersSnap = await getDocs(membersQuery);
+
+    const members = membersSnap.docs.map(mDoc => ({
+      user_id: mDoc.data().user_id,
+      is_active: mDoc.data().is_active || false
+    }));
+
+    sessions.push({
+      id: sessionDoc.id,
+      session_name: sessionData.session_name,
+      created_by: sessionData.created_by,
+      team_id: sessionData.team_id,
+      max_members: sessionData.max_members || 5,
+      is_active: sessionData.is_active,
+      created_at: sessionData.created_at?.toDate?.()?.toISOString() || new Date().toISOString(),
+      expires_at: sessionData.expires_at?.toDate?.()?.toISOString() || new Date().toISOString(),
+      members
+    });
+  }
+
+  return sessions.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 };
 
 const createGhostSession = async (data: {
   teamId: string;
   sessionName: string;
   encryptionKey: string;
-}) => {
-  const { data: sessionId, error } = await supabase.rpc('create_ghost_session', {
-    p_team_id: data.teamId,
-    p_session_name: data.sessionName,
-    p_encryption_key: data.encryptionKey
+}): Promise<string> => {
+  const user = auth.currentUser;
+  if (!user) throw new Error('Not authenticated');
+
+  const expiresAt = new Date();
+  expiresAt.setHours(expiresAt.getHours() + 24); // 24 hour expiry
+
+  const sessionsRef = collection(db, 'ghost_sessions');
+  const sessionDoc = await addDoc(sessionsRef, {
+    session_name: data.sessionName,
+    team_id: data.teamId,
+    created_by: user.uid,
+    encryption_key_hash: data.encryptionKey,
+    max_members: 5,
+    is_active: true,
+    created_at: serverTimestamp(),
+    expires_at: expiresAt
   });
 
-  if (error) throw error;
-  return sessionId;
+  // Add creator as first member
+  const membersRef = collection(db, 'ghost_session_members');
+  await addDoc(membersRef, {
+    session_id: sessionDoc.id,
+    user_id: user.uid,
+    is_active: true,
+    joined_at: serverTimestamp()
+  });
+
+  return sessionDoc.id;
 };
 
-const joinGhostSession = async (sessionId: string) => {
-  const { data, error } = await supabase.rpc('join_ghost_session', {
-    p_session_id: sessionId
-  });
+const joinGhostSession = async (sessionId: string): Promise<void> => {
+  const user = auth.currentUser;
+  if (!user) throw new Error('Not authenticated');
 
-  if (error) throw error;
-  return data;
+  // Check if already a member
+  const membersRef = collection(db, 'ghost_session_members');
+  const existingQuery = query(
+    membersRef,
+    where('session_id', '==', sessionId),
+    where('user_id', '==', user.uid)
+  );
+  const existingSnap = await getDocs(existingQuery);
+
+  if (!existingSnap.empty) {
+    // Update existing membership
+    const memberDoc = existingSnap.docs[0];
+    await updateDoc(doc(db, 'ghost_session_members', memberDoc.id), {
+      is_active: true
+    });
+  } else {
+    // Add new member
+    await addDoc(membersRef, {
+      session_id: sessionId,
+      user_id: user.uid,
+      is_active: true,
+      joined_at: serverTimestamp()
+    });
+  }
 };
 
 export const GhostSessionManager = ({ teamId }: GhostSessionManagerProps) => {
@@ -89,7 +154,7 @@ export const GhostSessionManager = ({ teamId }: GhostSessionManagerProps) => {
       setIsCreateDialogOpen(false);
       setSessionName('');
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast({
         title: "Error",
         description: `Failed to create ghost session: ${error.message}`,
@@ -108,7 +173,7 @@ export const GhostSessionManager = ({ teamId }: GhostSessionManagerProps) => {
         description: "You've joined the encrypted session.",
       });
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast({
         title: "Error",
         description: `Failed to join session: ${error.message}`,
@@ -139,8 +204,8 @@ export const GhostSessionManager = ({ teamId }: GhostSessionManagerProps) => {
     });
   };
 
-  const getActiveMemberCount = (session: any) => {
-    return session.ghost_session_members?.filter((member: any) => member.is_active).length || 0;
+  const getActiveMemberCount = (session: GhostSession) => {
+    return session.members?.filter(member => member.is_active).length || 0;
   };
 
   if (isLoading) {
@@ -166,7 +231,7 @@ export const GhostSessionManager = ({ teamId }: GhostSessionManagerProps) => {
 
       <div className="space-y-2">
         {sessions && sessions.length > 0 ? (
-          sessions.map((session: any) => (
+          sessions.map((session) => (
             <div
               key={session.id}
               className="p-4 bg-gray-800 border border-gray-700 rounded-lg hover:border-purple-500 transition-colors"
@@ -216,7 +281,7 @@ export const GhostSessionManager = ({ teamId }: GhostSessionManagerProps) => {
               <span>Create Ghost Session</span>
             </DialogTitle>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <div>
               <Label htmlFor="session-name">Session Name</Label>
@@ -238,7 +303,7 @@ export const GhostSessionManager = ({ teamId }: GhostSessionManagerProps) => {
             <Button variant="ghost" onClick={() => setIsCreateDialogOpen(false)}>
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={handleCreateSession}
               disabled={createMutation.isPending}
               className="bg-purple-600 hover:bg-purple-700"

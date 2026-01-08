@@ -1,6 +1,8 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { auth, db } from '@/integrations/firebase/client';
+import { onAuthStateChanged } from 'firebase/auth';
+import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
 import { conversationService, DirectMessage, Conversation } from '@/services/conversationService';
 import { toast } from '@/hooks/use-toast';
 
@@ -9,7 +11,7 @@ export const useDirectMessages = () => {
   const [activeConversation, setActiveConversation] = useState<string | null>(null);
   const [messages, setMessages] = useState<DirectMessage[]>([]);
   const [loading, setLoading] = useState(false);
-  const channelRef = useRef<any>(null);
+  const unsubscribeRef = useRef<(() => void) | null>(null);
 
   // Load conversations
   const loadConversations = async () => {
@@ -29,7 +31,7 @@ export const useDirectMessages = () => {
   // Load messages for active conversation
   const loadMessages = async (conversationId: string) => {
     if (!conversationId) return;
-    
+
     setLoading(true);
     try {
       const data = await conversationService.getMessages(conversationId);
@@ -61,8 +63,6 @@ export const useDirectMessages = () => {
       let messageType: 'text' | 'image' | 'file' = 'text';
 
       if (attachment) {
-        // For now, we'll handle attachments as file messages
-        // In a full implementation, you'd upload to Supabase Storage
         attachmentName = attachment.name;
         attachmentType = attachment.type;
         messageType = attachment.type.startsWith('image/') ? 'image' : 'file';
@@ -79,7 +79,7 @@ export const useDirectMessages = () => {
       );
 
       setMessages(prev => [...prev, newMessage]);
-      await loadConversations(); // Refresh to update last message info
+      await loadConversations();
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
@@ -96,91 +96,64 @@ export const useDirectMessages = () => {
     loadMessages(conversationId);
   };
 
-  // Set up real-time subscriptions
+  // Set up real-time subscriptions for messages
   useEffect(() => {
-    const setupRealtime = async () => {
-      // Clean up existing channel if it exists
-      if (channelRef.current) {
-        try {
-          await supabase.removeChannel(channelRef.current);
-        } catch (error) {
-          console.error('Error removing channel:', error);
-        }
-        channelRef.current = null;
-      }
+    if (!activeConversation) return;
 
-      // Create new channel with a unique name to avoid conflicts
-      const channelName = `direct-messages-${Date.now()}-${Math.random()}`;
-      const channel = supabase.channel(channelName);
+    // Clean up previous subscription
+    if (unsubscribeRef.current) {
+      unsubscribeRef.current();
+    }
 
-      // Configure the channel before subscribing
-      channel
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'direct_messages'
-          },
-          (payload) => {
-            const newMessage = payload.new as DirectMessage;
-            
-            // Only add message if it's for the active conversation
-            if (newMessage.conversation_id === activeConversation) {
-              setMessages(prev => [...prev, newMessage]);
-            }
-            
-            // Refresh conversations to update last message info
-            loadConversations();
-          }
-        )
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'conversation_notifications'
-          },
-          (payload) => {
-            const notification = payload.new as any;
-            if (notification.type === 'new_chat') {
-              toast({
-                title: '🔒 NEW SECURE CHANNEL',
-                description: 'Someone started a conversation with you.',
-              });
-              loadConversations();
-            }
-          }
-        );
+    // Subscribe to messages for the active conversation
+    const messagesRef = collection(db, 'direct_messages');
+    const messagesQuery = query(
+      messagesRef,
+      where('conversation_id', '==', activeConversation),
+      orderBy('sent_at', 'asc')
+    );
 
-      // Subscribe to the channel only once
-      try {
-        await channel.subscribe((status) => {
-          console.log('Channel subscription status:', status);
-          if (status === 'SUBSCRIBED') {
-            console.log('Successfully subscribed to real-time updates');
-          }
-        });
+    const unsubscribe = onSnapshot(messagesQuery, (snapshot) => {
+      const newMessages: DirectMessage[] = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          conversation_id: data.conversation_id,
+          sender_id: data.sender_id,
+          content: data.content,
+          sent_at: data.sent_at?.toDate?.()?.toISOString() || new Date().toISOString(),
+          message_type: data.message_type || 'text',
+          read_at: data.read_at?.toDate?.()?.toISOString() || null,
+          encrypted: data.encrypted || false,
+          attachment_url: data.attachment_url || null,
+          attachment_name: data.attachment_name || null,
+          attachment_type: data.attachment_type || null,
+          reply_to_id: data.reply_to_id || null
+        };
+      });
+      setMessages(newMessages);
+    }, (error) => {
+      console.error('Error in messages subscription:', error);
+    });
 
-        channelRef.current = channel;
-      } catch (error) {
-        console.error('Error subscribing to channel:', error);
-      }
-    };
-
-    setupRealtime();
+    unsubscribeRef.current = unsubscribe;
 
     return () => {
-      if (channelRef.current) {
-        supabase.removeChannel(channelRef.current);
-        channelRef.current = null;
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current();
+        unsubscribeRef.current = null;
       }
     };
   }, [activeConversation]);
 
-  // Load conversations on mount
+  // Load conversations on mount (only if authenticated)
   useEffect(() => {
-    loadConversations();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        loadConversations();
+      }
+    });
+    return () => unsubscribe();
   }, []);
 
   return {

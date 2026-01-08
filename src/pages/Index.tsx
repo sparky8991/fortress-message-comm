@@ -1,21 +1,21 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { auth } from '@/integrations/firebase/client';
+import { onAuthStateChanged, User } from 'firebase/auth';
 import { Sidebar } from '@/components/Sidebar';
 import { ChatArea } from '@/components/ChatArea';
 import { CallInterface } from '@/components/CallInterface';
-import { Session } from '@supabase/supabase-js';
 import { Loader2 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useDirectMessages } from '@/hooks/useDirectMessages';
 import { cn } from '@/lib/utils';
 
 const Index = () => {
-  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const isMobile = useIsMobile();
-  const [activeChat, setActiveChat] = useState<string | null>(null); // Changed to null
+  const [activeChat, setActiveChat] = useState<string | null>(null);
   const [isInCall, setIsInCall] = useState(false);
   const [callType, setCallType] = useState<'voice' | 'video'>('voice');
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -23,23 +23,15 @@ const Index = () => {
   const { activeConversation } = useDirectMessages();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
       setLoading(false);
-      if (!session) {
+      if (!user) {
         navigate('/auth');
       }
     });
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        navigate('/auth');
-      }
-      setSession(session);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    return () => unsubscribe();
   }, [navigate]);
 
   const handleChatSelect = (chatId: string) => {
@@ -77,7 +69,7 @@ const Index = () => {
     );
   }
 
-  if (!session) {
+  if (!user) {
     return null;
   }
 

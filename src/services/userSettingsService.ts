@@ -1,5 +1,6 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { db, auth } from '@/integrations/firebase/client';
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { toast } from '@/hooks/use-toast';
 
 export interface NotificationSettings {
@@ -30,28 +31,21 @@ export interface UserSettings {
 export const userSettingsService = {
   async getUserSettings(): Promise<UserSettings | null> {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = auth.currentUser;
       if (!user) throw new Error('User not authenticated');
 
-      const { data, error } = await supabase
-        .from('user_settings')
-        .select('notification_settings, security_settings, appearance_settings')
-        .eq('user_id', user.id)
-        .single();
+      const settingsRef = doc(db, 'user_settings', user.uid);
+      const settingsSnap = await getDoc(settingsRef);
 
-      if (error) {
-        if (error.code === 'PGRST116') {
-          // No settings found, create default settings
-          return await this.createDefaultSettings();
-        }
-        throw error;
+      if (!settingsSnap.exists()) {
+        return await this.createDefaultSettings();
       }
 
-      // Cast the Json types to our interfaces using unknown first
+      const data = settingsSnap.data();
       return {
-        notification_settings: data.notification_settings as unknown as NotificationSettings,
-        security_settings: data.security_settings as unknown as SecuritySettings,
-        appearance_settings: data.appearance_settings as unknown as AppearanceSettings,
+        notification_settings: data.notification_settings as NotificationSettings,
+        security_settings: data.security_settings as SecuritySettings,
+        appearance_settings: data.appearance_settings as AppearanceSettings,
       };
     } catch (error) {
       console.error('Error fetching user settings:', error);
@@ -61,11 +55,10 @@ export const userSettingsService = {
 
   async createDefaultSettings(): Promise<UserSettings> {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = auth.currentUser;
       if (!user) throw new Error('User not authenticated');
 
-      const defaultSettings = {
-        user_id: user.id,
+      const defaultSettings: UserSettings = {
         notification_settings: {
           unreadReminderEnabled: true,
           reminderTimerEnabled: true,
@@ -78,26 +71,21 @@ export const userSettingsService = {
           autoDeleteTimer: 24
         },
         appearance_settings: {
-          theme: 'dark' as const,
-          fontSize: 'medium' as const,
+          theme: 'dark',
+          fontSize: 'medium',
           language: 'en'
         }
       };
 
-      const { data, error } = await supabase
-        .from('user_settings')
-        .insert(defaultSettings)
-        .select('notification_settings, security_settings, appearance_settings')
-        .single();
+      const settingsRef = doc(db, 'user_settings', user.uid);
+      await setDoc(settingsRef, {
+        user_id: user.uid,
+        ...defaultSettings,
+        created_at: serverTimestamp(),
+        updated_at: serverTimestamp()
+      });
 
-      if (error) throw error;
-
-      // Cast the Json types to our interfaces using unknown first
-      return {
-        notification_settings: data.notification_settings as unknown as NotificationSettings,
-        security_settings: data.security_settings as unknown as SecuritySettings,
-        appearance_settings: data.appearance_settings as unknown as AppearanceSettings,
-      };
+      return defaultSettings;
     } catch (error) {
       console.error('Error creating default settings:', error);
       throw error;
@@ -106,15 +94,14 @@ export const userSettingsService = {
 
   async updateNotificationSettings(settings: NotificationSettings): Promise<void> {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = auth.currentUser;
       if (!user) throw new Error('User not authenticated');
 
-      const { error } = await supabase
-        .from('user_settings')
-        .update({ notification_settings: settings as any })
-        .eq('user_id', user.id);
-
-      if (error) throw error;
+      const settingsRef = doc(db, 'user_settings', user.uid);
+      await updateDoc(settingsRef, {
+        notification_settings: settings,
+        updated_at: serverTimestamp()
+      });
 
       toast({
         title: 'Settings Saved',
@@ -133,15 +120,14 @@ export const userSettingsService = {
 
   async updateSecuritySettings(settings: SecuritySettings): Promise<void> {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = auth.currentUser;
       if (!user) throw new Error('User not authenticated');
 
-      const { error } = await supabase
-        .from('user_settings')
-        .update({ security_settings: settings as any })
-        .eq('user_id', user.id);
-
-      if (error) throw error;
+      const settingsRef = doc(db, 'user_settings', user.uid);
+      await updateDoc(settingsRef, {
+        security_settings: settings,
+        updated_at: serverTimestamp()
+      });
 
       toast({
         title: 'Security Settings Saved',
@@ -160,15 +146,14 @@ export const userSettingsService = {
 
   async updateAppearanceSettings(settings: AppearanceSettings): Promise<void> {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = auth.currentUser;
       if (!user) throw new Error('User not authenticated');
 
-      const { error } = await supabase
-        .from('user_settings')
-        .update({ appearance_settings: settings as any })
-        .eq('user_id', user.id);
-
-      if (error) throw error;
+      const settingsRef = doc(db, 'user_settings', user.uid);
+      await updateDoc(settingsRef, {
+        appearance_settings: settings,
+        updated_at: serverTimestamp()
+      });
 
       toast({
         title: 'Appearance Settings Saved',

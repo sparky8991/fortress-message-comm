@@ -5,7 +5,8 @@ import { Search, Settings, Shield, Lock, Users, LogOut, MessageSquare, MoreVerti
 import { ContactList } from './ContactList';
 import { SecurityPanel } from './SecurityPanel';
 import { UserSearchDialog } from './UserSearchDialog';
-import { supabase } from '@/integrations/supabase/client';
+import { auth } from '@/integrations/firebase/client';
+import { signOut } from 'firebase/auth';
 import { TeamList } from './TeamList';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useDirectMessages } from '@/hooks/useDirectMessages';
@@ -32,7 +33,7 @@ export const Sidebar = ({ activeChat, onChatSelect }: SidebarProps) => {
   const { switchToConversation } = useDirectMessages();
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await signOut(auth);
     navigate('/auth');
   };
 

@@ -19,13 +19,30 @@ interface ChatAreaProps {
 export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaProps) => {
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
   const { settings: userSettings } = useUserSettings();
-  
+
   // Fallback settings for backward compatibility
   const [fallbackSettings, setFallbackSettings] = useState({
     unreadReminderEnabled: true,
     reminderTimerEnabled: true,
     unreadReminderTime: 5
   });
+
+  // All hooks must be called before any conditional returns
+  const {
+    currentMessages,
+    replyingTo,
+    handleStartNewGroup,
+    handleReply,
+    handleCancelReply,
+    handleSendMessage
+  } = useChatMessages(activeChat);
+
+  const contact = contactInfo[activeChat as keyof typeof contactInfo];
+
+  // Use settings from database if available, otherwise use fallback
+  const currentNotificationSettings = userSettings?.notification_settings || fallbackSettings;
+
+  useNotifications(currentMessages, currentNotificationSettings);
 
   // If no active chat is selected, show welcome screen
   if (!activeChat) {
@@ -74,22 +91,6 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
       </div>
     );
   }
-
-  const {
-    currentMessages,
-    replyingTo,
-    handleStartNewGroup,
-    handleReply,
-    handleCancelReply,
-    handleSendMessage
-  } = useChatMessages(activeChat);
-
-  const contact = contactInfo[activeChat as keyof typeof contactInfo];
-  
-  // Use settings from database if available, otherwise use fallback
-  const currentNotificationSettings = userSettings?.notification_settings || fallbackSettings;
-  
-  useNotifications(currentMessages, currentNotificationSettings);
 
   const handleSaveNotificationSettings = (newSettings: typeof fallbackSettings) => {
     // This is now handled by the NotificationSettings component via the userSettings hook
