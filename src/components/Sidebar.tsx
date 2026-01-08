@@ -1,12 +1,14 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Settings, Shield, Lock, Users, LogOut, MessageSquare, MoreVertical, User as UserIcon, UserPlus } from 'lucide-react';
+import { Search, Settings, Shield, Lock, Users, LogOut, MessageSquare, MoreVertical, User as UserIcon, UserPlus, Edit2 } from 'lucide-react';
 import { ContactList } from './ContactList';
 import { SecurityPanel } from './SecurityPanel';
 import { UserSearchDialog } from './UserSearchDialog';
-import { auth } from '@/integrations/firebase/client';
-import { signOut } from 'firebase/auth';
+import { EditCallSignDialog } from './EditCallSignDialog';
+import { auth, db } from '@/integrations/firebase/client';
+import { signOut, onAuthStateChanged } from 'firebase/auth';
+import { doc, onSnapshot } from 'firebase/firestore';
 import { TeamList } from './TeamList';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useDirectMessages } from '@/hooks/useDirectMessages';
@@ -28,9 +30,27 @@ export const Sidebar = ({ activeChat, onChatSelect }: SidebarProps) => {
   const [activeTab, setActiveTab] = useState<'chats' | 'teams' | 'security'>('chats');
   const [searchQuery, setSearchQuery] = useState('');
   const [showUserSearch, setShowUserSearch] = useState(false);
+  const [showEditCallSign, setShowEditCallSign] = useState(false);
+  const [callSign, setCallSign] = useState<string>('');
   const isMobile = useIsMobile();
   const navigate = useNavigate();
   const { switchToConversation } = useDirectMessages();
+
+  // Subscribe to user's profile to get call sign
+  useEffect(() => {
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const profileRef = doc(db, 'profiles', user.uid);
+        const unsubscribeProfile = onSnapshot(profileRef, (snap) => {
+          if (snap.exists()) {
+            setCallSign(snap.data().callSign || '');
+          }
+        });
+        return () => unsubscribeProfile();
+      }
+    });
+    return () => unsubscribeAuth();
+  }, []);
 
   const handleLogout = async () => {
     await signOut(auth);
@@ -82,7 +102,24 @@ export const Sidebar = ({ activeChat, onChatSelect }: SidebarProps) => {
             </DropdownMenu>
           </div>
         </div>
-        
+
+        {/* Call Sign Display */}
+        {callSign && (
+          <div className="flex items-center justify-between py-2 px-3 bg-gray-700/50 rounded-lg">
+            <div className="flex items-center space-x-2 min-w-0">
+              <UserIcon className="w-4 h-4 text-green-500 flex-shrink-0" />
+              <span className="text-sm text-white font-medium truncate">{callSign}</span>
+            </div>
+            <button
+              onClick={() => setShowEditCallSign(true)}
+              className="p-1.5 rounded text-gray-400 hover:text-white hover:bg-gray-600 transition-colors flex-shrink-0"
+              title="Edit call sign"
+            >
+              <Edit2 className="w-3 h-3" />
+            </button>
+          </div>
+        )}
+
         {/* Search with new user button */}
         <div className="pt-5 pb-1">
           <div className="flex space-x-2">
@@ -179,6 +216,14 @@ export const Sidebar = ({ activeChat, onChatSelect }: SidebarProps) => {
         isOpen={showUserSearch}
         onClose={() => setShowUserSearch(false)}
         onStartConversation={handleStartConversation}
+      />
+
+      {/* Edit Call Sign Dialog */}
+      <EditCallSignDialog
+        isOpen={showEditCallSign}
+        onClose={() => setShowEditCallSign(false)}
+        currentCallSign={callSign}
+        onCallSignUpdated={(newCallSign) => setCallSign(newCallSign)}
       />
     </div>
   );
