@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound";
 import AuthPage from "./pages/Auth";
 import ProfileSettingsPage from "./pages/ProfileSettings";
 import { InvitePage } from "./pages/InvitePage";
+import CallSignSetup from "./pages/CallSignSetup";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +21,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/auth" element={<AuthPage />} />
+          <Route path="/setup-callsign" element={<CallSignSetup />} />
           <Route path="/profile-settings" element={<ProfileSettingsPage />} />
           <Route path="/invite/:inviteCode" element={<InvitePage />} />
           <Route path="/" element={<Index />} />
