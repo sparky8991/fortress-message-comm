@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { auth } from '@/integrations/firebase/client';
+import { auth, db } from '@/integrations/firebase/client';
 import { onAuthStateChanged, User } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 import { Sidebar } from '@/components/Sidebar';
 import { ChatArea } from '@/components/ChatArea';
 import { CallInterface } from '@/components/CallInterface';
@@ -23,12 +24,33 @@ const Index = () => {
   const { activeConversation } = useDirectMessages();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setLoading(false);
-      if (!user) {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (!currentUser) {
+        setUser(null);
+        setLoading(false);
         navigate('/auth');
+        return;
       }
+
+      // Check if user has a valid call sign
+      const profileRef = doc(db, 'profiles', currentUser.uid);
+      const profileSnap = await getDoc(profileRef);
+
+      if (profileSnap.exists()) {
+        const profileData = profileSnap.data();
+        // If no call sign set, redirect to setup
+        if (!profileData.callSign) {
+          navigate('/setup-callsign');
+          return;
+        }
+      } else {
+        // Profile doesn't exist yet, redirect to setup
+        navigate('/setup-callsign');
+        return;
+      }
+
+      setUser(currentUser);
+      setLoading(false);
     });
 
     return () => unsubscribe();

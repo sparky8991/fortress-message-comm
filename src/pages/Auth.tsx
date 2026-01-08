@@ -55,7 +55,8 @@ const AuthPage = () => {
         email: userData.email,
         firstName: userData.firstName || userData.displayName?.split(' ')[0] || '',
         lastName: userData.lastName || userData.displayName?.split(' ').slice(1).join(' ') || '',
-        callSign: userData.callSign || userData.displayName || 'User',
+        // Only set callSign if explicitly provided (email signup), not for Google sign-in
+        callSign: userData.callSign || null,
         avatarUrl: userData.photoURL || null,
         createdAt: new Date().toISOString(),
         ghostModeActive: false,
