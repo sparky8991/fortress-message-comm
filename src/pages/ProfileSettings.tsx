@@ -1,32 +1,41 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { auth, db } from '@/integrations/firebase/client';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { auth, db, storage } from '@/integrations/firebase/client';
 import { onAuthStateChanged, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, query, where, getDocs } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Loader2, User, KeyRound, ChevronLeft, Lock, Eye, EyeOff, Mail } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Loader2, User, KeyRound, ChevronLeft, Lock, Eye, EyeOff, Mail, Camera, Trash2, ImageIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const ProfileSettingsPage = () => {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [updatingPassword, setUpdatingPassword] = useState(false);
   const [checkingCallSign, setCheckingCallSign] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [profile, setProfile] = useState<{
     firstName: string | null;
     lastName: string | null;
     callSign: string | null;
     bio: string | null;
+    avatarUrl: string | null;
+    showAvatar: boolean;
   } | null>(null);
   const [userEmail, setUserEmail] = useState<string>('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [callSign, setCallSign] = useState('');
   const [bio, setBio] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [showAvatar, setShowAvatar] = useState(true);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [callSignError, setCallSignError] = useState('');
 
   // Password change states
@@ -52,6 +61,8 @@ const ProfileSettingsPage = () => {
         lastName: null,
         callSign: null,
         bio: null,
+        avatarUrl: null,
+        showAvatar: true,
         createdAt: serverTimestamp()
       });
       console.log('Profile created successfully');
@@ -97,7 +108,9 @@ const ProfileSettingsPage = () => {
               firstName: data.firstName || null,
               lastName: data.lastName || null,
               callSign: data.callSign || null,
-              bio: data.bio || null
+              bio: data.bio || null,
+              avatarUrl: data.avatarUrl || null,
+              showAvatar: data.showAvatar !== false
             });
           }
         } else {
@@ -105,7 +118,9 @@ const ProfileSettingsPage = () => {
             firstName: null,
             lastName: null,
             callSign: null,
-            bio: null
+            bio: null,
+            avatarUrl: null,
+            showAvatar: true
           });
         }
       } else {
@@ -115,7 +130,9 @@ const ProfileSettingsPage = () => {
           firstName: data.firstName || null,
           lastName: data.lastName || null,
           callSign: data.callSign || null,
-          bio: data.bio || null
+          bio: data.bio || null,
+          avatarUrl: data.avatarUrl || null,
+          showAvatar: data.showAvatar !== false
         });
       }
     } catch (error: any) {
@@ -131,7 +148,9 @@ const ProfileSettingsPage = () => {
         firstName: null,
         lastName: null,
         callSign: null,
-        bio: null
+        bio: null,
+        avatarUrl: null,
+        showAvatar: true
       });
     } finally {
       setLoading(false);
@@ -177,6 +196,130 @@ const ProfileSettingsPage = () => {
       checkCallSignAvailability(newCallSign);
     }, 500);
     return () => clearTimeout(timeoutId);
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: 'Invalid file type',
+        description: 'Please select an image file (PNG, JPG, etc.)',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: 'File too large',
+        description: 'Please select an image smaller than 5MB',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setUploadingAvatar(true);
+    try {
+      const user = auth.currentUser;
+      if (!user) throw new Error('User not authenticated');
+
+      // Create a reference for the avatar
+      const avatarRef = ref(storage, `avatars/${user.uid}/profile.${file.name.split('.').pop()}`);
+
+      // Upload the file
+      await uploadBytes(avatarRef, file);
+
+      // Get the download URL
+      const downloadUrl = await getDownloadURL(avatarRef);
+
+      // Update the profile with the new avatar URL
+      const profileRef = doc(db, 'profiles', user.uid);
+      await updateDoc(profileRef, {
+        avatarUrl: downloadUrl,
+        updatedAt: serverTimestamp()
+      });
+
+      setAvatarUrl(downloadUrl);
+      toast({
+        title: 'Avatar uploaded',
+        description: 'Your profile picture has been updated.'
+      });
+    } catch (error: any) {
+      console.error('Error uploading avatar:', error);
+      toast({
+        title: 'Upload failed',
+        description: error.message || 'Failed to upload avatar. Please try again.',
+        variant: 'destructive'
+      });
+    } finally {
+      setUploadingAvatar(false);
+      // Reset the file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    setUploadingAvatar(true);
+    try {
+      const user = auth.currentUser;
+      if (!user) throw new Error('User not authenticated');
+
+      // Update the profile to remove the avatar URL
+      const profileRef = doc(db, 'profiles', user.uid);
+      await updateDoc(profileRef, {
+        avatarUrl: null,
+        updatedAt: serverTimestamp()
+      });
+
+      setAvatarUrl(null);
+      toast({
+        title: 'Avatar removed',
+        description: 'Your profile picture has been removed.'
+      });
+    } catch (error: any) {
+      console.error('Error removing avatar:', error);
+      toast({
+        title: 'Removal failed',
+        description: error.message || 'Failed to remove avatar. Please try again.',
+        variant: 'destructive'
+      });
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
+  const handleShowAvatarToggle = async (checked: boolean) => {
+    try {
+      const user = auth.currentUser;
+      if (!user) throw new Error('User not authenticated');
+
+      const profileRef = doc(db, 'profiles', user.uid);
+      await updateDoc(profileRef, {
+        showAvatar: checked,
+        updatedAt: serverTimestamp()
+      });
+
+      setShowAvatar(checked);
+      toast({
+        title: checked ? 'Avatar visible' : 'Avatar hidden',
+        description: checked
+          ? 'Your avatar will be shown to other users.'
+          : 'Your avatar will be hidden from other users.'
+      });
+    } catch (error: any) {
+      console.error('Error updating avatar visibility:', error);
+      toast({
+        title: 'Update failed',
+        description: 'Failed to update avatar visibility.',
+        variant: 'destructive'
+      });
+    }
   };
 
   const validatePassword = () => {
@@ -311,6 +454,8 @@ const ProfileSettingsPage = () => {
       setLastName(profile.lastName || '');
       setCallSign(profile.callSign || '');
       setBio(profile.bio || '');
+      setAvatarUrl(profile.avatarUrl || null);
+      setShowAvatar(profile.showAvatar !== false);
     }
   }, [profile]);
 
@@ -343,6 +488,75 @@ const ProfileSettingsPage = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleUpdateProfile} className="space-y-6">
+              {/* Avatar Upload Section */}
+              <div className="flex flex-col items-center space-y-4 pb-6 border-b border-gray-700">
+                <div className="relative">
+                  <Avatar className="w-24 h-24 border-4 border-gray-600">
+                    <AvatarImage src={avatarUrl || undefined} alt="Profile avatar" />
+                    <AvatarFallback className="bg-gray-700 text-white text-2xl">
+                      {callSign ? callSign.charAt(0).toUpperCase() : firstName ? firstName.charAt(0).toUpperCase() : <User className="w-10 h-10" />}
+                    </AvatarFallback>
+                  </Avatar>
+                  {uploadingAvatar && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
+                      <Loader2 className="w-8 h-8 animate-spin text-green-500" />
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarUpload}
+                    className="hidden"
+                    id="avatar-upload"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadingAvatar}
+                    className="border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
+                  >
+                    <Camera className="w-4 h-4 mr-2" />
+                    {avatarUrl ? 'Change Photo' : 'Upload Photo'}
+                  </Button>
+                  {avatarUrl && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleRemoveAvatar}
+                      disabled={uploadingAvatar}
+                      className="border-red-600 text-red-400 hover:bg-red-600/20 hover:text-red-300"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Remove
+                    </Button>
+                  )}
+                </div>
+
+                <p className="text-xs text-gray-500">PNG, JPG up to 5MB</p>
+
+                {/* Show Avatar Toggle */}
+                <div className="flex items-center space-x-3 pt-2">
+                  <Switch
+                    id="showAvatar"
+                    checked={showAvatar}
+                    onCheckedChange={handleShowAvatarToggle}
+                  />
+                  <Label htmlFor="showAvatar" className="text-gray-300 text-sm cursor-pointer">
+                    <div className="flex items-center space-x-2">
+                      <ImageIcon className="w-4 h-4 text-gray-400" />
+                      <span>Show my avatar to other users</span>
+                    </div>
+                  </Label>
+                </div>
+              </div>
+
               <div>
                 <Label htmlFor="userEmail" className="text-gray-300">Email Address</Label>
                 <div className="flex items-center mt-2">

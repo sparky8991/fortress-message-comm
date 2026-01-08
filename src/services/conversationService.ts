@@ -44,7 +44,8 @@ export interface Conversation {
       username: string;
       full_name: string;
       user_number: number;
-      avatar_url: string;
+      avatar_url: string | null;
+      show_avatar?: boolean;
     };
   }[];
 }
@@ -258,7 +259,8 @@ export const conversationService = {
             username: profileData.callSign || profileData.email,
             full_name: `${profileData.firstName || ''} ${profileData.lastName || ''}`.trim(),
             user_number: 0,
-            avatar_url: profileData.avatarUrl || null
+            avatar_url: profileData.showAvatar !== false ? (profileData.avatarUrl || null) : null,
+            show_avatar: profileData.showAvatar !== false
           } : null
         });
       }
