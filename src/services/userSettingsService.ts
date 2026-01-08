@@ -22,10 +22,28 @@ export interface AppearanceSettings {
   language: string;
 }
 
+export interface CallSettings {
+  ringtoneEnabled: boolean;
+  vibrationEnabled: boolean;
+  autoAnswerEnabled: boolean;
+  videoQuality: 'low' | 'medium' | 'high';
+  noiseCancellation: boolean;
+}
+
+export interface ChatSettings {
+  enterToSend: boolean;
+  showTypingIndicator: boolean;
+  showReadReceipts: boolean;
+  messagePreview: boolean;
+  mediaAutoDownload: boolean;
+}
+
 export interface UserSettings {
   notification_settings: NotificationSettings;
   security_settings: SecuritySettings;
   appearance_settings: AppearanceSettings;
+  call_settings?: CallSettings;
+  chat_settings?: ChatSettings;
 }
 
 export const userSettingsService = {
@@ -74,6 +92,20 @@ export const userSettingsService = {
           theme: 'dark',
           fontSize: 'medium',
           language: 'en'
+        },
+        call_settings: {
+          ringtoneEnabled: true,
+          vibrationEnabled: true,
+          autoAnswerEnabled: false,
+          videoQuality: 'high',
+          noiseCancellation: true
+        },
+        chat_settings: {
+          enterToSend: true,
+          showTypingIndicator: true,
+          showReadReceipts: true,
+          messagePreview: true,
+          mediaAutoDownload: true
         }
       };
 
@@ -164,6 +196,58 @@ export const userSettingsService = {
       toast({
         title: 'Save Failed',
         description: 'Failed to save appearance settings. Please try again.',
+        variant: 'destructive',
+      });
+      throw error;
+    }
+  },
+
+  async updateCallSettings(settings: CallSettings): Promise<void> {
+    try {
+      const user = auth.currentUser;
+      if (!user) throw new Error('User not authenticated');
+
+      const settingsRef = doc(db, 'user_settings', user.uid);
+      await updateDoc(settingsRef, {
+        call_settings: settings,
+        updated_at: serverTimestamp()
+      });
+
+      toast({
+        title: 'Call Settings Saved',
+        description: 'Your call preferences have been updated.',
+      });
+    } catch (error) {
+      console.error('Error updating call settings:', error);
+      toast({
+        title: 'Save Failed',
+        description: 'Failed to save call settings. Please try again.',
+        variant: 'destructive',
+      });
+      throw error;
+    }
+  },
+
+  async updateChatSettings(settings: ChatSettings): Promise<void> {
+    try {
+      const user = auth.currentUser;
+      if (!user) throw new Error('User not authenticated');
+
+      const settingsRef = doc(db, 'user_settings', user.uid);
+      await updateDoc(settingsRef, {
+        chat_settings: settings,
+        updated_at: serverTimestamp()
+      });
+
+      toast({
+        title: 'Chat Settings Saved',
+        description: 'Your chat preferences have been updated.',
+      });
+    } catch (error) {
+      console.error('Error updating chat settings:', error);
+      toast({
+        title: 'Save Failed',
+        description: 'Failed to save chat settings. Please try again.',
         variant: 'destructive',
       });
       throw error;

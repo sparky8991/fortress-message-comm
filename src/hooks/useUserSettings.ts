@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { userSettingsService, UserSettings, NotificationSettings, SecuritySettings, AppearanceSettings } from '@/services/userSettingsService';
+import { userSettingsService, UserSettings, NotificationSettings, SecuritySettings, AppearanceSettings, CallSettings, ChatSettings } from '@/services/userSettingsService';
 
 export const useUserSettings = () => {
   const [settings, setSettings] = useState<UserSettings | null>(null);
@@ -67,6 +67,34 @@ export const useUserSettings = () => {
     }
   }, [settings]);
 
+  const updateCallSettings = useCallback(async (newSettings: CallSettings) => {
+    try {
+      await userSettingsService.updateCallSettings(newSettings);
+      if (settings) {
+        setSettings({
+          ...settings,
+          call_settings: newSettings
+        });
+      }
+    } catch (error) {
+      console.error('Failed to update call settings:', error);
+    }
+  }, [settings]);
+
+  const updateChatSettings = useCallback(async (newSettings: ChatSettings) => {
+    try {
+      await userSettingsService.updateChatSettings(newSettings);
+      if (settings) {
+        setSettings({
+          ...settings,
+          chat_settings: newSettings
+        });
+      }
+    } catch (error) {
+      console.error('Failed to update chat settings:', error);
+    }
+  }, [settings]);
+
   return {
     settings,
     loading,
@@ -74,6 +102,8 @@ export const useUserSettings = () => {
     updateNotificationSettings,
     updateSecuritySettings,
     updateAppearanceSettings,
+    updateCallSettings,
+    updateChatSettings,
     refreshSettings: loadSettings
   };
 };
