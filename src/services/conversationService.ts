@@ -89,6 +89,10 @@ export const conversationService = {
 
         if (convSnap.exists()) {
           const data = convSnap.data();
+
+          // Get participants for this conversation
+          const participants = await this.getConversationParticipants(convId);
+
           conversations.push({
             id: convSnap.id,
             type: data.type || 'direct',
@@ -96,7 +100,7 @@ export const conversationService = {
             updated_at: toISOString(data.updated_at),
             last_message_at: data.last_message_at ? toISOString(data.last_message_at) : null,
             last_message_preview: data.last_message_preview || null,
-            participants: []
+            participants: participants
           });
         }
       }

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { MessageList } from './MessageList';
 import { NotificationSettings } from './NotificationSettings';
 import { useNotifications } from '@/hooks/useNotifications';
@@ -8,6 +8,8 @@ import { ChatHeader } from './ChatHeader';
 import { MessageInput } from './MessageInput';
 import { contactInfo } from '@/constants/contactInfo';
 import { useChatMessages } from '@/hooks/useChatMessages';
+import { useDirectMessages } from '@/hooks/useDirectMessages';
+import { auth } from '@/integrations/firebase/client';
 import { MessageSquare, Search } from 'lucide-react';
 
 interface ChatAreaProps {
@@ -19,6 +21,7 @@ interface ChatAreaProps {
 export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaProps) => {
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
   const { settings: userSettings } = useUserSettings();
+  const { conversations, activeConversation } = useDirectMessages();
 
   // Fallback settings for backward compatibility
   const [fallbackSettings, setFallbackSettings] = useState({
@@ -37,7 +40,35 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
     handleSendMessage
   } = useChatMessages(activeChat);
 
-  const contact = contactInfo[activeChat as keyof typeof contactInfo];
+  // Get contact info - either from static contactInfo or from conversation participants
+  const contact = useMemo(() => {
+    // First try static contact info (for team chats, etc.)
+    const staticContact = contactInfo[activeChat as keyof typeof contactInfo];
+    if (staticContact) return staticContact;
+
+    // For direct conversations, get the other participant's info
+    const currentUserId = auth.currentUser?.uid;
+    const conversation = conversations.find(c => c.id === activeChat);
+
+    if (conversation && conversation.participants) {
+      const otherParticipant = conversation.participants.find(p => p.user_id !== currentUserId);
+      if (otherParticipant?.profiles) {
+        const name = otherParticipant.profiles.username || otherParticipant.profiles.full_name || 'Unknown User';
+        return {
+          name: name,
+          status: 'End-to-end encrypted',
+          avatar: name.charAt(0).toUpperCase()
+        };
+      }
+    }
+
+    // Default fallback
+    return {
+      name: 'Secure Chat',
+      status: 'End-to-end encrypted',
+      avatar: '🔒'
+    };
+  }, [activeChat, conversations]);
 
   // Use settings from database if available, otherwise use fallback
   const currentNotificationSettings = userSettings?.notification_settings || fallbackSettings;
