@@ -10,6 +10,9 @@ import { CallInterface } from '@/components/CallInterface';
 import { StatusBar } from '@/components/StatusBar';
 import { StatusViewer } from '@/components/StatusViewer';
 import { StatusCreator } from '@/components/StatusCreator';
+import { MobileNavBar } from '@/components/MobileNavBar';
+import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
+import { UserSearchDialog } from '@/components/UserSearchDialog';
 import { StatusUser } from '@/services/statusService';
 import { Loader2 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -27,8 +30,10 @@ const Index = () => {
   const [viewingStatus, setViewingStatus] = useState<StatusUser | null>(null);
   const [showStatusCreator, setShowStatusCreator] = useState(false);
   const [statusRefreshKey, setStatusRefreshKey] = useState(0);
+  const [mobileTab, setMobileTab] = useState<'chats' | 'teams' | 'security' | 'profile'>('chats');
+  const [showUserSearch, setShowUserSearch] = useState(false);
   const navigate = useNavigate();
-  const { activeConversation } = useDirectMessages();
+  const { activeConversation, switchToConversation } = useDirectMessages();
 
   const handleStatusCreated = useCallback(() => {
     setStatusRefreshKey(prev => prev + 1);
@@ -74,6 +79,12 @@ const Index = () => {
     }
   };
 
+  const handleStartConversation = (conversationId: string) => {
+    switchToConversation(conversationId);
+    setActiveChat(conversationId);
+    setShowUserSearch(false);
+  };
+
   // Determine the current chat type and ID
   const getCurrentChatInfo = () => {
     if (activeConversation) {
@@ -109,10 +120,10 @@ const Index = () => {
   const currentChat = getCurrentChatInfo();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-black">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-black safe-area-inset">
       {isInCall ? (
         <div className="w-full px-2 md:px-4 py-4">
-          <CallInterface 
+          <CallInterface
             callType={callType}
             onEndCall={() => setIsInCall(false)}
             contactName="Contact"
@@ -120,8 +131,11 @@ const Index = () => {
         </div>
       ) : (
         <>
-          <div className="flex w-full h-screen">
-            {/* Sidebar */}
+          <div className={cn(
+            "flex w-full h-screen",
+            isMobile && "pb-16" // Make room for bottom nav
+          )}>
+            {/* Sidebar - hidden on mobile, shown on desktop */}
             <div
               className={cn(
                   'md:flex flex-col',
@@ -154,7 +168,10 @@ const Index = () => {
               />
 
               {/* Chat area */}
-              <div className="flex-1 min-h-0">
+              <div className={cn(
+                "flex-1 min-h-0",
+                isMobile && "pb-safe" // Extra padding for safe area
+              )}>
                 <ChatArea
                   activeChat={currentChat?.id || ''}
                   onStartCall={(type) => {
@@ -166,6 +183,30 @@ const Index = () => {
               </div>
             </div>
           </div>
+
+          {/* Mobile Bottom Navigation */}
+          {isMobile && (
+            <MobileNavBar
+              activeTab={mobileTab}
+              onTabChange={(tab) => {
+                setMobileTab(tab);
+                if (tab === 'chats' || tab === 'teams' || tab === 'security') {
+                  setSidebarOpen(true);
+                }
+              }}
+              onNewChat={() => setShowUserSearch(true)}
+            />
+          )}
+
+          {/* PWA Install Prompt */}
+          <PWAInstallPrompt />
+
+          {/* User Search Dialog */}
+          <UserSearchDialog
+            isOpen={showUserSearch}
+            onClose={() => setShowUserSearch(false)}
+            onStartConversation={handleStartConversation}
+          />
 
           {/* Status Viewer */}
           {viewingStatus && (

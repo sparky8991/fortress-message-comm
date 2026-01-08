@@ -2,11 +2,23 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>SecureChat - Military Grade Encrypted Messaging</title>
     <meta name="description" content="Secure team messaging with military-grade encryption. Built By Johnathan" />
     <meta name="author" content="Johnathan Carlson" />
 
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#22c55e" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="SecureChat" />
+    <meta name="application-name" content="SecureChat" />
+    <meta name="msapplication-TileColor" content="#111827" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <!-- Open Graph -->
     <meta property="og:title" content="Fortress Message Comm" />
     <meta property="og:description" content="Secure team messaging with military-grade encryption. Built By Johnathan" />
     <meta property="og:type" content="website" />
@@ -15,22 +27,41 @@
     <meta property="og:image:height" content="1024" />
     <meta property="og:url" content="https://fortress-message-comm.netlify.app" />
 
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Fortress Message Comm" />
     <meta name="twitter:description" content="Secure team messaging with military-grade encryption. Built By Johnathan" />
     <meta name="twitter:image" content="https://fortress-message-comm.netlify.app/fortress-logo.png" />
 
-    <!-- Favicons -->
+    <!-- Favicons & Icons -->
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <meta name="apple-mobile-web-app-title" content="Fortress Message Comm" />
     <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Splash screens for iOS -->
+    <link rel="apple-touch-startup-image" href="/splash/apple-splash-2048-2732.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/splash/apple-splash-1170-2532.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/splash/apple-splash-1125-2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
   </head>
 
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Register service worker for PWA
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+              console.log('SW registered:', registration.scope);
+            })
+            .catch(error => {
+              console.log('SW registration failed:', error);
+            });
+        });
+      }
+    </script>
   </body>
 </html>
