@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { MessageSquare, Clock } from 'lucide-react';
 import { useDirectMessages } from '@/hooks/useDirectMessages';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { auth } from '@/integrations/firebase/client';
 
 interface ContactListProps {
   activeChat: string;
@@ -11,11 +12,11 @@ interface ContactListProps {
   includeDirectMessages?: boolean;
 }
 
-export const ContactList = ({ 
-  activeChat, 
-  onChatSelect, 
+export const ContactList = ({
+  activeChat,
+  onChatSelect,
   searchQuery,
-  includeDirectMessages = false 
+  includeDirectMessages = false
 }: ContactListProps) => {
   const { conversations, switchToConversation } = useDirectMessages();
   const [filteredContacts, setFilteredContacts] = useState<any[]>([]);
@@ -23,21 +24,27 @@ export const ContactList = ({
   // Filter contacts based on search query
   useEffect(() => {
     let allContacts: any[] = [];
+    const currentUserId = auth.currentUser?.uid;
 
     if (includeDirectMessages) {
       const directConversations = conversations.map(conv => {
-        const otherParticipant = conv.participants?.find(p => p.user_id !== conv.id);
-        
+        // Find the other participant (not the current user)
+        const otherParticipant = conv.participants?.find(p => p.user_id !== currentUserId);
+        const participantName = otherParticipant?.profiles?.username ||
+                               otherParticipant?.profiles?.full_name ||
+                               'Unknown User';
+        const participantAvatar = otherParticipant?.profiles?.avatar_url || '';
+
         return {
           id: conv.id,
-          name: `Direct Chat ${conv.id.substring(0, 8)}`,
+          name: participantName,
           status: 'online',
           lastMessage: conv.last_message_preview || 'No messages yet',
-          time: conv.last_message_at ? new Date(conv.last_message_at).toLocaleTimeString([], { 
-            hour: '2-digit', 
-            minute: '2-digit' 
+          time: conv.last_message_at ? new Date(conv.last_message_at).toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit'
           }) : '',
-          avatar: '',
+          avatar: participantAvatar,
           type: 'direct',
           conversationId: conv.id
         };
