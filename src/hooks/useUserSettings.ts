@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { userSettingsService, UserSettings, NotificationSettings, SecuritySettings, AppearanceSettings, CallSettings, ChatSettings } from '@/services/userSettingsService';
+import { userSettingsService, UserSettings, NotificationSettings, SecuritySettings, AppearanceSettings, CallSettings, ChatSettings, ThemeSettings } from '@/services/userSettingsService';
 
 export const useUserSettings = () => {
   const [settings, setSettings] = useState<UserSettings | null>(null);
@@ -95,6 +95,20 @@ export const useUserSettings = () => {
     }
   }, [settings]);
 
+  const updateThemeSettings = useCallback(async (newSettings: ThemeSettings) => {
+    try {
+      await userSettingsService.updateThemeSettings(newSettings);
+      if (settings) {
+        setSettings({
+          ...settings,
+          theme_settings: newSettings
+        });
+      }
+    } catch (error) {
+      console.error('Failed to update theme settings:', error);
+    }
+  }, [settings]);
+
   return {
     settings,
     loading,
@@ -104,6 +118,7 @@ export const useUserSettings = () => {
     updateAppearanceSettings,
     updateCallSettings,
     updateChatSettings,
+    updateThemeSettings,
     refreshSettings: loadSettings
   };
 };

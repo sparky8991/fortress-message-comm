@@ -35,6 +35,7 @@ export interface Conversation {
   updated_at: string;
   last_message_at: string | null;
   last_message_preview: string | null;
+  unread_count?: number;
   participants?: {
     user_id: string;
     joined_at: string;
@@ -94,6 +95,9 @@ export const conversationService = {
           // Get participants for this conversation
           const participants = await this.getConversationParticipants(convId);
 
+          // Get unread count
+          const unread_count = await this.getUnreadCount(convId);
+
           conversations.push({
             id: convSnap.id,
             type: data.type || 'direct',
@@ -101,6 +105,7 @@ export const conversationService = {
             updated_at: toISOString(data.updated_at),
             last_message_at: data.last_message_at ? toISOString(data.last_message_at) : null,
             last_message_preview: data.last_message_preview || null,
+            unread_count,
             participants: participants
           });
         }
@@ -269,6 +274,62 @@ export const conversationService = {
     } catch (error) {
       console.error('Error getting participants:', error);
       throw error;
+    }
+  },
+
+  async getUnreadCount(conversationId: string): Promise<number> {
+    const user = auth.currentUser;
+    if (!user) return 0;
+
+    try {
+      const messagesRef = collection(db, 'direct_messages');
+      const messagesQuery = query(
+        messagesRef,
+        where('conversation_id', '==', conversationId)
+      );
+      const messagesSnap = await getDocs(messagesQuery);
+
+      // Count messages not from current user that are unread (read_at is null)
+      let unreadCount = 0;
+      messagesSnap.forEach(doc => {
+        const data = doc.data();
+        if (data.sender_id !== user.uid && !data.read_at) {
+          unreadCount++;
+        }
+      });
+
+      return unreadCount;
+    } catch (error) {
+      console.error('Error getting unread count:', error);
+      return 0;
+    }
+  },
+
+  async markConversationAsRead(conversationId: string): Promise<void> {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    try {
+      const messagesRef = collection(db, 'direct_messages');
+      const messagesQuery = query(
+        messagesRef,
+        where('conversation_id', '==', conversationId)
+      );
+      const messagesSnap = await getDocs(messagesQuery);
+
+      // Mark all unread messages from other users as read
+      const batch: Promise<void>[] = [];
+      messagesSnap.forEach(docSnap => {
+        const data = docSnap.data();
+        if (data.sender_id !== user.uid && !data.read_at) {
+          const messageRef = doc(db, 'direct_messages', docSnap.id);
+          batch.push(updateDoc(messageRef, { read_at: serverTimestamp() }));
+        }
+      });
+
+      await Promise.all(batch);
+    } catch (error) {
+      console.error('Error marking conversation as read:', error);
     }
   },
 

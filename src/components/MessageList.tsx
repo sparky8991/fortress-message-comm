@@ -6,6 +6,20 @@ import { Message } from '@/constants/initialMessages';
 import { contactNames } from '@/constants/contactInfo';
 import { useIsMobile } from '@/hooks/use-mobile';
 
+// Helper function to detect if a message is a GIF URL
+const isGifUrl = (text: string): boolean => {
+  if (!text) return false;
+  const trimmed = text.trim();
+  // Check for common GIF hosting domains and .gif extension
+  const gifPatterns = [
+    /^https?:\/\/.*\.gif(\?.*)?$/i,
+    /^https?:\/\/media\.tenor\.com\//i,
+    /^https?:\/\/.*\.giphy\.com\//i,
+    /^https?:\/\/tenor\.googleapis\.com\//i
+  ];
+  return gifPatterns.some(pattern => pattern.test(trimmed));
+};
+
 interface MessageListProps {
   messages: Message[];
   onReply: (messageId: string, messageText: string) => void;
@@ -121,9 +135,21 @@ export const MessageList = ({
                     )}
                     
                     {message.text && (
-                      <p className="text-xs md:text-sm break-words font-mono leading-relaxed whitespace-pre-wrap">
-                        {message.text}
-                      </p>
+                      isGifUrl(message.text) ? (
+                        <div className="rounded-lg overflow-hidden">
+                          <img
+                            src={message.text}
+                            alt="GIF"
+                            className="max-w-full h-auto rounded-lg"
+                            style={{ maxHeight: '200px' }}
+                            loading="lazy"
+                          />
+                        </div>
+                      ) : (
+                        <p className="text-xs md:text-sm break-words font-mono leading-relaxed whitespace-pre-wrap">
+                          {message.text}
+                        </p>
+                      )
                     )}
                     
                     <div className="flex items-center justify-between mt-2 md:mt-3 pt-1 md:pt-2 border-t border-gray-700/40">
