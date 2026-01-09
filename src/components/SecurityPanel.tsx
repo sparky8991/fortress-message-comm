@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useUserSettings } from '@/hooks/useUserSettings';
-import { PanicButton } from './PanicMode';
+import { HoldPanicButton } from './HoldPanicButton';
 import { PinSetup } from './ScreenLock';
 
 export const SecurityPanel = () => {
@@ -287,12 +287,12 @@ export const SecurityPanel = () => {
           <span>Emergency</span>
         </h3>
 
-        <div className="bg-red-900/20 border border-red-800/50 rounded-lg p-4">
+        <div className="bg-red-900/20 border border-red-800/50 rounded-xl p-4">
           <p className="text-gray-300 text-sm mb-4">
-            Use panic mode to immediately wipe all your messages, conversations, and local data.
-            This cannot be undone.
+            Hold the button below for 3 seconds to wipe all your messages, conversations, and local data.
+            This action cannot be undone.
           </p>
-          <PanicButton />
+          <HoldPanicButton variant="full" />
         </div>
       </div>
 

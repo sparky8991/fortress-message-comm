@@ -1,5 +1,5 @@
 import React from 'react';
-import { MessageSquare, Users, Shield, User, Plus } from 'lucide-react';
+import { MessageSquare, Users, Shield, User, Plus, AlertTriangle } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDirectMessages } from '@/hooks/useDirectMessages';
 
@@ -21,25 +21,29 @@ export const MobileNavBar = ({ activeTab, onTabChange, onNewChat }: MobileNavBar
       id: 'chats' as const,
       icon: MessageSquare,
       label: 'Chats',
-      badge: totalUnread > 0 ? totalUnread : null
+      badge: totalUnread > 0 ? totalUnread : null,
+      color: 'green'
     },
     {
       id: 'teams' as const,
       icon: Users,
       label: 'Teams',
-      badge: null
+      badge: null,
+      color: 'green'
     },
     {
       id: 'security' as const,
       icon: Shield,
       label: 'Security',
-      badge: null
+      badge: null,
+      color: 'green'
     },
     {
       id: 'profile' as const,
       icon: User,
       label: 'Profile',
-      badge: null
+      badge: null,
+      color: 'green'
     }
   ];
 
@@ -52,48 +56,58 @@ export const MobileNavBar = ({ activeTab, onTabChange, onNewChat }: MobileNavBar
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-700 z-40 safe-area-bottom">
-      <div className="flex items-center justify-around px-2 py-1">
-        {tabs.map((tab) => {
+    <nav className="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-lg border-t border-gray-800 z-40 safe-area-bottom">
+      {/* Floating action button for new chat */}
+      {onNewChat && (
+        <button
+          onClick={onNewChat}
+          className="absolute -top-7 left-1/2 transform -translate-x-1/2 w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 hover:from-green-400 hover:to-green-500 active:scale-95 rounded-2xl flex items-center justify-center shadow-xl shadow-green-500/30 transition-all z-10 border-4 border-gray-900"
+          aria-label="New chat"
+        >
+          <Plus className="w-6 h-6 text-black" />
+        </button>
+      )}
+
+      <div className="flex items-center justify-around px-1 pt-2 pb-1">
+        {tabs.map((tab, index) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id ||
             (tab.id === 'profile' && location.pathname === '/profile-settings');
+
+          // Add extra margin in the middle for the FAB
+          const extraClass = index === 1 ? 'mr-6' : index === 2 ? 'ml-6' : '';
 
           return (
             <button
               key={tab.id}
               onClick={() => handleTabClick(tab.id)}
-              className={`flex flex-col items-center justify-center py-2 px-4 rounded-lg transition-all min-w-[64px] min-h-[56px] relative ${
+              className={`flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all min-w-[60px] min-h-[52px] relative ${extraClass} ${
                 isActive
-                  ? 'text-green-400 bg-green-500/10'
-                  : 'text-gray-400 hover:text-gray-300 active:bg-gray-800'
+                  ? 'text-green-400'
+                  : 'text-gray-500 hover:text-gray-400 active:bg-gray-800/50'
               }`}
             >
+              {/* Active indicator */}
+              {isActive && (
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-green-500 rounded-full" />
+              )}
+
               <div className="relative">
-                <Icon className={`w-5 h-5 ${isActive ? 'scale-110' : ''} transition-transform`} />
+                <div className={`p-1.5 rounded-lg transition-all ${isActive ? 'bg-green-500/10' : ''}`}>
+                  <Icon className={`w-5 h-5 transition-all ${isActive ? 'scale-110' : ''}`} />
+                </div>
                 {tab.badge && (
-                  <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-1 bg-green-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-green-500 text-black text-[10px] font-bold rounded-full flex items-center justify-center shadow-lg">
                     {tab.badge > 99 ? '99+' : tab.badge}
                   </span>
                 )}
               </div>
-              <span className={`text-[10px] mt-1 font-medium ${isActive ? 'text-green-400' : ''}`}>
+              <span className={`text-[10px] mt-0.5 font-medium transition-colors ${isActive ? 'text-green-400' : ''}`}>
                 {tab.label}
               </span>
             </button>
           );
         })}
-
-        {/* Floating action button for new chat */}
-        {onNewChat && (
-          <button
-            onClick={onNewChat}
-            className="absolute -top-6 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-green-500 hover:bg-green-600 active:bg-green-700 rounded-full flex items-center justify-center shadow-lg shadow-green-500/30 transition-all"
-            aria-label="New chat"
-          >
-            <Plus className="w-6 h-6 text-black" />
-          </button>
-        )}
       </div>
     </nav>
   );
