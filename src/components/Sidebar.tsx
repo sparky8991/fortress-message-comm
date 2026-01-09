@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Shield, Lock, Users, LogOut, MessageSquare, User as UserIcon, UserPlus, Edit2, AlertTriangle, ChevronRight } from 'lucide-react';
+import { Search, Shield, Lock, Users, LogOut, MessageSquare, User as UserIcon, UserPlus, Edit2, AlertTriangle, Settings } from 'lucide-react';
 import { ContactList } from './ContactList';
 import { SecurityPanel } from './SecurityPanel';
 import { UserSearchDialog } from './UserSearchDialog';
@@ -83,22 +83,34 @@ export const Sidebar = ({ activeChat, onChatSelect }: SidebarProps) => {
         {/* User Profile Card */}
         {callSign && (
           <div className="flex items-center justify-between p-3 bg-gray-800/50 rounded-xl border border-gray-700/50 mb-4">
-            <div className="flex items-center gap-3 min-w-0">
+            <button
+              onClick={() => navigate('/profile-settings')}
+              className="flex items-center gap-3 min-w-0 hover:opacity-80 transition-opacity"
+            >
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center flex-shrink-0">
                 <UserIcon className="w-5 h-5 text-black" />
               </div>
-              <div className="min-w-0">
+              <div className="min-w-0 text-left">
                 <span className="text-[10px] text-gray-500 block uppercase tracking-wider">Call Sign</span>
                 <span className="text-sm text-white font-semibold truncate block">{callSign}</span>
               </div>
-            </div>
-            <button
-              onClick={() => setShowEditCallSign(true)}
-              className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700 transition-colors flex-shrink-0"
-              title="Edit call sign"
-            >
-              <Edit2 className="w-4 h-4" />
             </button>
+            <div className="flex items-center gap-1 flex-shrink-0">
+              <button
+                onClick={() => setShowEditCallSign(true)}
+                className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700 transition-colors"
+                title="Edit call sign"
+              >
+                <Edit2 className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => navigate('/profile-settings')}
+                className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700 transition-colors"
+                title="Profile settings"
+              >
+                <Settings className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         )}
 
