@@ -1,16 +1,18 @@
 
 import React, { useState, useEffect } from 'react';
-import { Shield, Key, Lock, Eye, EyeOff, Fingerprint, Smartphone, Wifi, Loader2, AlertTriangle, KeyRound } from 'lucide-react';
+import { Shield, Key, Lock, Eye, EyeOff, Fingerprint, Smartphone, Wifi, Loader2, AlertTriangle, KeyRound, Settings } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useUserSettings } from '@/hooks/useUserSettings';
+import { useUserRisk } from '@/contexts/UserRiskContext';
 import { HoldPanicButton } from './HoldPanicButton';
 import { PinSetup } from './ScreenLock';
 
 export const SecurityPanel = () => {
   const { settings: userSettings, updateSecuritySettings, loading } = useUserSettings();
+  const { riskLevel, isFeatureVisible, setRiskLevel } = useUserRisk();
   const [autoDeleteMessages, setAutoDeleteMessages] = useState(true);
   const [screenshotProtection, setScreenshotProtection] = useState(true);
   const [biometricLock, setBiometricLock] = useState(true);
@@ -280,19 +282,62 @@ export const SecurityPanel = () => {
         </div>
       </div>
 
-      {/* Emergency Actions */}
-      <div className="space-y-4">
+      {/* Emergency Actions - Only visible for high-risk users */}
+      {isFeatureVisible('panic-mode') && (
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-white flex items-center space-x-2">
+            <AlertTriangle className="w-5 h-5 text-red-500" />
+            <span>Emergency</span>
+          </h3>
+
+          <div className="bg-red-900/20 border border-red-800/50 rounded-xl p-4">
+            <p className="text-gray-300 text-sm mb-4">
+              Hold the button below for 3 seconds to wipe all your messages, conversations, and local data.
+              This action cannot be undone.
+            </p>
+            <HoldPanicButton variant="full" />
+          </div>
+        </div>
+      )}
+
+      {/* Security Experience Toggle */}
+      <div className="space-y-4 pt-4 border-t border-gray-700">
         <h3 className="text-lg font-semibold text-white flex items-center space-x-2">
-          <AlertTriangle className="w-5 h-5 text-red-500" />
-          <span>Emergency</span>
+          <Settings className="w-5 h-5" />
+          <span>Security Experience</span>
         </h3>
 
-        <div className="bg-red-900/20 border border-red-800/50 rounded-xl p-4">
-          <p className="text-gray-300 text-sm mb-4">
-            Hold the button below for 3 seconds to wipe all your messages, conversations, and local data.
-            This action cannot be undone.
+        <div className="bg-gray-800 rounded-xl p-4 space-y-3">
+          <p className="text-gray-400 text-sm">
+            Adjust which security features are shown based on your needs.
           </p>
-          <HoldPanicButton variant="full" />
+          <div className="flex gap-2">
+            <button
+              onClick={() => setRiskLevel('normal')}
+              className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${
+                riskLevel === 'normal'
+                  ? 'bg-green-600 text-black'
+                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              }`}
+            >
+              Standard
+            </button>
+            <button
+              onClick={() => setRiskLevel('high-risk')}
+              className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${
+                riskLevel === 'high-risk'
+                  ? 'bg-green-600 text-black'
+                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              }`}
+            >
+              High-Risk
+            </button>
+          </div>
+          <p className="text-gray-500 text-xs">
+            {riskLevel === 'high-risk'
+              ? 'Advanced protection features are enabled for sensitive situations.'
+              : 'Simple experience with strong default privacy.'}
+          </p>
         </div>
       </div>
 

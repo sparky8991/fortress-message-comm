@@ -13,6 +13,8 @@ import { StatusCreator } from '@/components/StatusCreator';
 import { MobileNavBar } from '@/components/MobileNavBar';
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 import { UserSearchDialog } from '@/components/UserSearchDialog';
+import { OnboardingFlow } from '@/components/onboarding/OnboardingFlow';
+import { useUserRisk } from '@/contexts/UserRiskContext';
 import { StatusUser } from '@/services/statusService';
 import { Loader2 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -22,6 +24,7 @@ import { cn } from '@/lib/utils';
 const Index = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const isMobile = useIsMobile();
   const [activeChat, setActiveChat] = useState<string | null>(null);
   const [isInCall, setIsInCall] = useState(false);
@@ -34,10 +37,18 @@ const Index = () => {
   const [showUserSearch, setShowUserSearch] = useState(false);
   const navigate = useNavigate();
   const { activeConversation, switchToConversation } = useDirectMessages();
+  const { hasCompletedOnboarding, loading: riskLoading } = useUserRisk();
 
   const handleStatusCreated = useCallback(() => {
     setStatusRefreshKey(prev => prev + 1);
   }, []);
+
+  // Check if onboarding should be shown
+  useEffect(() => {
+    if (!riskLoading && user && !hasCompletedOnboarding) {
+      setShowOnboarding(true);
+    }
+  }, [hasCompletedOnboarding, riskLoading, user]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -102,7 +113,7 @@ const Index = () => {
     return null; // No active chat
   };
 
-  if (loading) {
+  if (loading || riskLoading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="flex flex-col items-center space-y-4">
@@ -115,6 +126,11 @@ const Index = () => {
 
   if (!user) {
     return null;
+  }
+
+  // Show onboarding for new users
+  if (showOnboarding) {
+    return <OnboardingFlow onComplete={() => setShowOnboarding(false)} />;
   }
 
   const currentChat = getCurrentChatInfo();

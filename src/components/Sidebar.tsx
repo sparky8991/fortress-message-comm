@@ -13,6 +13,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { TeamList } from './TeamList';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useDirectMessages } from '@/hooks/useDirectMessages';
+import { useUserRisk } from '@/contexts/UserRiskContext';
 import { Button } from '@/components/ui/button';
 
 interface SidebarProps {
@@ -29,6 +30,7 @@ export const Sidebar = ({ activeChat, onChatSelect }: SidebarProps) => {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
   const { switchToConversation } = useDirectMessages();
+  const { isFeatureVisible } = useUserRisk();
 
   // Subscribe to user's profile to get call sign
   useEffect(() => {
@@ -182,14 +184,16 @@ export const Sidebar = ({ activeChat, onChatSelect }: SidebarProps) => {
 
       {/* Footer - Quick Actions */}
       <div className="p-3 border-t border-gray-800 space-y-2">
-        {/* Panic Mode - Hold to activate */}
-        <div className="p-3 bg-red-900/10 border border-red-800/30 rounded-xl">
-          <div className="flex items-center gap-2 mb-2">
-            <AlertTriangle className="w-4 h-4 text-red-500" />
-            <span className="text-xs text-red-400 font-medium">Emergency</span>
+        {/* Panic Mode - Only visible for high-risk users */}
+        {isFeatureVisible('panic-mode') && (
+          <div className="p-3 bg-red-900/10 border border-red-800/30 rounded-xl">
+            <div className="flex items-center gap-2 mb-2">
+              <AlertTriangle className="w-4 h-4 text-red-500" />
+              <span className="text-xs text-red-400 font-medium">Emergency</span>
+            </div>
+            <HoldPanicButton variant="full" />
           </div>
-          <HoldPanicButton variant="full" />
-        </div>
+        )}
 
         {/* Logout Button */}
         <button
