@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Shield, Lock, Check, CheckCheck, Clock } from 'lucide-react';
 import { AttachmentPreview } from './AttachmentPreview';
 import { MessageContextMenu } from './MessageContextMenu';
+import { VoiceMessagePlayer } from './VoiceMessagePlayer';
 import { Message } from '@/constants/initialMessages';
 import { contactNames } from '@/constants/contactInfo';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -18,6 +19,16 @@ const isGifUrl = (text: string): boolean => {
     /^https?:\/\/tenor\.googleapis\.com\//i
   ];
   return gifPatterns.some(pattern => pattern.test(trimmed));
+};
+
+// Helper function to detect if an attachment is a voice message
+const isVoiceMessage = (attachment: Message['attachment']): boolean => {
+  if (!attachment) return false;
+  // Check if metadata indicates voice message
+  if (attachment.metadata?.isVoiceMessage) return true;
+  // Check if it's an audio file with voice_ prefix in name
+  if (attachment.name?.startsWith('voice_') && attachment.type?.startsWith('audio/')) return true;
+  return false;
 };
 
 interface MessageListProps {
@@ -130,7 +141,15 @@ export const MessageList = ({
                     
                     {message.attachment && (
                       <div className="mb-2 md:mb-3">
-                        <AttachmentPreview attachment={message.attachment} />
+                        {isVoiceMessage(message.attachment) ? (
+                          <VoiceMessagePlayer
+                            audioUrl={message.attachment.url}
+                            duration={message.attachment.metadata?.duration || 0}
+                            isOwn={message.sender === 'me'}
+                          />
+                        ) : (
+                          <AttachmentPreview attachment={message.attachment} />
+                        )}
                       </div>
                     )}
                     

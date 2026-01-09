@@ -1,10 +1,11 @@
 
 import React, { useState, useRef } from 'react';
-import { Send, Paperclip, Smile, FileText, X, Shield, Lock, Terminal, ImageIcon } from 'lucide-react';
+import { Send, Paperclip, Smile, FileText, X, Shield, Lock, Terminal, ImageIcon, Mic } from 'lucide-react';
 import { EmojiPicker } from './EmojiPicker';
 import { GifPicker } from './GifPicker';
 import { EncryptedImageUpload } from './EncryptedImageUpload';
 import { ReplyPreview } from './ReplyPreview';
+import { VoiceRecorder } from './VoiceRecorder';
 import { toast } from '@/hooks/use-toast';
 
 interface MessageInputProps {
@@ -24,6 +25,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showGifPicker, setShowGifPicker] = useState(false);
   const [showEncryptedUpload, setShowEncryptedUpload] = useState(false);
+  const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,6 +93,28 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
     if (onCancelReply) onCancelReply();
   };
 
+  const handleVoiceSend = (audioBlob: Blob, duration: number) => {
+    // Convert blob to file with voice message metadata
+    const audioFile = new File([audioBlob], `voice_${Date.now()}.webm`, {
+      type: audioBlob.type
+    });
+
+    // Send with voice metadata
+    onSendMessage('', audioFile, {
+      isVoiceMessage: true,
+      duration,
+      mimeType: audioBlob.type
+    }, replyingTo);
+
+    setShowVoiceRecorder(false);
+    if (onCancelReply) onCancelReply();
+
+    toast({
+      title: '🎙️ VOICE TRANSMISSION SENT',
+      description: `${duration}s audio message encrypted and delivered.`,
+    });
+  };
+
   const isEncryptedFile = attachment?.name.includes('encrypted_') && attachment?.name.endsWith('.enc');
 
   return (
@@ -103,6 +127,15 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
       )}
 
       <div className="border-t border-gray-700/80 bg-gray-800/95 backdrop-blur-sm w-full max-w-full overflow-hidden">
+        {/* Voice Recorder */}
+        {showVoiceRecorder && (
+          <div className="p-3 border-b border-gray-700/50">
+            <VoiceRecorder
+              onSend={handleVoiceSend}
+              onCancel={() => setShowVoiceRecorder(false)}
+            />
+          </div>
+        )}
         <ReplyPreview 
           replyingTo={replyingTo} 
           onCancelReply={onCancelReply || (() => {})} 
@@ -157,13 +190,26 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                 <Paperclip className="w-4 h-4" />
               </button>
               
-              <button 
-                onClick={() => setShowEncryptedUpload(true)} 
+              <button
+                onClick={() => setShowEncryptedUpload(true)}
                 className="p-2.5 text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded-lg transition-all duration-200 flex-shrink-0 min-h-[40px] min-w-[40px] flex items-center justify-center hover:scale-105 active:scale-95"
                 title="Encrypt Image"
                 aria-label="Encrypt and attach image"
               >
                 <Lock className="w-4 h-4 animate-pulse" />
+              </button>
+
+              <button
+                onClick={() => setShowVoiceRecorder(!showVoiceRecorder)}
+                className={`p-2.5 rounded-lg transition-all duration-200 flex-shrink-0 min-h-[40px] min-w-[40px] flex items-center justify-center hover:scale-105 active:scale-95 ${
+                  showVoiceRecorder
+                    ? 'bg-green-500 text-black'
+                    : 'text-green-400 hover:text-green-300 hover:bg-green-500/20'
+                }`}
+                title="Voice Message"
+                aria-label="Record voice message"
+              >
+                <Mic className="w-4 h-4" />
               </button>
             </div>
             

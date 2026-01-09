@@ -1,8 +1,9 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { auth, db } from '@/integrations/firebase/client';
+import { auth, db, storage } from '@/integrations/firebase/client';
 import { onAuthStateChanged } from 'firebase/auth';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { conversationService, DirectMessage, Conversation } from '@/services/conversationService';
 import { toast } from '@/hooks/use-toast';
 
@@ -52,20 +53,40 @@ export const useDirectMessages = () => {
   const sendMessage = async (
     content: string,
     attachment?: File,
+    metadata?: any,
     replyToId?: string
   ) => {
-    if (!activeConversation || !content.trim()) return;
+    const user = auth.currentUser;
+    // Allow sending if there's content OR an attachment (for voice messages)
+    if (!activeConversation || (!content.trim() && !attachment)) return;
+    if (!user) return;
 
     try {
-      let attachmentUrl = null;
-      let attachmentName = null;
-      let attachmentType = null;
-      let messageType: 'text' | 'image' | 'file' = 'text';
+      let attachmentUrl: string | null = null;
+      let attachmentName: string | null = null;
+      let attachmentType: string | null = null;
+      let messageType: 'text' | 'image' | 'file' | 'voice' = 'text';
 
       if (attachment) {
+        // Upload attachment to Firebase Storage
+        const fileExt = attachment.name.split('.').pop();
+        const filePath = `chat_attachments/${user.uid}/${activeConversation}/${Date.now()}.${fileExt}`;
+
+        const storageRef = ref(storage, filePath);
+        await uploadBytes(storageRef, attachment);
+        attachmentUrl = await getDownloadURL(storageRef);
+
         attachmentName = attachment.name;
         attachmentType = attachment.type;
-        messageType = attachment.type.startsWith('image/') ? 'image' : 'file';
+
+        // Determine message type
+        if (metadata?.isVoiceMessage) {
+          messageType = 'voice';
+        } else if (attachment.type.startsWith('image/')) {
+          messageType = 'image';
+        } else {
+          messageType = 'file';
+        }
       }
 
       const newMessage = await conversationService.sendMessage(
@@ -75,7 +96,8 @@ export const useDirectMessages = () => {
         attachmentUrl,
         attachmentName,
         attachmentType,
-        replyToId
+        replyToId,
+        metadata
       );
 
       setMessages(prev => [...prev, newMessage]);
@@ -141,7 +163,8 @@ export const useDirectMessages = () => {
           attachment_url: data.attachment_url || null,
           attachment_name: data.attachment_name || null,
           attachment_type: data.attachment_type || null,
-          reply_to_id: data.reply_to_id || null
+          reply_to_id: data.reply_to_id || null,
+          metadata: data.metadata || null
         };
       });
       // Sort client-side by sent_at ascending
