@@ -282,23 +282,22 @@ export const SecurityPanel = () => {
         </div>
       </div>
 
-      {/* Emergency Actions - Only visible for high-risk users */}
-      {isFeatureVisible('panic-mode') && (
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-white flex items-center space-x-2">
-            <AlertTriangle className="w-5 h-5 text-red-500" />
-            <span>Emergency</span>
-          </h3>
+      {/* Emergency Actions - Always accessible, prominence varies by risk level */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-white flex items-center space-x-2">
+          <AlertTriangle className="w-5 h-5 text-red-500" />
+          <span>Emergency</span>
+        </h3>
 
-          <div className="bg-red-900/20 border border-red-800/50 rounded-xl p-4">
-            <p className="text-gray-300 text-sm mb-4">
-              Hold the button below for 3 seconds to wipe all your messages, conversations, and local data.
-              This action cannot be undone.
-            </p>
-            <HoldPanicButton variant="full" />
-          </div>
+        <div className="bg-red-900/20 border border-red-800/50 rounded-xl p-4">
+          <p className="text-gray-300 text-sm mb-4">
+            {riskLevel === 'high-risk'
+              ? 'Hold the button below for 3 seconds to wipe all your messages, conversations, and local data. This action cannot be undone.'
+              : 'Emergency data wipe is available if you need to quickly clear all your data. This action cannot be undone.'}
+          </p>
+          <HoldPanicButton variant="full" />
         </div>
-      )}
+      </div>
 
       {/* Security Experience Toggle */}
       <div className="space-y-4 pt-4 border-t border-gray-700">
