@@ -10,26 +10,29 @@ import AuthPage from "./pages/Auth";
 import ProfileSettingsPage from "./pages/ProfileSettings";
 import { InvitePage } from "./pages/InvitePage";
 import CallSignSetup from "./pages/CallSignSetup";
+import { UserRiskProvider } from "./contexts/UserRiskContext";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/auth" element={<AuthPage />} />
-          <Route path="/setup-callsign" element={<CallSignSetup />} />
-          <Route path="/profile-settings" element={<ProfileSettingsPage />} />
-          <Route path="/invite/:inviteCode" element={<InvitePage />} />
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <UserRiskProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/auth" element={<AuthPage />} />
+            <Route path="/setup-callsign" element={<CallSignSetup />} />
+            <Route path="/profile-settings" element={<ProfileSettingsPage />} />
+            <Route path="/invite/:inviteCode" element={<InvitePage />} />
+            <Route path="/" element={<Index />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </UserRiskProvider>
   </QueryClientProvider>
 );
 
