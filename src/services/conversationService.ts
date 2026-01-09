@@ -19,13 +19,18 @@ export interface DirectMessage {
   sender_id: string;
   content: string;
   sent_at: string;
-  message_type: 'text' | 'image' | 'file' | 'system';
+  message_type: 'text' | 'image' | 'file' | 'voice' | 'system';
   read_at: string | null;
   encrypted: boolean;
   attachment_url: string | null;
   attachment_name: string | null;
   attachment_type: string | null;
   reply_to_id: string | null;
+  metadata?: {
+    isVoiceMessage?: boolean;
+    duration?: number;
+    mimeType?: string;
+  } | null;
 }
 
 export interface Conversation {
@@ -147,7 +152,8 @@ export const conversationService = {
           attachment_url: data.attachment_url || null,
           attachment_name: data.attachment_name || null,
           attachment_type: data.attachment_type || null,
-          reply_to_id: data.reply_to_id || null
+          reply_to_id: data.reply_to_id || null,
+          metadata: data.metadata || null
         };
       });
 
@@ -164,18 +170,19 @@ export const conversationService = {
   async sendMessage(
     conversationId: string,
     content: string,
-    messageType: 'text' | 'image' | 'file' = 'text',
-    attachmentUrl?: string,
-    attachmentName?: string,
-    attachmentType?: string,
-    replyToId?: string
+    messageType: 'text' | 'image' | 'file' | 'voice' = 'text',
+    attachmentUrl?: string | null,
+    attachmentName?: string | null,
+    attachmentType?: string | null,
+    replyToId?: string,
+    metadata?: any
   ): Promise<DirectMessage> {
     const user = auth.currentUser;
     if (!user) throw new Error('Not authenticated');
 
     try {
       const messagesRef = collection(db, 'direct_messages');
-      const newMessage = {
+      const newMessage: any = {
         conversation_id: conversationId,
         sender_id: user.uid,
         content,
@@ -189,13 +196,30 @@ export const conversationService = {
         read_at: null
       };
 
+      // Add metadata for voice messages
+      if (metadata) {
+        newMessage.metadata = metadata;
+      }
+
       const docRef = await addDoc(messagesRef, newMessage);
 
       // Update conversation's last message info
       const convRef = doc(db, 'conversations', conversationId);
+
+      // Generate appropriate preview for message type
+      let lastMessagePreview = content.substring(0, 100);
+      if (messageType === 'voice') {
+        const duration = metadata?.duration || 0;
+        lastMessagePreview = `🎙️ Voice message (${duration}s)`;
+      } else if (messageType === 'image' && !content) {
+        lastMessagePreview = '📷 Image';
+      } else if (messageType === 'file' && !content) {
+        lastMessagePreview = `📎 ${attachmentName || 'File'}`;
+      }
+
       await updateDoc(convRef, {
         last_message_at: serverTimestamp(),
-        last_message_preview: content.substring(0, 100),
+        last_message_preview: lastMessagePreview,
         updated_at: serverTimestamp()
       });
 
@@ -211,7 +235,8 @@ export const conversationService = {
         attachment_url: attachmentUrl || null,
         attachment_name: attachmentName || null,
         attachment_type: attachmentType || null,
-        reply_to_id: replyToId || null
+        reply_to_id: replyToId || null,
+        metadata: metadata || null
       };
     } catch (error) {
       console.error('Error sending message:', error);
