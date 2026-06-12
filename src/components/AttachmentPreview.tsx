@@ -11,6 +11,8 @@ interface Attachment {
     salt: string;
     iv: string;
     originalName: string;
+    mimeType?: string;
+    shareCode?: string;
   };
 }
 

@@ -8,13 +8,23 @@ import {
   ContextMenuTrigger,
 } from '@/components/ui/context-menu';
 import { EncryptedImageUpload } from './EncryptedImageUpload';
+import { buildEncryptedPayloadMessage, stripEncryptedPayloadSecrets } from '@/utils/encryptedPayloadMessage';
+import { toast } from '@/hooks/use-toast';
+
+type MessageMetadata = Record<string, unknown> & {
+  salt?: string;
+  iv?: string;
+  originalName?: string;
+  mimeType?: string;
+  shareCode?: string;
+};
 
 interface MessageContextMenuProps {
   children: React.ReactNode;
   onReply: (messageId: string, messageText: string) => void;
   messageId: string;
   messageText: string;
-  onSendMessage: (message: string, attachment: File | null, encryptionMetadata?: any) => void;
+  onSendMessage: (message: string, attachment: File | null, encryptionMetadata?: MessageMetadata) => void;
   onStartNewGroup?: (contactName: string) => void;
   contactName: string;
 }
@@ -40,9 +50,23 @@ export const MessageContextMenu = ({
     }
   };
 
-  const handleEncryptedImageReady = (encryptedFile: File, metadata: any) => {
-    const shareMessage = `🔒 ENCRYPTED PAYLOAD DEPLOYED\n\nDecryption Key: ${metadata.shareCode}\n\n⚠️ CLASSIFIED - Share key securely with authorized personnel only`;
-    onSendMessage(shareMessage, encryptedFile, metadata);
+  const handleEncryptedImageReady = (encryptedFile: File, metadata: MessageMetadata) => {
+    const shareMessage = buildEncryptedPayloadMessage(metadata);
+    const safeMetadata = stripEncryptedPayloadSecrets(metadata);
+    const shareCode = typeof metadata?.shareCode === 'string' ? metadata.shareCode : '';
+
+    if (shareCode) {
+      navigator.clipboard.writeText(shareCode).catch((error) => {
+        console.error('Failed to copy decryption key:', error);
+        toast({
+          title: 'COPY FAILED',
+          description: 'Copy the decryption key from the encryption dialog before sending.',
+          variant: 'destructive'
+        });
+      });
+    }
+
+    onSendMessage(shareMessage, encryptedFile, safeMetadata);
     setShowEncryptedUpload(false);
   };
 

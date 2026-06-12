@@ -10,7 +10,7 @@ import { PasswordDisplay } from '@/components/PasswordDisplay';
 import { FileSelector } from '@/components/FileSelector';
 
 interface EncryptedImageUploadProps {
-  onEncryptedImageReady: (encryptedFile: File, metadata: { salt: string, iv: string, originalName: string, shareCode: string }) => void;
+  onEncryptedImageReady: (encryptedFile: File, metadata: { salt: string, iv: string, originalName: string, mimeType: string, shareCode: string }) => void;
   onCancel: () => void;
 }
 
@@ -42,6 +42,7 @@ export const EncryptedImageUpload = ({ onEncryptedImageReady, onCancel }: Encryp
         salt: btoa(String.fromCharCode(...salt)),
         iv: btoa(String.fromCharCode(...iv)),
         originalName: fileName,
+        mimeType: selectedFile.type,
         shareCode: generatedPassword
       };
 

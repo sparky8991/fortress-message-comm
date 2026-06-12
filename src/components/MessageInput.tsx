@@ -1,12 +1,13 @@
 
 import React, { useState, useRef } from 'react';
-import { Send, Paperclip, Smile, FileText, X, Shield, Lock, Terminal, ImageIcon, Mic } from 'lucide-react';
+import { Send, Paperclip, Smile, FileText, X, Shield, Lock, Terminal, ImageIcon, Mic, Copy } from 'lucide-react';
 import { EmojiPicker } from './EmojiPicker';
 import { GifPicker } from './GifPicker';
 import { EncryptedImageUpload } from './EncryptedImageUpload';
 import { ReplyPreview } from './ReplyPreview';
 import { VoiceRecorder } from './VoiceRecorder';
 import { toast } from '@/hooks/use-toast';
+import { buildEncryptedPayloadMessage, stripEncryptedPayloadSecrets } from '@/utils/encryptedPayloadMessage';
 
 type ReplyingTo = {
   messageId: string;
@@ -76,15 +77,34 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
     setAttachment(encryptedFile);
     setEncryptionMetadata(metadata);
     setShowEncryptedUpload(false);
-    
-    const shareMessage = `🔒 ENCRYPTED PAYLOAD DEPLOYED\n\nDecryption Key: ${metadata.shareCode}\n\n⚠️ CLASSIFIED - Share key securely with authorized personnel only`;
-    setMessage(shareMessage);
+    setMessage(buildEncryptedPayloadMessage(metadata));
+  };
+
+  const copyEncryptedKey = async () => {
+    const shareCode = encryptionMetadata?.shareCode;
+    if (typeof shareCode !== 'string' || !shareCode) return;
+
+    try {
+      await navigator.clipboard.writeText(shareCode);
+      toast({
+        title: 'DECRYPTION KEY COPIED',
+        description: 'Share this key separately from the encrypted payload.',
+      });
+    } catch (error) {
+      console.error('Failed to copy decryption key:', error);
+      toast({
+        title: 'COPY FAILED',
+        description: 'Select and copy the key manually before sending.',
+        variant: 'destructive'
+      });
+    }
   };
 
   const handleSend = async () => {
     if (!message.trim() && !attachment) return;
     try {
-      await onSendMessage(message.trim(), attachment, encryptionMetadata, replyingTo);
+      const metadataForSend = stripEncryptedPayloadSecrets(encryptionMetadata) as MessageMetadata | null;
+      await onSendMessage(message.trim(), attachment, metadataForSend, replyingTo);
       setMessage('');
       setAttachment(null);
       setEncryptionMetadata(null);
@@ -175,9 +195,21 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                   <span className="text-xs text-white font-medium font-mono block truncate">
                     {isEncryptedFile ? `[ENCRYPTED]: ${encryptionMetadata?.originalName || 'PAYLOAD'}` : `${attachment.name}`}
                   </span>
-                  <span className="text-xs text-gray-400 font-mono">
-                    {(attachment.size / 1024 / 1024).toFixed(2)} MB
-                  </span>
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <span className="text-xs text-gray-400 font-mono">
+                      {(attachment.size / 1024 / 1024).toFixed(2)} MB
+                    </span>
+                    {isEncryptedFile && typeof encryptionMetadata?.shareCode === 'string' && (
+                      <button
+                        type="button"
+                        onClick={copyEncryptedKey}
+                        className="inline-flex items-center gap-1 text-xs text-green-300 hover:text-green-200 font-mono rounded px-1.5 py-0.5 bg-green-500/10 border border-green-500/25"
+                      >
+                        <Copy className="w-3 h-3" />
+                        Copy decryption key
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
               <button 

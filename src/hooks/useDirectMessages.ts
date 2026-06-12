@@ -6,6 +6,7 @@ import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { conversationService, DirectMessage, Conversation } from '@/services/conversationService';
 import { toast } from '@/hooks/use-toast';
 import { uploadChatAttachment } from '@/integrations/supabase/storage';
+import { stripEncryptedPayloadSecrets } from '@/utils/encryptedPayloadMessage';
 
 type MessageMetadata = Record<string, unknown> & {
   isVoiceMessage?: boolean;
@@ -72,7 +73,7 @@ export const useDirectMessages = () => {
       let attachmentName: string | null = null;
       let attachmentType: string | null = null;
       let messageType: 'text' | 'image' | 'file' | 'voice' = 'text';
-      let messageMetadata = metadata;
+      let messageMetadata = stripEncryptedPayloadSecrets(metadata);
 
       if (attachment) {
         const uploadedAttachment = await uploadChatAttachment({
@@ -85,7 +86,7 @@ export const useDirectMessages = () => {
         attachmentName = attachment.name;
         attachmentType = attachment.type;
         messageMetadata = {
-          ...(metadata || {}),
+          ...(stripEncryptedPayloadSecrets(metadata) || {}),
           storageProvider: 'supabase',
           storagePath: uploadedAttachment.path,
         };

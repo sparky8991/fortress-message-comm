@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Lock, Eye, EyeOff, Download, Skull, Terminal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +15,7 @@ interface EncryptedImageViewerProps {
       salt: string;
       iv: string;
       originalName: string;
+      mimeType?: string;
       shareCode?: string;
     };
   };
@@ -26,15 +27,16 @@ export const EncryptedImageViewer = ({ attachment }: EncryptedImageViewerProps) 
   const [decryptedImageUrl, setDecryptedImageUrl] = useState<string | null>(null);
   const [isDecrypting, setIsDecrypting] = useState(false);
   const [isDecrypted, setIsDecrypted] = useState(false);
+  const [autoDecryptAttempted, setAutoDecryptAttempted] = useState(false);
 
-  const handleDecrypt = async () => {
-    if (!password.trim()) {
+  const decryptWithKey = useCallback(async (key: string, showSuccessToast = true) => {
+    if (!key.trim()) {
       toast({
         title: '🚫 ACCESS DENIED',
         description: 'Cipher key required for payload decryption.',
         variant: 'destructive'
       });
-      return;
+      return false;
     }
 
     if (!attachment.metadata) {
@@ -43,7 +45,7 @@ export const EncryptedImageViewer = ({ attachment }: EncryptedImageViewerProps) 
         description: 'Encrypted payload missing metadata headers.',
         variant: 'destructive'
       });
-      return;
+      return false;
     }
 
     setIsDecrypting(true);
@@ -55,18 +57,21 @@ export const EncryptedImageViewer = ({ attachment }: EncryptedImageViewerProps) 
       const salt = new Uint8Array(atob(attachment.metadata.salt).split('').map(char => char.charCodeAt(0)));
       const iv = new Uint8Array(atob(attachment.metadata.iv).split('').map(char => char.charCodeAt(0)));
 
-      const decryptedData = await ImageEncryption.decryptImage(encryptedData, password, salt, iv);
+      const decryptedData = await ImageEncryption.decryptImage(encryptedData, key, salt, iv);
       
-      const mimeType = 'image/jpeg';
+      const mimeType = attachment.metadata.mimeType || 'image/jpeg';
       const blobUrl = ImageEncryption.createBlobUrl(decryptedData, mimeType);
       
       setDecryptedImageUrl(blobUrl);
       setIsDecrypted(true);
       
-      toast({
-        title: '🔓 PAYLOAD DECRYPTED',
-        description: 'Cipher successfully broken. Data accessed.',
-      });
+      if (showSuccessToast) {
+        toast({
+          title: '🔓 PAYLOAD DECRYPTED',
+          description: 'Cipher successfully broken. Data accessed.',
+        });
+      }
+      return true;
     } catch (error) {
       console.error('Decryption error:', error);
       toast({
@@ -74,9 +79,14 @@ export const EncryptedImageViewer = ({ attachment }: EncryptedImageViewerProps) 
         description: 'Invalid cipher key or corrupted payload.',
         variant: 'destructive'
       });
+      return false;
     } finally {
       setIsDecrypting(false);
     }
+  }, [attachment.metadata, attachment.url]);
+
+  const handleDecrypt = async () => {
+    await decryptWithKey(password);
   };
 
   const handleDownload = () => {
@@ -102,6 +112,15 @@ export const EncryptedImageViewer = ({ attachment }: EncryptedImageViewerProps) 
       }
     };
   }, [decryptedImageUrl]);
+
+  useEffect(() => {
+    const shareCode = attachment.metadata?.shareCode;
+    if (!shareCode || isDecrypted || isDecrypting || autoDecryptAttempted) return;
+
+    setPassword(shareCode);
+    setAutoDecryptAttempted(true);
+    void decryptWithKey(shareCode, false);
+  }, [attachment.metadata?.shareCode, autoDecryptAttempted, decryptWithKey, isDecrypted, isDecrypting]);
 
   if (isDecrypted && decryptedImageUrl) {
     return (
