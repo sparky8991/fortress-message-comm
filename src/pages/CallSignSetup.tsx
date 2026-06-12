@@ -134,7 +134,6 @@ const CallSignSetup = () => {
               <UserCheck className="h-5 w-5 text-green-500" />
             </div>
             <input
-              type="text"
               placeholder="Enter Call Sign"
               value={callSign}
               onChange={(e) => setCallSign(e.target.value)}

@@ -266,7 +266,6 @@ const AuthPage = () => {
                   <User className="h-5 w-5 text-green-500" />
                 </div>
                 <input
-                  type="text"
                   placeholder="Enter First Name"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
@@ -281,7 +280,6 @@ const AuthPage = () => {
                   <User className="h-5 w-5 text-green-500" />
                 </div>
                 <input
-                  type="text"
                   placeholder="Enter Last Name"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
@@ -296,7 +294,6 @@ const AuthPage = () => {
                   <UserCheck className="h-5 w-5 text-green-500" />
                 </div>
                 <input
-                  type="text"
                   placeholder="Enter Call Sign"
                   value={callSign}
                   onChange={(e) => setCallSign(e.target.value)}
