@@ -7,7 +7,6 @@ import { doc, getDoc } from 'firebase/firestore';
 import { Sidebar } from '@/components/Sidebar';
 import { ChatArea } from '@/components/ChatArea';
 import { CallInterface } from '@/components/CallInterface';
-import { StatusBar } from '@/components/StatusBar';
 import { StatusViewer } from '@/components/StatusViewer';
 import { StatusCreator } from '@/components/StatusCreator';
 import { MobileNavBar } from '@/components/MobileNavBar';
@@ -165,7 +164,7 @@ const Index = () => {
   const currentChat = getCurrentChatInfo();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-black safe-area-inset">
+    <div className="h-dvh overflow-hidden bg-gradient-to-br from-gray-900 via-gray-900 to-black safe-area-inset">
       {isInCall ? (
         <div className="w-full px-2 md:px-4 py-4">
           <CallInterface
@@ -177,7 +176,7 @@ const Index = () => {
       ) : (
         <>
           <div className={cn(
-            "flex w-full h-screen",
+            "flex w-full h-dvh overflow-hidden",
             isMobile && "pb-16" // Make room for bottom nav
           )}>
             {/* Sidebar - hidden on mobile, shown on desktop */}
@@ -192,6 +191,9 @@ const Index = () => {
               <Sidebar
                 activeChat={currentChat?.id || ''}
                 onChatSelect={handleChatSelect}
+                statusRefreshKey={statusRefreshKey}
+                onViewStatus={(statusUser) => setViewingStatus(statusUser)}
+                onCreateStatus={() => setShowStatusCreator(true)}
               />
             </div>
 
@@ -204,14 +206,7 @@ const Index = () => {
             )}
 
             {/* Main content area */}
-            <div className="flex-1 min-w-0 flex flex-col">
-              {/* Status Bar */}
-              <StatusBar
-                key={statusRefreshKey}
-                onViewStatus={(statusUser) => setViewingStatus(statusUser)}
-                onCreateStatus={() => setShowStatusCreator(true)}
-              />
-
+            <div className="flex-1 min-w-0 min-h-0 flex flex-col overflow-hidden">
               {/* Chat area */}
               <div className={cn(
                 "flex-1 min-h-0",

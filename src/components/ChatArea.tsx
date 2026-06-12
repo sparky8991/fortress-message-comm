@@ -78,7 +78,7 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
   // If no active chat is selected, show welcome screen
   if (!activeChat) {
     return (
-      <div className="flex flex-col bg-gray-900 min-h-screen w-full">
+      <div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-gray-900">
         {/* Header for mobile */}
         <div className="sticky top-0 z-30 bg-gray-800/95 backdrop-blur-sm md:hidden">
           <div className="p-4 flex items-center justify-between">
@@ -130,7 +130,7 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
   };
 
   return (
-    <div className="flex flex-col bg-gray-900 min-h-screen w-full">
+    <div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-gray-900">
       {/* Header - Always visible at top */}
       <div className="sticky top-0 z-30 bg-gray-800/95 backdrop-blur-sm">
         <ChatHeader
@@ -142,7 +142,7 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
       </div>
 
       {/* Messages - Scrollable content area */}
-      <div className="flex-1 pb-24">
+      <div className="flex-1 min-h-0 overflow-y-auto pb-24">
         <MessageList 
           messages={currentMessages} 
           onReply={handleReply}

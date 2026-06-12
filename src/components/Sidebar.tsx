@@ -7,6 +7,7 @@ import { SecurityPanel } from './SecurityPanel';
 import { UserSearchDialog } from './UserSearchDialog';
 import { EditCallSignDialog } from './EditCallSignDialog';
 import { HoldPanicButton } from './HoldPanicButton';
+import { StatusBar } from './StatusBar';
 import { auth, db } from '@/integrations/firebase/client';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
@@ -15,13 +16,23 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useDirectMessages } from '@/hooks/useDirectMessages';
 import { useUserRisk } from '@/contexts/UserRiskContext';
 import { Button } from '@/components/ui/button';
+import { StatusUser } from '@/services/statusService';
 
 interface SidebarProps {
   activeChat: string;
   onChatSelect: (chatId: string) => void;
+  onViewStatus?: (statusUser: StatusUser) => void;
+  onCreateStatus?: () => void;
+  statusRefreshKey?: number;
 }
 
-export const Sidebar = ({ activeChat, onChatSelect }: SidebarProps) => {
+export const Sidebar = ({
+  activeChat,
+  onChatSelect,
+  onViewStatus,
+  onCreateStatus,
+  statusRefreshKey
+}: SidebarProps) => {
   const [activeTab, setActiveTab] = useState<'chats' | 'teams' | 'security'>('chats');
   const [searchQuery, setSearchQuery] = useState('');
   const [showUserSearch, setShowUserSearch] = useState(false);
@@ -136,6 +147,15 @@ export const Sidebar = ({ activeChat, onChatSelect }: SidebarProps) => {
           </Button>
         </div>
       </div>
+
+      {onViewStatus && onCreateStatus && (
+        <StatusBar
+          key={statusRefreshKey}
+          variant="sidebar"
+          onViewStatus={onViewStatus}
+          onCreateStatus={onCreateStatus}
+        />
+      )}
 
       {/* Tabs - Pill style */}
       <div className="px-3 py-2 border-b border-gray-800">
