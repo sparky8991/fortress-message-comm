@@ -12,6 +12,11 @@ type MessageMetadata = Record<string, unknown> & {
   isVoiceMessage?: boolean;
   duration?: number;
   mimeType?: string;
+  burnAfterRead?: boolean;
+  burnAfterReadSeconds?: number;
+  burnOpenedAt?: null;
+  burnExpiresAt?: null;
+  burnOpenedBy?: null;
 };
 
 export const useDirectMessages = () => {

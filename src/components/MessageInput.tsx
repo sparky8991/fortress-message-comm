@@ -1,6 +1,6 @@
 
 import React, { useState, useRef } from 'react';
-import { Send, Paperclip, Smile, FileText, X, Shield, Lock, Terminal, ImageIcon, Mic, Copy } from 'lucide-react';
+import { Send, Paperclip, Smile, FileText, X, Shield, Lock, Terminal, ImageIcon, Mic, Copy, Flame } from 'lucide-react';
 import { EmojiPicker } from './EmojiPicker';
 import { GifPicker } from './GifPicker';
 import { EncryptedImageUpload } from './EncryptedImageUpload';
@@ -8,6 +8,7 @@ import { ReplyPreview } from './ReplyPreview';
 import { VoiceRecorder } from './VoiceRecorder';
 import { toast } from '@/hooks/use-toast';
 import { buildEncryptedPayloadMessage, stripEncryptedPayloadSecrets } from '@/utils/encryptedPayloadMessage';
+import { BURN_AFTER_READ_SECONDS } from '@/utils/burnAfterRead.js';
 
 type ReplyingTo = {
   messageId: string;
@@ -21,6 +22,11 @@ type MessageMetadata = Record<string, unknown> & {
   mimeType?: string;
   originalName?: string;
   shareCode?: string;
+  burnAfterRead?: boolean;
+  burnAfterReadSeconds?: number;
+  burnOpenedAt?: null;
+  burnExpiresAt?: null;
+  burnOpenedBy?: null;
 };
 
 interface MessageInputProps {
@@ -37,6 +43,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
   const [showGifPicker, setShowGifPicker] = useState(false);
   const [showEncryptedUpload, setShowEncryptedUpload] = useState(false);
   const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
+  const [burnAfterReadEnabled, setBurnAfterReadEnabled] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -103,11 +110,22 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
   const handleSend = async () => {
     if (!message.trim() && !attachment) return;
     try {
-      const metadataForSend = stripEncryptedPayloadSecrets(encryptionMetadata) as MessageMetadata | null;
+      const safeMetadata = stripEncryptedPayloadSecrets(encryptionMetadata) as MessageMetadata | null;
+      const metadataForSend: MessageMetadata | null = burnAfterReadEnabled
+        ? {
+            ...(safeMetadata || {}),
+            burnAfterRead: true,
+            burnAfterReadSeconds: BURN_AFTER_READ_SECONDS,
+            burnOpenedAt: null,
+            burnExpiresAt: null,
+            burnOpenedBy: null,
+          }
+        : safeMetadata;
       await onSendMessage(message.trim(), attachment, metadataForSend, replyingTo);
       setMessage('');
       setAttachment(null);
       setEncryptionMetadata(null);
+      setBurnAfterReadEnabled(false);
       setShowEmojiPicker(false);
       setShowGifPicker(false);
       if (onCancelReply) onCancelReply();
@@ -249,6 +267,20 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
               </button>
 
               <button
+                onClick={() => setBurnAfterReadEnabled((enabled) => !enabled)}
+                className={`p-2.5 rounded-lg transition-all duration-200 flex-shrink-0 min-h-[40px] min-w-[40px] flex items-center justify-center hover:scale-105 active:scale-95 ${
+                  burnAfterReadEnabled
+                    ? 'bg-orange-500 text-black shadow-lg shadow-orange-500/30'
+                    : 'text-orange-400 hover:text-orange-300 hover:bg-orange-500/20'
+                }`}
+                title="Burn after read: 2 minutes"
+                aria-label="Toggle burn after read"
+                aria-pressed={burnAfterReadEnabled}
+              >
+                <Flame className="w-4 h-4" />
+              </button>
+
+              <button
                 onClick={() => setShowVoiceRecorder(!showVoiceRecorder)}
                 className={`p-2.5 rounded-lg transition-all duration-200 flex-shrink-0 min-h-[40px] min-w-[40px] flex items-center justify-center hover:scale-105 active:scale-95 ${
                   showVoiceRecorder
@@ -323,9 +355,19 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
           </div>
           
           <div className="flex items-center justify-center pt-1">
-            <div className="flex items-center space-x-1.5 text-xs text-green-500/80 font-mono bg-green-500/10 px-2.5 py-1 rounded-full border border-green-500/20">
-              <Shield className="w-3 h-3 flex-shrink-0 animate-pulse" />
-              <span className="text-center font-medium">END-TO-END ENCRYPTED</span>
+            <div className={`flex items-center space-x-1.5 text-xs font-mono px-2.5 py-1 rounded-full border ${
+              burnAfterReadEnabled
+                ? 'text-orange-300 bg-orange-500/10 border-orange-500/30'
+                : 'text-green-500/80 bg-green-500/10 border-green-500/20'
+            }`}>
+              {burnAfterReadEnabled ? (
+                <Flame className="w-3 h-3 flex-shrink-0 animate-pulse" />
+              ) : (
+                <Shield className="w-3 h-3 flex-shrink-0 animate-pulse" />
+              )}
+              <span className="text-center font-medium">
+                {burnAfterReadEnabled ? 'BURNS 2 MIN AFTER OPEN' : 'END-TO-END ENCRYPTED'}
+              </span>
             </div>
           </div>
         </div>

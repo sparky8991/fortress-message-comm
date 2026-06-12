@@ -1,4 +1,16 @@
 
+export type MessageMetadata = Record<string, unknown> & {
+  isVoiceMessage?: boolean;
+  duration?: number;
+  mimeType?: string;
+  originalName?: string;
+  burnAfterRead?: boolean;
+  burnAfterReadSeconds?: number;
+  burnOpenedAt?: unknown;
+  burnExpiresAt?: unknown;
+  burnOpenedBy?: string | null;
+};
+
 export interface Message {
   id: string;
   text: string;
@@ -11,8 +23,9 @@ export interface Message {
     name: string;
     url: string;
     type: string;
-    metadata?: any;
+    metadata?: MessageMetadata;
   };
+  metadata?: MessageMetadata;
   replyTo?: {
     messageId: string;
     messageText: string;

@@ -62,6 +62,53 @@ service cloud.firestore {
         && request.resource.data.creatorId == request.auth.uid;
     }
 
+    function isExpiredBurnAfterReadMessage() {
+      return signedIn()
+        && resource.data.keys().hasAny(['metadata'])
+        && resource.data.metadata is map
+        && resource.data.metadata.burnAfterRead == true
+        && resource.data.metadata.keys().hasAny(['burnExpiresAt'])
+        && resource.data.metadata.burnExpiresAt is timestamp
+        && resource.data.metadata.burnExpiresAt <= request.time
+        && resource.data.metadata.keys().hasAny(['burnOpenedBy'])
+        && resource.data.metadata.burnOpenedBy == request.auth.uid;
+    }
+
+    function onlyDirectMessageFieldsChanged(fields) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(fields);
+    }
+
+    function isReadReceiptUpdate() {
+      return signedIn()
+        && onlyDirectMessageFieldsChanged(['read_at'])
+        && request.resource.data.read_at is timestamp;
+    }
+
+    function isReactionUpdate() {
+      return signedIn()
+        && onlyDirectMessageFieldsChanged(['reactions'])
+        && request.resource.data.reactions is list;
+    }
+
+    function isBurnAfterReadOpenUpdate() {
+      return signedIn()
+        && onlyDirectMessageFieldsChanged(['metadata'])
+        && resource.data.keys().hasAny(['metadata'])
+        && resource.data.metadata is map
+        && request.resource.data.metadata is map
+        && resource.data.metadata.burnAfterRead == true
+        && request.resource.data.metadata.burnAfterRead == true
+        && resource.data.metadata.burnOpenedAt == null
+        && resource.data.sender_id != request.auth.uid
+        && request.resource.data.metadata.burnOpenedBy == request.auth.uid
+        && request.resource.data.metadata.burnOpenedAt is timestamp
+        && request.resource.data.metadata.burnExpiresAt is timestamp
+        && request.resource.data.metadata.burnExpiresAt > request.time
+        && request.resource.data.metadata.diff(resource.data.metadata)
+          .affectedKeys()
+          .hasOnly(['burnOpenedAt', 'burnExpiresAt', 'burnOpenedBy']);
+    }
+
     match /profiles/{userId} {
       allow read: if signedIn();
       allow create, update, delete: if isUser(userId);
@@ -161,9 +208,14 @@ service cloud.firestore {
 
     match /direct_messages/{messageId} {
       // Message reads depend on conversation membership metadata that is not yet present on conversation docs.
-      allow read, update: if signedIn();
+      allow read: if signedIn();
+      allow update: if ownsSenderId()
+        || ownsSenderIdCamel()
+        || isReadReceiptUpdate()
+        || isReactionUpdate()
+        || isBurnAfterReadOpenUpdate();
       allow create: if ownsSenderIdOnWrite() || ownsSenderIdCamelOnWrite();
-      allow delete: if ownsSenderId() || ownsSenderIdCamel();
+      allow delete: if ownsSenderId() || ownsSenderIdCamel() || isExpiredBurnAfterReadMessage();
     }
 
     match /ghost_sessions/{sessionId} {

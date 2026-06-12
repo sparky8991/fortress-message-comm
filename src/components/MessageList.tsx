@@ -3,6 +3,7 @@ import { Shield, Lock, Check, CheckCheck, Clock } from 'lucide-react';
 import { AttachmentPreview } from './AttachmentPreview';
 import { MessageContextMenu } from './MessageContextMenu';
 import { VoiceMessagePlayer } from './VoiceMessagePlayer';
+import { BurnAfterReadMessage } from './BurnAfterReadMessage';
 import { Message } from '@/constants/initialMessages';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -33,7 +34,7 @@ const isVoiceMessage = (attachment: Message['attachment']): boolean => {
 interface MessageListProps {
   messages: Message[];
   onReply: (messageId: string, messageText: string) => void;
-  onSendMessage: (message: string, attachment: File | null, encryptionMetadata?: any) => void;
+  onSendMessage: (message: string, attachment: File | null, encryptionMetadata?: Message['metadata']) => void;
   onStartNewGroup?: (contactName: string) => void;
   contactName?: string;
 }
@@ -125,75 +126,77 @@ export const MessageList = ({
                       letterSpacing: '0.3px'
                     }}
                   >
-                    {/* Reply indicator */}
-                    {message.replyTo && (
-                      <div className="mb-2 md:mb-3 p-2 md:p-3 bg-black/60 rounded-md md:rounded-lg border-l-2 border-green-400 shadow-inner">
-                        <p className="text-xs text-green-300 font-semibold mb-1 font-mono flex items-center space-x-1">
-                          <span className="text-green-500">{'>'}</span>
-                          <span>{message.replyTo.sender}</span>
-                        </p>
-                        <p className="text-xs opacity-90 truncate font-mono leading-relaxed">
-                          {message.replyTo.messageText}
-                        </p>
-                      </div>
-                    )}
-                    
-                    {message.attachment && (
-                      <div className="mb-2 md:mb-3">
-                        {isVoiceMessage(message.attachment) ? (
-                          <VoiceMessagePlayer
-                            audioUrl={message.attachment.url}
-                            duration={message.attachment.metadata?.duration || 0}
-                            isOwn={message.sender === 'me'}
-                          />
-                        ) : (
-                          <AttachmentPreview attachment={message.attachment} />
-                        )}
-                      </div>
-                    )}
-                    
-                    {message.text && (
-                      isGifUrl(message.text) ? (
-                        <div className="rounded-lg overflow-hidden">
-                          <img
-                            src={message.text}
-                            alt="GIF"
-                            className="max-w-full h-auto rounded-lg"
-                            style={{ maxHeight: '200px' }}
-                            loading="lazy"
-                          />
-                        </div>
-                      ) : (
-                        <p className="text-xs md:text-sm break-words font-mono leading-relaxed whitespace-pre-wrap">
-                          {message.text}
-                        </p>
-                      )
-                    )}
-                    
-                    <div className="flex items-center justify-between mt-2 md:mt-3 pt-1 md:pt-2 border-t border-gray-700/40">
-                      <div className="flex items-center space-x-2 md:space-x-3">
-                        {message.encrypted && (
-                          <div className="flex items-center space-x-1 md:space-x-1.5">
-                            <Shield className="w-2.5 h-2.5 md:w-3 md:h-3 text-green-400/80 animate-pulse" />
-                            <span className="text-xs text-green-400/70 font-mono font-medium">
-                              {isMobile ? 'ENC' : 'ENCRYPTED'}
-                            </span>
-                          </div>
-                        )}
-                        {!showUsername && (
-                          <span className={`text-xs font-mono ${
-                            message.sender === 'me' ? 'text-green-300/60' : 'text-gray-400'
-                          }`}>
-                            {message.timestamp}
-                          </span>
-                        )}
-                      </div>
-                      {message.sender === 'me' && (
-                        <div className="flex-shrink-0 opacity-70 group-hover:opacity-100 transition-opacity">
-                          {getStatusIcon(message.status)}
+                    <BurnAfterReadMessage message={message}>
+                      {/* Reply indicator */}
+                      {message.replyTo && (
+                        <div className="mb-2 md:mb-3 p-2 md:p-3 bg-black/60 rounded-md md:rounded-lg border-l-2 border-green-400 shadow-inner">
+                          <p className="text-xs text-green-300 font-semibold mb-1 font-mono flex items-center space-x-1">
+                            <span className="text-green-500">{'>'}</span>
+                            <span>{message.replyTo.sender}</span>
+                          </p>
+                          <p className="text-xs opacity-90 truncate font-mono leading-relaxed">
+                            {message.replyTo.messageText}
+                          </p>
                         </div>
                       )}
-                    </div>
+
+                      {message.attachment && (
+                        <div className="mb-2 md:mb-3">
+                          {isVoiceMessage(message.attachment) ? (
+                            <VoiceMessagePlayer
+                              audioUrl={message.attachment.url}
+                              duration={message.attachment.metadata?.duration || 0}
+                              isOwn={message.sender === 'me'}
+                            />
+                          ) : (
+                            <AttachmentPreview attachment={message.attachment} />
+                          )}
+                        </div>
+                      )}
+
+                      {message.text && (
+                        isGifUrl(message.text) ? (
+                          <div className="rounded-lg overflow-hidden">
+                            <img
+                              src={message.text}
+                              alt="GIF"
+                              className="max-w-full h-auto rounded-lg"
+                              style={{ maxHeight: '200px' }}
+                              loading="lazy"
+                            />
+                          </div>
+                        ) : (
+                          <p className="text-xs md:text-sm break-words font-mono leading-relaxed whitespace-pre-wrap">
+                            {message.text}
+                          </p>
+                        )
+                      )}
+
+                      <div className="flex items-center justify-between mt-2 md:mt-3 pt-1 md:pt-2 border-t border-gray-700/40">
+                        <div className="flex items-center space-x-2 md:space-x-3">
+                          {message.encrypted && (
+                            <div className="flex items-center space-x-1 md:space-x-1.5">
+                              <Shield className="w-2.5 h-2.5 md:w-3 md:h-3 text-green-400/80 animate-pulse" />
+                              <span className="text-xs text-green-400/70 font-mono font-medium">
+                                {isMobile ? 'ENC' : 'ENCRYPTED'}
+                              </span>
+                            </div>
+                          )}
+                          {!showUsername && (
+                            <span className={`text-xs font-mono ${
+                              message.sender === 'me' ? 'text-green-300/60' : 'text-gray-400'
+                            }`}>
+                              {message.timestamp}
+                            </span>
+                          )}
+                        </div>
+                        {message.sender === 'me' && (
+                          <div className="flex-shrink-0 opacity-70 group-hover:opacity-100 transition-opacity">
+                            {getStatusIcon(message.status)}
+                          </div>
+                        )}
+                      </div>
+                    </BurnAfterReadMessage>
                   </div>
                 </MessageContextMenu>
               </div>

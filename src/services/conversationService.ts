@@ -13,6 +13,19 @@ import {
   Timestamp
 } from 'firebase/firestore';
 
+type TimestampLike = Date | string | number | Timestamp | { toDate: () => Date } | null;
+
+export type DirectMessageMetadata = Record<string, unknown> & {
+  isVoiceMessage?: boolean;
+  duration?: number;
+  mimeType?: string;
+  burnAfterRead?: boolean;
+  burnAfterReadSeconds?: number;
+  burnOpenedAt?: TimestampLike;
+  burnExpiresAt?: TimestampLike;
+  burnOpenedBy?: string | null;
+};
+
 export interface DirectMessage {
   id: string;
   conversation_id: string;
@@ -26,11 +39,7 @@ export interface DirectMessage {
   attachment_name: string | null;
   attachment_type: string | null;
   reply_to_id: string | null;
-  metadata?: {
-    isVoiceMessage?: boolean;
-    duration?: number;
-    mimeType?: string;
-  } | null;
+  metadata?: DirectMessageMetadata | null;
 }
 
 export interface Conversation {
@@ -57,9 +66,11 @@ export interface Conversation {
 }
 
 // Helper to convert Firestore timestamp to ISO string
-const toISOString = (timestamp: any): string => {
+const toISOString = (timestamp: TimestampLike): string => {
   if (!timestamp) return new Date().toISOString();
-  if (timestamp.toDate) return timestamp.toDate().toISOString();
+  if (typeof timestamp === 'object' && 'toDate' in timestamp && typeof timestamp.toDate === 'function') {
+    return timestamp.toDate().toISOString();
+  }
   if (timestamp instanceof Date) return timestamp.toISOString();
   return new Date(timestamp).toISOString();
 };
@@ -175,14 +186,14 @@ export const conversationService = {
     attachmentName?: string | null,
     attachmentType?: string | null,
     replyToId?: string,
-    metadata?: any
+    metadata?: DirectMessageMetadata
   ): Promise<DirectMessage> {
     const user = auth.currentUser;
     if (!user) throw new Error('Not authenticated');
 
     try {
       const messagesRef = collection(db, 'direct_messages');
-      const newMessage: any = {
+      const newMessage: Record<string, unknown> = {
         conversation_id: conversationId,
         sender_id: user.uid,
         content,

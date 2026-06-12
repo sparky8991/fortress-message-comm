@@ -17,6 +17,11 @@ type MessageMetadata = Record<string, unknown> & {
   mimeType?: string;
   originalName?: string;
   shareCode?: string;
+  burnAfterRead?: boolean;
+  burnAfterReadSeconds?: number;
+  burnOpenedAt?: unknown;
+  burnExpiresAt?: unknown;
+  burnOpenedBy?: string | null;
 };
 
 interface ChatAreaProps {
@@ -94,6 +99,7 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
       sender: message.sender_id === currentUserId ? 'me' : 'contact',
       status: message.read_at ? 'read' : 'sent',
       encrypted: message.encrypted,
+      metadata: message.metadata || undefined,
       sentAt: new Date(message.sent_at),
       attachment: message.attachment_url ? {
         name: message.attachment_name || 'Attachment',
