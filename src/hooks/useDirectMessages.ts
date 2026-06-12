@@ -100,8 +100,8 @@ export const useDirectMessages = () => {
         metadata
       );
 
-      setMessages(prev => [...prev, newMessage]);
       await loadConversations();
+      return newMessage;
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
@@ -109,6 +109,7 @@ export const useDirectMessages = () => {
         description: 'Please try again.',
         variant: 'destructive'
       });
+      throw error;
     }
   };
 

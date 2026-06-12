@@ -9,7 +9,7 @@ import { VoiceRecorder } from './VoiceRecorder';
 import { toast } from '@/hooks/use-toast';
 
 interface MessageInputProps {
-  onSendMessage: (message: string, attachment: File | null, encryptionMetadata?: any, replyTo?: any) => void;
+  onSendMessage: (message: string, attachment: File | null, encryptionMetadata?: any, replyTo?: any) => void | Promise<void>;
   replyingTo?: {
     messageId: string;
     messageText: string;
@@ -71,15 +71,19 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
     setMessage(shareMessage);
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!message.trim() && !attachment) return;
-    onSendMessage(message.trim(), attachment, encryptionMetadata, replyingTo);
-    setMessage('');
-    setAttachment(null);
-    setEncryptionMetadata(null);
-    setShowEmojiPicker(false);
-    setShowGifPicker(false);
-    if (onCancelReply) onCancelReply();
+    try {
+      await onSendMessage(message.trim(), attachment, encryptionMetadata, replyingTo);
+      setMessage('');
+      setAttachment(null);
+      setEncryptionMetadata(null);
+      setShowEmojiPicker(false);
+      setShowGifPicker(false);
+      if (onCancelReply) onCancelReply();
+    } catch (error) {
+      console.error('Send failed:', error);
+    }
   };
 
   const handleEmojiSelect = (emoji: string) => {
@@ -88,9 +92,12 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
 
   const handleGifSelect = (gifUrl: string) => {
     // Send GIF immediately as a message
-    onSendMessage(gifUrl, null, null, replyingTo);
-    setShowGifPicker(false);
-    if (onCancelReply) onCancelReply();
+    Promise.resolve(onSendMessage(gifUrl, null, null, replyingTo))
+      .then(() => {
+        setShowGifPicker(false);
+        if (onCancelReply) onCancelReply();
+      })
+      .catch((error) => console.error('GIF send failed:', error));
   };
 
   const handleVoiceSend = (audioBlob: Blob, duration: number) => {
