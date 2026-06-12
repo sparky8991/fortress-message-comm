@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Shield, Lock, Users, LogOut, MessageSquare, User as UserIcon, UserPlus, Edit2, AlertTriangle, Settings } from 'lucide-react';
+import { Search, Shield, Lock, Users, LogOut, MessageSquare, User as UserIcon, UserPlus, Edit2, AlertTriangle } from 'lucide-react';
 import { ContactList } from './ContactList';
 import { SecurityPanel } from './SecurityPanel';
 import { UserSearchDialog } from './UserSearchDialog';
@@ -17,6 +17,7 @@ import { useDirectMessages } from '@/hooks/useDirectMessages';
 import { useUserRisk } from '@/contexts/UserRiskContext';
 import { Button } from '@/components/ui/button';
 import { StatusUser } from '@/services/statusService';
+import { AppSettingsMenu } from './AppSettingsMenu';
 
 interface SidebarProps {
   activeChat: string;
@@ -114,13 +115,9 @@ export const Sidebar = ({
               >
                 <Edit2 className="w-4 h-4" />
               </button>
-              <button
-                onClick={() => navigate('/profile-settings')}
-                className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700 transition-colors"
-                title="Profile settings"
-              >
-                <Settings className="w-4 h-4" />
-              </button>
+              <AppSettingsMenu
+                triggerClassName="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700 transition-colors"
+              />
             </div>
           </div>
         )}

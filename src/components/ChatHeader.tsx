@@ -1,24 +1,7 @@
 
-import React, { useState } from 'react';
-import { Phone, Video, MoreVertical, Lock, Settings, User, Bell, Shield, LogOut, Info, MessageSquare, Phone as PhoneIcon, Palette } from 'lucide-react';
+import React from 'react';
+import { Phone, Video, Lock } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useNavigate } from 'react-router-dom';
-import { auth } from '@/integrations/firebase/client';
-import { signOut } from 'firebase/auth';
-import { useToast } from '@/hooks/use-toast';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { PrivacySecuritySettings } from './PrivacySecuritySettings';
-import { CallSettingsDialog } from './CallSettingsDialog';
-import { ChatSettingsDialog } from './ChatSettingsDialog';
-import { ThemeSettingsDialog } from './ThemeSettingsDialog';
-import { AboutDialog } from './AboutDialog';
 
 interface ContactInfo {
   name: string;
@@ -29,41 +12,11 @@ interface ContactInfo {
 interface ChatHeaderProps {
   contact: ContactInfo;
   onStartCall: (type: 'voice' | 'video') => void;
-  onShowNotificationSettings: () => void;
   onToggleSidebar?: () => void;
 }
 
-export const ChatHeader = ({ contact, onStartCall, onShowNotificationSettings, onToggleSidebar }: ChatHeaderProps) => {
+export const ChatHeader = ({ contact, onStartCall, onToggleSidebar }: ChatHeaderProps) => {
   const isMobile = useIsMobile();
-  const navigate = useNavigate();
-  const { toast } = useToast();
-
-  // Dialog states
-  const [showPrivacySecurity, setShowPrivacySecurity] = useState(false);
-  const [showCallSettings, setShowCallSettings] = useState(false);
-  const [showChatSettings, setShowChatSettings] = useState(false);
-  const [showThemeSettings, setShowThemeSettings] = useState(false);
-  const [showAbout, setShowAbout] = useState(false);
-
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-
-      toast({
-        title: "Logged out",
-        description: "You have been successfully logged out."
-      });
-
-      navigate('/auth');
-    } catch (error: any) {
-      console.error('Logout error:', error);
-      toast({
-        title: "Logout failed",
-        description: error.message || "Failed to log out. Please try again.",
-        variant: "destructive"
-      });
-    }
-  };
 
   return (
     <div className="p-3 border-b border-gray-700/80 bg-gray-800/95 backdrop-blur-sm shadow-lg">
@@ -124,141 +77,8 @@ export const ChatHeader = ({ contact, onStartCall, onShowNotificationSettings, o
           >
             <Video className="w-4 h-4" />
           </button>
-          {!isMobile && (
-            <button
-              onClick={onShowNotificationSettings}
-              className="p-2 text-gray-300 hover:text-white hover:bg-gray-700/80 rounded-xl transition-all duration-200 min-h-[40px] min-w-[40px] flex items-center justify-center hover:scale-105 active:scale-95"
-              title="Notification Settings"
-              aria-label="Open notification settings"
-            >
-              <Settings className="w-4 h-4" />
-            </button>
-          )}
-
-          {/* Settings Dropdown Menu */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                className="p-2 text-gray-300 hover:text-white hover:bg-gray-700/80 rounded-xl transition-all duration-200 min-h-[40px] min-w-[40px] flex items-center justify-center hover:scale-105 active:scale-95"
-                title="Settings Menu"
-                aria-label="Open settings menu"
-              >
-                <MoreVertical className="w-4 h-4" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="w-56 bg-gray-800 border-gray-700 text-white shadow-xl"
-              sideOffset={8}
-            >
-              <DropdownMenuLabel className="text-green-400 font-mono text-xs tracking-wider">
-                SETTINGS
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-gray-700" />
-
-              {/* Profile Settings */}
-              <DropdownMenuItem
-                onClick={() => navigate('/profile-settings')}
-                className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer"
-              >
-                <User className="mr-2 h-4 w-4 text-green-500" />
-                <span>Profile Settings</span>
-              </DropdownMenuItem>
-
-              {/* Notification Settings - Always show, but different behavior */}
-              <DropdownMenuItem
-                onClick={onShowNotificationSettings}
-                className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer"
-              >
-                <Bell className="mr-2 h-4 w-4 text-blue-500" />
-                <span>Notifications</span>
-              </DropdownMenuItem>
-
-              <DropdownMenuSeparator className="bg-gray-700" />
-
-              {/* Privacy & Security */}
-              <DropdownMenuItem
-                onClick={() => setShowPrivacySecurity(true)}
-                className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer"
-              >
-                <Shield className="mr-2 h-4 w-4 text-purple-500" />
-                <span>Privacy & Security</span>
-              </DropdownMenuItem>
-
-              {/* Call Settings */}
-              <DropdownMenuItem
-                onClick={() => setShowCallSettings(true)}
-                className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer"
-              >
-                <PhoneIcon className="mr-2 h-4 w-4 text-orange-500" />
-                <span>Call Settings</span>
-              </DropdownMenuItem>
-
-              {/* Chat Settings */}
-              <DropdownMenuItem
-                onClick={() => setShowChatSettings(true)}
-                className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer"
-              >
-                <MessageSquare className="mr-2 h-4 w-4 text-cyan-500" />
-                <span>Chat Settings</span>
-              </DropdownMenuItem>
-
-              {/* Theme Settings */}
-              <DropdownMenuItem
-                onClick={() => setShowThemeSettings(true)}
-                className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer"
-              >
-                <Palette className="mr-2 h-4 w-4 text-pink-500" />
-                <span>Theme Settings</span>
-              </DropdownMenuItem>
-
-              <DropdownMenuSeparator className="bg-gray-700" />
-
-              {/* About */}
-              <DropdownMenuItem
-                onClick={() => setShowAbout(true)}
-                className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer"
-              >
-                <Info className="mr-2 h-4 w-4 text-gray-400" />
-                <span>About SecureChat</span>
-              </DropdownMenuItem>
-
-              <DropdownMenuSeparator className="bg-gray-700" />
-
-              {/* Logout */}
-              <DropdownMenuItem
-                onClick={handleLogout}
-                className="hover:bg-red-900/50 focus:bg-red-900/50 cursor-pointer text-red-400 hover:text-red-300"
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Logout</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </div>
-
-      {/* Settings Dialogs */}
-      <PrivacySecuritySettings
-        isOpen={showPrivacySecurity}
-        onClose={() => setShowPrivacySecurity(false)}
-      />
-      <CallSettingsDialog
-        isOpen={showCallSettings}
-        onClose={() => setShowCallSettings(false)}
-      />
-      <ChatSettingsDialog
-        isOpen={showChatSettings}
-        onClose={() => setShowChatSettings(false)}
-      />
-      <ThemeSettingsDialog
-        isOpen={showThemeSettings}
-        onClose={() => setShowThemeSettings(false)}
-      />
-      <AboutDialog
-        isOpen={showAbout}
-        onClose={() => setShowAbout(false)}
-      />
     </div>
   );
 };

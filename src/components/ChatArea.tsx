@@ -1,7 +1,6 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { MessageList } from './MessageList';
-import { NotificationSettings } from './NotificationSettings';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useUserSettings } from '@/hooks/useUserSettings';
 import { ChatHeader } from './ChatHeader';
@@ -12,6 +11,14 @@ import { auth } from '@/integrations/firebase/client';
 import { MessageSquare, Search } from 'lucide-react';
 import { Message } from '@/constants/initialMessages';
 
+type MessageMetadata = Record<string, unknown> & {
+  duration?: number;
+  isVoiceMessage?: boolean;
+  mimeType?: string;
+  originalName?: string;
+  shareCode?: string;
+};
+
 interface ChatAreaProps {
   activeChat: string;
   onStartCall: (type: 'voice' | 'video') => void;
@@ -19,7 +26,6 @@ interface ChatAreaProps {
 }
 
 export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaProps) => {
-  const [showNotificationSettings, setShowNotificationSettings] = useState(false);
   const { settings: userSettings } = useUserSettings();
   const {
     conversations,
@@ -34,17 +40,16 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
   } | null>(null);
 
   // Fallback settings for backward compatibility
-  const [fallbackSettings, setFallbackSettings] = useState({
+  const fallbackSettings = {
     unreadReminderEnabled: true,
     reminderTimerEnabled: true,
     unreadReminderTime: 5
-  });
-
+  };
   useEffect(() => {
     if (activeChat) {
       switchToConversation(activeChat);
     }
-  }, [activeChat]);
+  }, [activeChat, switchToConversation]);
 
   // Get contact info - either from static contactInfo or from conversation participants
   const contact = useMemo(() => {
@@ -157,12 +162,6 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
     );
   }
 
-  const handleSaveNotificationSettings = (newSettings: typeof fallbackSettings) => {
-    // This is now handled by the NotificationSettings component via the userSettings hook
-    // Keep this for backward compatibility
-    setFallbackSettings(newSettings);
-  };
-
   const handleStartNewGroup = (contactName: string) => {
     console.log(`Starting new group with ${contactName}`);
   };
@@ -185,7 +184,7 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
   const handleSendMessage = async (
     messageText: string,
     attachmentFile: File | null,
-    encryptionMetadata?: any,
+    encryptionMetadata?: MessageMetadata | null,
     replyTo?: typeof replyingTo
   ) => {
     if (!activeChat) return;
@@ -194,7 +193,7 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
       activeChat,
       messageText,
       attachmentFile || undefined,
-      encryptionMetadata,
+      encryptionMetadata || undefined,
       replyTo?.messageId
     );
   };
@@ -206,7 +205,6 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
         <ChatHeader
           contact={contact}
           onStartCall={onStartCall}
-          onShowNotificationSettings={() => setShowNotificationSettings(true)}
           onToggleSidebar={onToggleSidebar}
         />
       </div>
@@ -231,13 +229,6 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
         />
       </div>
 
-      {/* Notification Settings Modal */}
-      <NotificationSettings
-        isOpen={showNotificationSettings}
-        onClose={() => setShowNotificationSettings(false)}
-        settings={currentNotificationSettings}
-        onSave={handleSaveNotificationSettings}
-      />
     </div>
   );
 };
