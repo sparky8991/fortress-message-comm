@@ -1,4 +1,4 @@
-# CLAUDE.md - AI Assistant Guide for SecureChat
+# AGENTS.md - AI Assistant Guide for SecureChat
 
 ## Project Overview
 

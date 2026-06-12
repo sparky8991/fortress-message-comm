@@ -63,8 +63,7 @@ self.addEventListener('fetch', (event) => {
 
   // For API requests, use network first
   if (url.pathname.startsWith('/api') ||
-      url.hostname.includes('firebase') ||
-      url.hostname.includes('supabase')) {
+      url.hostname.includes('firebase')) {
     event.respondWith(networkFirst(request));
     return;
   }
