@@ -24,6 +24,7 @@ import { cn } from '@/lib/utils';
 const Index = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [initializationError, setInitializationError] = useState<string | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const isMobile = useIsMobile();
   const [activeChat, setActiveChat] = useState<string | null>(null);
@@ -52,6 +53,8 @@ const Index = () => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setInitializationError(null);
+
       if (!currentUser) {
         setUser(null);
         setLoading(false);
@@ -59,25 +62,34 @@ const Index = () => {
         return;
       }
 
-      // Check if user has a valid call sign
-      const profileRef = doc(db, 'profiles', currentUser.uid);
-      const profileSnap = await getDoc(profileRef);
+      try {
+        // Check if user has a valid call sign
+        const profileRef = doc(db, 'profiles', currentUser.uid);
+        const profileSnap = await getDoc(profileRef);
 
-      if (profileSnap.exists()) {
-        const profileData = profileSnap.data();
-        // If no call sign set, redirect to setup
-        if (!profileData.callSign) {
+        if (profileSnap.exists()) {
+          const profileData = profileSnap.data();
+          // If no call sign set, redirect to setup
+          if (!profileData.callSign) {
+            setLoading(false);
+            navigate('/setup-callsign');
+            return;
+          }
+        } else {
+          // Profile doesn't exist yet, redirect to setup
+          setLoading(false);
           navigate('/setup-callsign');
           return;
         }
-      } else {
-        // Profile doesn't exist yet, redirect to setup
-        navigate('/setup-callsign');
-        return;
-      }
 
-      setUser(currentUser);
-      setLoading(false);
+        setUser(currentUser);
+      } catch (error) {
+        console.error('Error initializing user profile:', error);
+        setUser(null);
+        setInitializationError('Unable to load your profile. Please refresh the page or sign in again.');
+      } finally {
+        setLoading(false);
+      }
     });
 
     return () => unsubscribe();
@@ -125,6 +137,23 @@ const Index = () => {
   }
 
   if (!user) {
+    if (initializationError) {
+      return (
+        <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4">
+          <div className="max-w-md text-center space-y-4">
+            <p className="text-red-400 font-mono text-sm">{initializationError}</p>
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 rounded-md bg-green-600 text-white hover:bg-green-500"
+            >
+              Refresh
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     return null;
   }
 

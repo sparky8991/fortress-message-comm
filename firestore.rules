@@ -1,0 +1,201 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isUser(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    function ownsUserId() {
+      return signedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    function ownsUserIdOnWrite() {
+      return signedIn() && request.resource.data.userId == request.auth.uid;
+    }
+
+    function ownsUserIdSnake() {
+      return signedIn() && resource.data.user_id == request.auth.uid;
+    }
+
+    function ownsUserIdSnakeOnWrite() {
+      return signedIn() && request.resource.data.user_id == request.auth.uid;
+    }
+
+    function ownsSenderId() {
+      return signedIn()
+        && resource.data.keys().hasAny(['sender_id'])
+        && resource.data.sender_id == request.auth.uid;
+    }
+
+    function ownsSenderIdOnWrite() {
+      return signedIn()
+        && request.resource.data.keys().hasAny(['sender_id'])
+        && request.resource.data.sender_id == request.auth.uid;
+    }
+
+    function ownsSenderIdCamel() {
+      return signedIn()
+        && resource.data.keys().hasAny(['senderId'])
+        && resource.data.senderId == request.auth.uid;
+    }
+
+    function ownsSenderIdCamelOnWrite() {
+      return signedIn()
+        && request.resource.data.keys().hasAny(['senderId'])
+        && request.resource.data.senderId == request.auth.uid;
+    }
+
+    function ownsCreatorId() {
+      return signedIn()
+        && resource.data.keys().hasAny(['creatorId'])
+        && resource.data.creatorId == request.auth.uid;
+    }
+
+    function ownsCreatorIdOnWrite() {
+      return signedIn()
+        && request.resource.data.keys().hasAny(['creatorId'])
+        && request.resource.data.creatorId == request.auth.uid;
+    }
+
+    match /profiles/{userId} {
+      allow read: if signedIn();
+      allow create, update, delete: if isUser(userId);
+    }
+
+    match /user_preferences/{userId} {
+      allow read, create, update, delete: if isUser(userId);
+    }
+
+    match /user_settings/{userId} {
+      allow read, create, update, delete: if isUser(userId);
+    }
+
+    match /burner_identities/{identityId} {
+      allow read, update, delete: if ownsUserId();
+      allow create: if ownsUserIdOnWrite();
+    }
+
+    match /vault_files/{fileId} {
+      allow read, update, delete: if ownsUserId();
+      allow create: if ownsUserIdOnWrite();
+    }
+
+    match /dead_man_switches/{switchId} {
+      allow read, update, delete: if ownsUserId();
+      allow create: if ownsUserIdOnWrite();
+    }
+
+    match /user_activity/{userId} {
+      allow read, create, update, delete: if isUser(userId);
+    }
+
+    match /status_updates/{statusId} {
+      allow read: if signedIn();
+      allow create: if ownsUserIdSnakeOnWrite();
+      allow update, delete: if ownsUserIdSnake();
+    }
+
+    match /statuses/{statusId} {
+      allow read: if signedIn();
+      allow create: if ownsUserIdSnakeOnWrite();
+      allow update: if signedIn();
+      allow delete: if ownsUserIdSnake();
+    }
+
+    match /screenshot_logs/{logId} {
+      allow read: if signedIn();
+      allow create: if ownsUserIdOnWrite() || ownsUserIdSnakeOnWrite();
+    }
+
+    match /broadcast_channels/{channelId} {
+      allow read: if signedIn();
+      allow create: if ownsCreatorIdOnWrite();
+      allow update, delete: if ownsCreatorId();
+    }
+
+    match /broadcast_subscriptions/{subscriptionId} {
+      allow read, update, delete: if ownsUserId();
+      allow create: if ownsUserIdOnWrite();
+    }
+
+    match /broadcast_messages/{messageId} {
+      allow read: if signedIn();
+      allow create: if ownsUserIdOnWrite()
+        || ownsUserIdSnakeOnWrite()
+        || ownsSenderIdOnWrite()
+        || ownsSenderIdCamelOnWrite();
+    }
+
+    match /teams/{teamId} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.created_by == request.auth.uid;
+      allow update, delete: if signedIn() && resource.data.created_by == request.auth.uid;
+    }
+
+    match /team_members/{memberId} {
+      // Random membership document IDs prevent membership-aware exists() checks.
+      allow read: if signedIn();
+      allow create, update, delete: if signedIn();
+    }
+
+    match /team_invitations/{invitationId} {
+      allow read, create, update: if signedIn();
+      allow delete: if false;
+    }
+
+    match /conversations/{conversationId} {
+      // Conversation participant records use random IDs today; tighten after adding deterministic membership docs.
+      allow read, create, update: if signedIn();
+      allow delete: if false;
+    }
+
+    match /conversation_participants/{participantId} {
+      // Used for participant lookups by conversation_id; tighten after the membership schema is migrated.
+      allow read, create, update, delete: if signedIn();
+    }
+
+    match /direct_messages/{messageId} {
+      // Message reads depend on conversation membership metadata that is not yet present on conversation docs.
+      allow read, update: if signedIn();
+      allow create: if ownsSenderIdOnWrite() || ownsSenderIdCamelOnWrite();
+      allow delete: if ownsSenderId() || ownsSenderIdCamel();
+    }
+
+    match /ghost_sessions/{sessionId} {
+      allow read, create, update: if signedIn();
+      allow delete: if false;
+    }
+
+    match /ghost_session_members/{memberId} {
+      allow read, create, update: if signedIn();
+      allow delete: if false;
+    }
+
+    match /location_sharing/{locationId} {
+      allow read: if signedIn();
+      allow create, update, delete: if signedIn();
+    }
+
+    match /typing_indicators/{typingId} {
+      allow read, create, update, delete: if signedIn();
+    }
+
+    match /calls/{callId} {
+      allow read, create, update, delete: if signedIn();
+    }
+
+    match /scheduled_messages/{messageId} {
+      allow read, update, delete: if ownsUserId();
+      allow create: if ownsUserIdOnWrite();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
