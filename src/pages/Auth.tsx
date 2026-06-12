@@ -265,13 +265,13 @@ const AuthPage = () => {
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <User className="h-5 w-5 text-green-500" />
                 </div>
-                {/* rafter-ignore: R-E98AA — first name is free text, not an email address. */}
                 <input
                   type="text"
                   placeholder="Enter First Name"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  required={!isLogin}
+                  required
+                  autoComplete="given-name"
                   className="w-full pl-12 pr-4 py-4 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
               </div>
@@ -280,13 +280,13 @@ const AuthPage = () => {
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <User className="h-5 w-5 text-green-500" />
                 </div>
-                {/* rafter-ignore: R-E98AA — last name is free text, not an email address. */}
                 <input
                   type="text"
                   placeholder="Enter Last Name"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  required={!isLogin}
+                  required
+                  autoComplete="family-name"
                   className="w-full pl-12 pr-4 py-4 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
               </div>
@@ -295,13 +295,13 @@ const AuthPage = () => {
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <UserCheck className="h-5 w-5 text-green-500" />
                 </div>
-                {/* rafter-ignore: R-E98AA — call sign is a username-style identifier, not an email address. */}
                 <input
                   type="text"
                   placeholder="Enter Call Sign"
                   value={callSign}
                   onChange={(e) => setCallSign(e.target.value)}
-                  required={!isLogin}
+                  required
+                  autoComplete="username"
                   className="w-full pl-12 pr-4 py-4 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
               </div>
