@@ -12,7 +12,8 @@ values (
     'image/gif',
     'image/jpeg',
     'image/png',
-    'image/webp'
+    'image/webp',
+    'application/octet-stream'
   ]
 )
 on conflict (id) do update
@@ -33,5 +34,5 @@ with check (
   and (storage.foldername(name))[2] is not null
   and (storage.foldername(name))[3] = 'conversations'
   and (storage.foldername(name))[4] is not null
-  and lower(storage.extension(name)) in ('gif', 'jpeg', 'jpg', 'png', 'webp')
+  and lower(storage.extension(name)) in ('enc', 'gif', 'jpeg', 'jpg', 'png', 'webp')
 );
