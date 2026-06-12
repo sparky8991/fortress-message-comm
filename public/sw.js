@@ -1,7 +1,7 @@
 // SecureChat Service Worker
-const CACHE_NAME = 'securechat-v1';
-const STATIC_CACHE = 'securechat-static-v1';
-const DYNAMIC_CACHE = 'securechat-dynamic-v1';
+const CACHE_NAME = 'securechat-v2';
+const STATIC_CACHE = `${CACHE_NAME}-static`;
+const DYNAMIC_CACHE = `${CACHE_NAME}-dynamic`;
 
 // Assets to cache on install
 const STATIC_ASSETS = [
@@ -68,10 +68,15 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // For static assets, use cache first
+  // App code and styles must update promptly after deploys.
   if (request.destination === 'style' ||
-      request.destination === 'script' ||
-      request.destination === 'image' ||
+      request.destination === 'script') {
+    event.respondWith(networkFirst(request));
+    return;
+  }
+
+  // Images and fonts can stay cache first for offline performance.
+  if (request.destination === 'image' ||
       request.destination === 'font') {
     event.respondWith(cacheFirst(request));
     return;
