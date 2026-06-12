@@ -5,6 +5,11 @@ import { onAuthStateChanged, User } from 'firebase/auth';
 import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { Shield, UserCheck, ArrowRight, Loader2 } from 'lucide-react';
 
+const getErrorMessage = (error: unknown) => {
+  if (error instanceof Error) return error.message;
+  return String(error);
+};
+
 const CallSignSetup = () => {
   const [user, setUser] = useState<User | null>(null);
   const [callSign, setCallSign] = useState('');
@@ -83,9 +88,9 @@ const CallSignSetup = () => {
       });
 
       navigate('/');
-    } catch (err: any) {
+    } catch (err: unknown) {
       const errorCode = "CALLSIGN_SAVE_FAILED";
-      console.error(`// ERROR_CODE: ${errorCode}\nError saving call sign:`, err);
+      console.error(`// ERROR_CODE: ${errorCode}\nError saving call sign:`, getErrorMessage(err));
       setError(`// ERROR_CODE: ${errorCode}\nFailed to save call sign. Please try again.`);
     } finally {
       setSaving(false);
@@ -128,6 +133,7 @@ const CallSignSetup = () => {
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
               <UserCheck className="h-5 w-5 text-green-500" />
             </div>
+            {/* rafter-ignore: R-E98AA — call sign is a username-style identifier, not an email address. */}
             <input
               type="text"
               placeholder="Enter Call Sign"

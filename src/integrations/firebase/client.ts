@@ -3,8 +3,14 @@ import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
+const firebaseApiKey = import.meta.env.VITE_FIREBASE_API_KEY;
+
+if (!firebaseApiKey) {
+  throw new Error("Missing VITE_FIREBASE_API_KEY environment variable");
+}
+
 const firebaseConfig = {
-  apiKey: "AIzaSyAILL6zwia9Zky_5jfpx6JgQ2St5FsZ_3A",
+  apiKey: firebaseApiKey,
   authDomain: "fortress-message-comm.firebaseapp.com",
   projectId: "fortress-message-comm",
   storageBucket: "fortress-message-comm.firebasestorage.app",

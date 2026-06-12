@@ -10,6 +10,32 @@ import {
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { Shield, Mail, Lock, ArrowRight, User, UserCheck } from 'lucide-react';
 
+type ProfileInput = {
+  email: string | null;
+  firstName?: string;
+  lastName?: string;
+  displayName?: string | null;
+  callSign?: string;
+  photoURL?: string | null;
+};
+
+type AuthError = {
+  code?: string;
+  message?: string;
+};
+
+const getAuthError = (error: unknown): AuthError => {
+  if (error && typeof error === 'object') {
+    const maybeError = error as AuthError;
+    return {
+      code: maybeError.code,
+      message: maybeError.message,
+    };
+  }
+
+  return {};
+};
+
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
@@ -45,7 +71,7 @@ const AuthPage = () => {
   };
 
   // Create user profile in Firestore
-  const createUserProfile = async (userId: string, userData: any) => {
+  const createUserProfile = async (userId: string, userData: ProfileInput) => {
     const userRef = doc(db, 'profiles', userId);
     const userSnap = await getDoc(userRef);
 
@@ -73,7 +99,11 @@ const AuthPage = () => {
     } else {
       // Update existing profile with searchable fields if missing
       const existingData = userSnap.data();
-      const updates: any = {};
+      const updates: Partial<ProfileInput> & {
+        emailLower?: string;
+        displayNameLower?: string;
+        avatarUrl?: string | null;
+      } = {};
 
       if (!existingData.emailLower && existingData.email) {
         updates.emailLower = existingData.email.toLowerCase();
@@ -109,8 +139,9 @@ const AuthPage = () => {
         photoURL: result.user.photoURL
       });
       navigate('/');
-    } catch (err: any) {
-      setError(`// ERROR_CODE: GOOGLE_AUTH_FAILURE\n${err.message}`);
+    } catch (err: unknown) {
+      const { message } = getAuthError(err);
+      setError(`// ERROR_CODE: GOOGLE_AUTH_FAILURE\n${message || 'Google sign-in failed.'}`);
     } finally {
       setLoading(false);
     }
@@ -146,20 +177,21 @@ const AuthPage = () => {
         });
         navigate('/');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const authError = getAuthError(err);
       let errorCode = "AUTH_FAILURE";
-      let detailedMessage = err.message;
+      let detailedMessage = authError.message || 'Authentication failed.';
 
-      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
+      if (authError.code === 'auth/user-not-found' || authError.code === 'auth/wrong-password') {
         errorCode = "INVALID_CREDENTIALS";
         detailedMessage = "Access denied. Incorrect email or password.";
-      } else if (err.code === 'auth/email-already-in-use') {
+      } else if (authError.code === 'auth/email-already-in-use') {
         errorCode = "USER_ALREADY_EXISTS";
         detailedMessage = "An account with this email already exists.";
-      } else if (err.code === 'auth/weak-password') {
+      } else if (authError.code === 'auth/weak-password') {
         errorCode = "WEAK_PASSWORD";
         detailedMessage = "Password must be at least 6 characters.";
-      } else if (err.code === 'auth/invalid-email') {
+      } else if (authError.code === 'auth/invalid-email') {
         errorCode = "INVALID_EMAIL";
         detailedMessage = "Please enter a valid email address.";
       }
@@ -233,6 +265,7 @@ const AuthPage = () => {
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <User className="h-5 w-5 text-green-500" />
                 </div>
+                {/* rafter-ignore: R-E98AA — first name is free text, not an email address. */}
                 <input
                   type="text"
                   placeholder="Enter First Name"
@@ -247,6 +280,7 @@ const AuthPage = () => {
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <User className="h-5 w-5 text-green-500" />
                 </div>
+                {/* rafter-ignore: R-E98AA — last name is free text, not an email address. */}
                 <input
                   type="text"
                   placeholder="Enter Last Name"
@@ -261,6 +295,7 @@ const AuthPage = () => {
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <UserCheck className="h-5 w-5 text-green-500" />
                 </div>
+                {/* rafter-ignore: R-E98AA — call sign is a username-style identifier, not an email address. */}
                 <input
                   type="text"
                   placeholder="Enter Call Sign"
