@@ -1,11 +1,17 @@
 
 import { useState, useEffect } from 'react';
-import { auth, storage } from '@/integrations/firebase/client';
+import { auth } from '@/integrations/firebase/client';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { toast } from '@/hooks/use-toast';
 import { Message, initialMessagesByChat } from '@/constants/initialMessages';
 import { contactNames } from '@/constants/contactInfo';
+import { uploadChatAttachment } from '@/integrations/supabase/storage';
+
+type MessageMetadata = Record<string, unknown> & {
+  isVoiceMessage?: boolean;
+  duration?: number;
+  mimeType?: string;
+};
 
 export const useChatMessages = (activeChat: string) => {
   const [messagesByChat, setMessagesByChat] = useState(initialMessagesByChat);
@@ -48,7 +54,12 @@ export const useChatMessages = (activeChat: string) => {
     setReplyingTo(null);
   };
 
-  const handleSendMessage = async (messageText: string, attachmentFile: File | null, encryptionMetadata?: any, replyTo?: any) => {
+  const handleSendMessage = async (
+    messageText: string,
+    attachmentFile: File | null,
+    encryptionMetadata?: MessageMetadata,
+    replyTo?: Message['replyTo']
+  ) => {
     if ((!messageText && !attachmentFile) || !user) return;
 
     console.log('Sending encrypted message:', messageText);
@@ -57,23 +68,28 @@ export const useChatMessages = (activeChat: string) => {
 
     if (attachmentFile) {
       const file = attachmentFile;
-      const fileExt = file.name.split('.').pop();
-      const filePath = `chat_attachments/${user.uid}/${activeChat}/${Date.now()}.${fileExt}`;
 
       try {
-        const storageRef = ref(storage, filePath);
-        await uploadBytes(storageRef, file);
-        const downloadURL = await getDownloadURL(storageRef);
+        const uploadedAttachment = await uploadChatAttachment({
+          userId: user.uid,
+          conversationId: activeChat,
+          file,
+        });
 
         attachmentDetails = {
           name: file.name,
-          url: downloadURL,
+          url: uploadedAttachment.publicUrl,
           type: file.type,
-          metadata: encryptionMetadata
+          metadata: {
+            ...(encryptionMetadata || {}),
+            storageProvider: 'supabase',
+            storagePath: uploadedAttachment.path,
+          }
         };
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const description = error instanceof Error ? error.message : 'Unable to upload attachment.';
         console.error('Upload error:', error);
-        toast({ title: "Upload Failed", description: error.message, variant: "destructive" });
+        toast({ title: "Upload Failed", description, variant: "destructive" });
         return;
       }
     }

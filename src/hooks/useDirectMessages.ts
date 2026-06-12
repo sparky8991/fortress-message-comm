@@ -1,11 +1,17 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { auth, db, storage } from '@/integrations/firebase/client';
+import { auth, db } from '@/integrations/firebase/client';
 import { onAuthStateChanged } from 'firebase/auth';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { conversationService, DirectMessage, Conversation } from '@/services/conversationService';
 import { toast } from '@/hooks/use-toast';
+import { uploadChatAttachment } from '@/integrations/supabase/storage';
+
+type MessageMetadata = Record<string, unknown> & {
+  isVoiceMessage?: boolean;
+  duration?: number;
+  mimeType?: string;
+};
 
 export const useDirectMessages = () => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -53,7 +59,7 @@ export const useDirectMessages = () => {
     conversationId: string,
     content: string,
     attachment?: File,
-    metadata?: any,
+    metadata?: MessageMetadata,
     replyToId?: string
   ) => {
     const user = auth.currentUser;
@@ -66,18 +72,23 @@ export const useDirectMessages = () => {
       let attachmentName: string | null = null;
       let attachmentType: string | null = null;
       let messageType: 'text' | 'image' | 'file' | 'voice' = 'text';
+      let messageMetadata = metadata;
 
       if (attachment) {
-        // Upload attachment to Firebase Storage
-        const fileExt = attachment.name.split('.').pop();
-        const filePath = `chat_attachments/${user.uid}/${conversationId}/${Date.now()}.${fileExt}`;
+        const uploadedAttachment = await uploadChatAttachment({
+          userId: user.uid,
+          conversationId,
+          file: attachment,
+        });
 
-        const storageRef = ref(storage, filePath);
-        await uploadBytes(storageRef, attachment);
-        attachmentUrl = await getDownloadURL(storageRef);
-
+        attachmentUrl = uploadedAttachment.publicUrl;
         attachmentName = attachment.name;
         attachmentType = attachment.type;
+        messageMetadata = {
+          ...(metadata || {}),
+          storageProvider: 'supabase',
+          storagePath: uploadedAttachment.path,
+        };
 
         // Determine message type
         if (metadata?.isVoiceMessage) {
@@ -97,7 +108,7 @@ export const useDirectMessages = () => {
         attachmentName,
         attachmentType,
         replyToId,
-        metadata
+        messageMetadata
       );
 
       await loadConversations();
@@ -117,7 +128,7 @@ export const useDirectMessages = () => {
   const sendMessage = async (
     content: string,
     attachment?: File,
-    metadata?: any,
+    metadata?: MessageMetadata,
     replyToId?: string
   ) => {
     if (!activeConversation) return;
