@@ -90,7 +90,9 @@ export const uploadChatAttachment = async ({
   validateChatAttachment(file);
   const extension = getSafeExtension(file.name);
   const objectPath = [
+    'users',
     sanitizePathSegment(userId),
+    'conversations',
     sanitizePathSegment(conversationId),
     `${Date.now()}-${crypto.randomUUID()}.${extension}`,
   ].join('/');
