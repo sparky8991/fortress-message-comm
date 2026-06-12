@@ -151,7 +151,7 @@ export const HoldPanicButton = ({ variant = 'full', onWipeComplete }: HoldPanicB
     if (!isWiping) cancelHold();
   };
 
-  // Wipe in progress overlay
+  // Emergency data removal progress overlay
   if (isWiping) {
     return (
       <div className="fixed inset-0 bg-red-900/95 z-50 flex flex-col items-center justify-center p-4">
