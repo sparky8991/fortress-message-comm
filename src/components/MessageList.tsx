@@ -4,7 +4,6 @@ import { AttachmentPreview } from './AttachmentPreview';
 import { MessageContextMenu } from './MessageContextMenu';
 import { VoiceMessagePlayer } from './VoiceMessagePlayer';
 import { Message } from '@/constants/initialMessages';
-import { contactNames } from '@/constants/contactInfo';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 // Helper function to detect if a message is a GIF URL
@@ -97,7 +96,7 @@ export const MessageList = ({
                 <div className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'}`}>
                   <div className="flex items-center space-x-2 md:space-x-3">
                     <span className="text-xs md:text-sm text-green-400/90 px-2 md:px-3 py-1 bg-green-500/15 rounded-full font-mono border border-green-500/30 font-medium">
-                      {contactNames[message.sender]}
+                      {message.sender === 'me' ? 'You' : contactName}
                     </span>
                     <span className="text-xs text-gray-400 font-mono">
                       {message.timestamp}

@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { MessageList } from './MessageList';
 import { NotificationSettings } from './NotificationSettings';
 import { useNotifications } from '@/hooks/useNotifications';
@@ -7,10 +7,10 @@ import { useUserSettings } from '@/hooks/useUserSettings';
 import { ChatHeader } from './ChatHeader';
 import { MessageInput } from './MessageInput';
 import { contactInfo } from '@/constants/contactInfo';
-import { useChatMessages } from '@/hooks/useChatMessages';
 import { useDirectMessages } from '@/hooks/useDirectMessages';
 import { auth } from '@/integrations/firebase/client';
 import { MessageSquare, Search } from 'lucide-react';
+import { Message } from '@/constants/initialMessages';
 
 interface ChatAreaProps {
   activeChat: string;
@@ -21,7 +21,17 @@ interface ChatAreaProps {
 export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaProps) => {
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
   const { settings: userSettings } = useUserSettings();
-  const { conversations, activeConversation } = useDirectMessages();
+  const {
+    conversations,
+    messages,
+    sendMessageToConversation,
+    switchToConversation
+  } = useDirectMessages();
+  const [replyingTo, setReplyingTo] = useState<{
+    messageId: string;
+    messageText: string;
+    sender: string;
+  } | null>(null);
 
   // Fallback settings for backward compatibility
   const [fallbackSettings, setFallbackSettings] = useState({
@@ -30,15 +40,11 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
     unreadReminderTime: 5
   });
 
-  // All hooks must be called before any conditional returns
-  const {
-    currentMessages,
-    replyingTo,
-    handleStartNewGroup,
-    handleReply,
-    handleCancelReply,
-    handleSendMessage
-  } = useChatMessages(activeChat);
+  useEffect(() => {
+    if (activeChat) {
+      switchToConversation(activeChat);
+    }
+  }, [activeChat]);
 
   // Get contact info - either from static contactInfo or from conversation participants
   const contact = useMemo(() => {
@@ -69,6 +75,34 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
       avatar: '🔒'
     };
   }, [activeChat, conversations]);
+
+  const currentMessages: Message[] = useMemo(() => {
+    const currentUserId = auth.currentUser?.uid;
+
+    return messages.map((message) => ({
+      id: message.id,
+      text: message.content,
+      timestamp: new Date(message.sent_at).toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit'
+      }),
+      sender: message.sender_id === currentUserId ? 'me' : 'contact',
+      status: message.read_at ? 'read' : 'sent',
+      encrypted: message.encrypted,
+      sentAt: new Date(message.sent_at),
+      attachment: message.attachment_url ? {
+        name: message.attachment_name || 'Attachment',
+        url: message.attachment_url,
+        type: message.attachment_type || 'application/octet-stream',
+        metadata: message.metadata || undefined
+      } : undefined,
+      replyTo: message.reply_to_id ? {
+        messageId: message.reply_to_id,
+        messageText: 'Reply',
+        sender: 'Contact'
+      } : undefined
+    }));
+  }, [messages]);
 
   // Use settings from database if available, otherwise use fallback
   const currentNotificationSettings = userSettings?.notification_settings || fallbackSettings;
@@ -127,6 +161,42 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
     // This is now handled by the NotificationSettings component via the userSettings hook
     // Keep this for backward compatibility
     setFallbackSettings(newSettings);
+  };
+
+  const handleStartNewGroup = (contactName: string) => {
+    console.log(`Starting new group with ${contactName}`);
+  };
+
+  const handleReply = (messageId: string, messageText: string) => {
+    const originalMessage = currentMessages.find(message => message.id === messageId);
+    if (!originalMessage) return;
+
+    setReplyingTo({
+      messageId,
+      messageText,
+      sender: originalMessage.sender === 'me' ? 'You' : contact.name
+    });
+  };
+
+  const handleCancelReply = () => {
+    setReplyingTo(null);
+  };
+
+  const handleSendMessage = async (
+    messageText: string,
+    attachmentFile: File | null,
+    encryptionMetadata?: any,
+    replyTo?: typeof replyingTo
+  ) => {
+    if (!activeChat) return;
+
+    await sendMessageToConversation(
+      activeChat,
+      messageText,
+      attachmentFile || undefined,
+      encryptionMetadata,
+      replyTo?.messageId
+    );
   };
 
   return (

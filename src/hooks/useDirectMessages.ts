@@ -49,8 +49,8 @@ export const useDirectMessages = () => {
     }
   };
 
-  // Send a message
-  const sendMessage = async (
+  const sendMessageToConversation = async (
+    conversationId: string,
     content: string,
     attachment?: File,
     metadata?: any,
@@ -58,7 +58,7 @@ export const useDirectMessages = () => {
   ) => {
     const user = auth.currentUser;
     // Allow sending if there's content OR an attachment (for voice messages)
-    if (!activeConversation || (!content.trim() && !attachment)) return;
+    if (!conversationId || (!content.trim() && !attachment)) return;
     if (!user) return;
 
     try {
@@ -70,7 +70,7 @@ export const useDirectMessages = () => {
       if (attachment) {
         // Upload attachment to Firebase Storage
         const fileExt = attachment.name.split('.').pop();
-        const filePath = `chat_attachments/${user.uid}/${activeConversation}/${Date.now()}.${fileExt}`;
+        const filePath = `chat_attachments/${user.uid}/${conversationId}/${Date.now()}.${fileExt}`;
 
         const storageRef = ref(storage, filePath);
         await uploadBytes(storageRef, attachment);
@@ -90,7 +90,7 @@ export const useDirectMessages = () => {
       }
 
       const newMessage = await conversationService.sendMessage(
-        activeConversation,
+        conversationId,
         content,
         messageType,
         attachmentUrl,
@@ -110,6 +110,17 @@ export const useDirectMessages = () => {
         variant: 'destructive'
       });
     }
+  };
+
+  // Send a message to the currently selected conversation
+  const sendMessage = async (
+    content: string,
+    attachment?: File,
+    metadata?: any,
+    replyToId?: string
+  ) => {
+    if (!activeConversation) return;
+    return sendMessageToConversation(activeConversation, content, attachment, metadata, replyToId);
   };
 
   // Switch to a conversation
@@ -188,12 +199,45 @@ export const useDirectMessages = () => {
 
   // Load conversations on mount (only if authenticated)
   useEffect(() => {
+    let unsubscribeParticipants: (() => void) | null = null;
+    let unsubscribeConversations: (() => void) | null = null;
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (unsubscribeParticipants) {
+        unsubscribeParticipants();
+        unsubscribeParticipants = null;
+      }
+      if (unsubscribeConversations) {
+        unsubscribeConversations();
+        unsubscribeConversations = null;
+      }
+
       if (user) {
         loadConversations();
+
+        const participantsQuery = query(
+          collection(db, 'conversation_participants'),
+          where('user_id', '==', user.uid)
+        );
+
+        unsubscribeParticipants = onSnapshot(participantsQuery, () => {
+          loadConversations();
+        }, (error) => {
+          console.error('Error in conversation participants subscription:', error);
+        });
+
+        unsubscribeConversations = onSnapshot(collection(db, 'conversations'), () => {
+          loadConversations();
+        }, (error) => {
+          console.error('Error in conversations subscription:', error);
+        });
       }
     });
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      if (unsubscribeParticipants) unsubscribeParticipants();
+      if (unsubscribeConversations) unsubscribeConversations();
+    };
   }, []);
 
   return {
@@ -202,6 +246,7 @@ export const useDirectMessages = () => {
     messages,
     loading,
     sendMessage,
+    sendMessageToConversation,
     switchToConversation,
     loadConversations,
     getTotalUnreadCount
