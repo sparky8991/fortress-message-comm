@@ -1,0 +1,2 @@
+# False positive on npm package integrity hashes; package-lock contains no executable credentials.
+package-lock.json:AWS Secret Access Key

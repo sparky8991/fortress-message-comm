@@ -8,20 +8,30 @@ import { ReplyPreview } from './ReplyPreview';
 import { VoiceRecorder } from './VoiceRecorder';
 import { toast } from '@/hooks/use-toast';
 
+type ReplyingTo = {
+  messageId: string;
+  messageText: string;
+  sender: string;
+};
+
+type MessageMetadata = Record<string, unknown> & {
+  duration?: number;
+  isVoiceMessage?: boolean;
+  mimeType?: string;
+  originalName?: string;
+  shareCode?: string;
+};
+
 interface MessageInputProps {
-  onSendMessage: (message: string, attachment: File | null, encryptionMetadata?: any, replyTo?: any) => void | Promise<void>;
-  replyingTo?: {
-    messageId: string;
-    messageText: string;
-    sender: string;
-  } | null;
+  onSendMessage: (message: string, attachment: File | null, encryptionMetadata?: MessageMetadata | null, replyTo?: ReplyingTo | null) => void | Promise<void>;
+  replyingTo?: ReplyingTo | null;
   onCancelReply?: () => void;
 }
 
 export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: MessageInputProps) => {
   const [message, setMessage] = useState('');
   const [attachment, setAttachment] = useState<File | null>(null);
-  const [encryptionMetadata, setEncryptionMetadata] = useState<any>(null);
+  const [encryptionMetadata, setEncryptionMetadata] = useState<MessageMetadata | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showGifPicker, setShowGifPicker] = useState(false);
   const [showEncryptedUpload, setShowEncryptedUpload] = useState(false);
@@ -62,7 +72,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
     });
   };
 
-  const handleEncryptedImageReady = (encryptedFile: File, metadata: any) => {
+  const handleEncryptedImageReady = (encryptedFile: File, metadata: MessageMetadata) => {
     setAttachment(encryptedFile);
     setEncryptionMetadata(metadata);
     setShowEncryptedUpload(false);
@@ -133,7 +143,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
         />
       )}
 
-      <div className="border-t border-gray-700/80 bg-gray-800/95 backdrop-blur-sm w-full max-w-full overflow-hidden">
+      <div className="border-t border-gray-700/80 bg-gray-800/95 backdrop-blur-sm w-full max-w-full overflow-visible">
         {/* Voice Recorder */}
         {showVoiceRecorder && (
           <div className="p-3 border-b border-gray-700/50">

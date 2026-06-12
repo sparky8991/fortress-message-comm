@@ -1,7 +1,0 @@
-version: 1
-ignore:
-  - paths:
-      - package-lock.json
-    rules:
-      - AWS Secret Access Key
-    reason: "False positive on npm package integrity hashes; package-lock contains no executable credentials."

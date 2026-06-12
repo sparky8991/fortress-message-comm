@@ -17,8 +17,19 @@ interface GifResult {
   title: string;
 }
 
+interface TenorGif {
+  id: string;
+  content_description?: string;
+  media_formats?: {
+    gif?: { url?: string };
+    mediumgif?: { url?: string };
+    tinygif?: { url?: string };
+    nanogif?: { url?: string };
+  };
+}
+
 // Using Tenor API (Google's GIF API) - free tier
-const TENOR_API_KEY = 'AIzaSyAyimkuYQYF_FXVALexPuGQctUWRURdCYQ'; // Public API key for Tenor
+const TENOR_API_KEY = import.meta.env.VITE_TENOR_API_KEY as string | undefined;
 
 export const GifPicker = ({ isOpen, onClose, onGifSelect }: GifPickerProps) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -27,6 +38,12 @@ export const GifPicker = ({ isOpen, onClose, onGifSelect }: GifPickerProps) => {
   const [trendingLoaded, setTrendingLoaded] = useState(false);
 
   const searchGifs = useCallback(async (query: string) => {
+    if (!TENOR_API_KEY) {
+      console.error('Tenor API key is not configured.');
+      setGifs([]);
+      return;
+    }
+
     setLoading(true);
     try {
       const endpoint = query
@@ -34,15 +51,24 @@ export const GifPicker = ({ isOpen, onClose, onGifSelect }: GifPickerProps) => {
         : `https://tenor.googleapis.com/v2/featured?key=${TENOR_API_KEY}&limit=30&media_filter=gif`;
 
       const response = await fetch(endpoint);
+      if (!response.ok) {
+        throw new Error(`Tenor request failed with status ${response.status}`);
+      }
+
       const data = await response.json();
 
       if (data.results) {
-        const formattedGifs: GifResult[] = data.results.map((gif: any) => ({
-          id: gif.id,
-          url: gif.media_formats?.gif?.url || gif.media_formats?.mediumgif?.url || '',
-          preview: gif.media_formats?.tinygif?.url || gif.media_formats?.nanogif?.url || '',
-          title: gif.content_description || 'GIF'
-        }));
+        const formattedGifs: GifResult[] = data.results
+          .map((gif: TenorGif) => {
+            const url = gif.media_formats?.gif?.url || gif.media_formats?.mediumgif?.url || '';
+            return {
+              id: gif.id,
+              url,
+              preview: gif.media_formats?.tinygif?.url || gif.media_formats?.nanogif?.url || url,
+              title: gif.content_description || 'GIF'
+            };
+          })
+          .filter((gif: GifResult) => gif.url && gif.preview);
         setGifs(formattedGifs);
       }
     } catch (error) {
@@ -84,7 +110,7 @@ export const GifPicker = ({ isOpen, onClose, onGifSelect }: GifPickerProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="absolute bottom-full right-0 mb-2 w-80 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 overflow-hidden">
+    <div className="absolute bottom-full right-0 mb-2 w-80 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-[70] overflow-hidden">
       {/* Header */}
       <div className="p-3 border-b border-gray-700 flex items-center justify-between">
         <div className="flex items-center space-x-2">
