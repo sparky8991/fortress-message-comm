@@ -19,6 +19,7 @@ import { Loader2 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useDirectMessages } from '@/hooks/useDirectMessages';
 import { cn } from '@/lib/utils';
+import { syncFirebaseUserToSupabase } from '@/services/supabaseUserSyncService';
 
 const Index = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -74,6 +75,10 @@ const Index = () => {
             navigate('/setup-callsign');
             return;
           }
+
+          syncFirebaseUserToSupabase(currentUser).catch((error) => {
+            console.warn('Unable to sync Firebase user to Supabase:', error);
+          });
         } else {
           // Profile doesn't exist yet, redirect to setup
           setLoading(false);
