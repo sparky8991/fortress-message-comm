@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Shield, Lock, Users, LogOut, MessageSquare, User as UserIcon, UserPlus, Edit2, AlertTriangle } from 'lucide-react';
+import { Search, Shield, Lock, Users, LogOut, MessageSquare, UserPlus, Edit2, AlertTriangle } from 'lucide-react';
 import { ContactList } from './ContactList';
 import { SecurityPanel } from './SecurityPanel';
 import { UserSearchDialog } from './UserSearchDialog';
@@ -43,6 +43,7 @@ export const Sidebar = ({
   const navigate = useNavigate();
   const { switchToConversation } = useDirectMessages();
   const { isFeatureVisible } = useUserRisk();
+  const initials = callSign ? callSign.slice(0, 2).toUpperCase() : 'SC';
 
   // Subscribe to user's profile to get call sign
   useEffect(() => {
@@ -71,52 +72,61 @@ export const Sidebar = ({
   };
 
   return (
-    <div className="w-80 bg-gray-900 border-r border-gray-800 flex flex-col h-full">
-      {/* Header - Cleaner design */}
-      <div className="p-4 border-b border-gray-800">
+    <div className="w-80 bg-[#06100b]/98 border-r border-green-500/15 flex flex-col h-full text-gray-100">
+      {/* Header */}
+      <div className="p-3 border-b border-green-500/15">
         {/* Brand & Status */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-start justify-between mb-5">
           <div className="flex items-center gap-2.5">
             <div className="relative">
-              <Shield className="w-6 h-6 text-green-500" />
-              <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              <div className="w-9 h-9 fortress-panel-muted rounded flex items-center justify-center">
+                <Shield className="w-5 h-5 text-green-400" />
+              </div>
+              <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-green-400 rounded-full animate-pulse" />
             </div>
             <div>
-              <h1 className="text-base font-bold text-white leading-tight">SecureChat</h1>
-              <span className="text-[10px] text-gray-500 font-mono">FORTRESS</span>
+              <h1 className="text-sm font-black text-white leading-tight font-mono tracking-[0.14em]">SECURECHAT</h1>
+              <span className="fortress-command">Fortress Terminal</span>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-green-500/10 border border-green-500/30">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded border border-green-500/30 bg-green-500/10">
             <Lock className="w-3 h-3 text-green-400" />
-            <span className="text-[10px] text-green-400 font-medium">SECURE</span>
+            <span className="fortress-command-strong">Secure</span>
           </div>
         </div>
 
         {/* User Profile Card */}
         {callSign && (
-          <div className="flex items-center justify-between p-3 bg-gray-800/50 rounded-xl border border-gray-700/50 mb-4">
+          <div className="flex items-center justify-between p-3 fortress-panel rounded mb-3">
             <button
               onClick={() => navigate('/profile-settings')}
-              className="flex items-center gap-3 min-w-0 hover:opacity-80 transition-opacity"
+              className="flex items-center gap-3 min-w-0 hover:opacity-85 transition-opacity fortress-focus rounded"
             >
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center flex-shrink-0">
-                <UserIcon className="w-5 h-5 text-black" />
+              <div className="w-10 h-10 rounded border border-green-400/40 bg-green-500/15 flex items-center justify-center flex-shrink-0">
+                <span className="font-mono text-sm font-black text-green-300">{initials}</span>
               </div>
               <div className="min-w-0 text-left">
-                <span className="text-[10px] text-gray-500 block uppercase tracking-wider">Call Sign</span>
-                <span className="text-sm text-white font-semibold truncate block">{callSign}</span>
+                <span className="fortress-command block">Call Sign</span>
+                <span className="text-sm text-white font-bold truncate block font-mono">
+                  {callSign}
+                  <span className="ml-1 text-green-400">✓</span>
+                </span>
               </div>
             </button>
-            <div className="flex items-center gap-1 flex-shrink-0">
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <div className="hidden min-[370px]:flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+                <span className="fortress-command">Online</span>
+              </div>
               <button
                 onClick={() => setShowEditCallSign(true)}
-                className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700 transition-colors"
+                className="p-2 rounded text-gray-400 hover:text-green-300 hover:bg-green-500/10 transition-colors fortress-focus"
                 title="Edit call sign"
               >
                 <Edit2 className="w-4 h-4" />
               </button>
               <AppSettingsMenu
-                triggerClassName="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700 transition-colors"
+                triggerClassName="p-2 rounded text-gray-400 hover:text-green-300 hover:bg-green-500/10 transition-colors fortress-focus"
               />
             </div>
           </div>
@@ -125,20 +135,20 @@ export const Sidebar = ({
         {/* Search */}
         <div className="flex gap-2">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-green-500/50" />
             <input
               type="search"
-              placeholder="Search conversations..."
+              placeholder="Search channels..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               autoComplete="off"
-              className="w-full pl-10 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500/50 text-sm transition-all"
+              className="w-full pl-10 pr-4 py-2.5 bg-[#07110c] border border-green-500/15 rounded text-green-100 placeholder-green-500/35 focus:outline-none focus:ring-2 focus:ring-green-500/40 focus:border-green-500/50 text-xs font-mono uppercase tracking-[0.12em] transition-all"
             />
           </div>
           <Button
             onClick={() => setShowUserSearch(true)}
             size="sm"
-            className="bg-green-600 hover:bg-green-500 text-black px-3 rounded-xl h-[42px]"
+            className="bg-green-500 hover:bg-green-400 text-black px-3 rounded h-[42px] shadow-none"
             title="Start new conversation"
           >
             <UserPlus className="w-4 h-4" />
@@ -155,15 +165,15 @@ export const Sidebar = ({
         />
       )}
 
-      {/* Tabs - Pill style */}
-      <div className="px-3 py-2 border-b border-gray-800">
-        <div className="flex gap-1 p-1 bg-gray-800/50 rounded-xl">
+      {/* Tabs */}
+      <div className="px-3 py-2 border-b border-green-500/15">
+        <div className="grid grid-cols-3 gap-1">
           <button
             onClick={() => setActiveTab('chats')}
-            className={`flex-1 py-2 px-3 text-xs font-medium rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+            className={`py-2 px-2 text-xs font-medium rounded transition-all flex items-center justify-center gap-1.5 border font-mono uppercase tracking-[0.12em] ${
               activeTab === 'chats'
-                ? 'bg-green-600 text-black shadow-lg shadow-green-500/20'
-                : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                ? 'bg-green-500/15 text-green-300 border-green-500/50'
+                : 'text-green-500/55 border-green-500/15 hover:text-green-300 hover:bg-green-500/10'
             }`}
           >
             <MessageSquare className="w-3.5 h-3.5" />
@@ -171,10 +181,10 @@ export const Sidebar = ({
           </button>
           <button
             onClick={() => setActiveTab('teams')}
-            className={`flex-1 py-2 px-3 text-xs font-medium rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+            className={`py-2 px-2 text-xs font-medium rounded transition-all flex items-center justify-center gap-1.5 border font-mono uppercase tracking-[0.12em] ${
               activeTab === 'teams'
-                ? 'bg-green-600 text-black shadow-lg shadow-green-500/20'
-                : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                ? 'bg-green-500/15 text-green-300 border-green-500/50'
+                : 'text-green-500/55 border-green-500/15 hover:text-green-300 hover:bg-green-500/10'
             }`}
           >
             <Users className="w-3.5 h-3.5" />
@@ -182,10 +192,10 @@ export const Sidebar = ({
           </button>
           <button
             onClick={() => setActiveTab('security')}
-            className={`flex-1 py-2 px-3 text-xs font-medium rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+            className={`py-2 px-2 text-xs font-medium rounded transition-all flex items-center justify-center gap-1.5 border font-mono uppercase tracking-[0.12em] ${
               activeTab === 'security'
-                ? 'bg-green-600 text-black shadow-lg shadow-green-500/20'
-                : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                ? 'bg-green-500/15 text-green-300 border-green-500/50'
+                : 'text-green-500/55 border-green-500/15 hover:text-green-300 hover:bg-green-500/10'
             }`}
           >
             <Shield className="w-3.5 h-3.5" />
@@ -195,7 +205,7 @@ export const Sidebar = ({
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto scrollbar-hide">
         {activeTab === 'chats' ? (
           <ContactList
             activeChat={activeChat}
@@ -213,10 +223,10 @@ export const Sidebar = ({
       </div>
 
       {/* Footer - Quick Actions */}
-      <div className="p-3 border-t border-gray-800 space-y-2">
+      <div className="p-3 border-t border-green-500/15 space-y-2">
         {/* Panic Mode - Only visible for high-risk users */}
         {isFeatureVisible('panic-mode') && (
-          <div className="p-3 bg-red-900/10 border border-red-800/30 rounded-xl">
+          <div className="p-3 bg-red-950/20 border border-red-800/30 rounded">
             <div className="flex items-center gap-2 mb-2">
               <AlertTriangle className="w-4 h-4 text-red-500" />
               <span className="text-xs text-red-400 font-medium">Emergency</span>
@@ -228,10 +238,10 @@ export const Sidebar = ({
         {/* Logout Button */}
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-gray-800 hover:bg-gray-700 rounded-xl text-gray-400 hover:text-white font-medium transition-all text-sm border border-gray-700"
+          className="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-[#07110c] hover:bg-green-500/10 rounded text-green-400/70 hover:text-green-300 font-mono uppercase tracking-[0.14em] transition-all text-xs border border-green-500/20"
         >
           <LogOut className="w-4 h-4" />
-          <span>Sign Out</span>
+          <span>Seal Session / Sign Out</span>
         </button>
       </div>
 

@@ -131,7 +131,7 @@ const Index = () => {
 
   if (loading || riskLoading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen fortress-shell flex items-center justify-center">
         <div className="flex flex-col items-center space-y-4">
           <Loader2 className="w-12 h-12 text-green-500 animate-spin" />
           <p className="text-green-400 font-mono text-sm">INITIALIZING...</p>
@@ -143,7 +143,7 @@ const Index = () => {
   if (!user) {
     if (initializationError) {
       return (
-        <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4">
+        <div className="min-h-screen fortress-shell flex items-center justify-center px-4">
           <div className="max-w-md text-center space-y-4">
             <p className="text-red-400 font-mono text-sm">{initializationError}</p>
             <button
@@ -169,7 +169,7 @@ const Index = () => {
   const currentChat = getCurrentChatInfo();
 
   return (
-    <div className="h-dvh overflow-hidden bg-gradient-to-br from-gray-900 via-gray-900 to-black safe-area-inset">
+    <div className="h-dvh overflow-hidden fortress-shell safe-area-inset">
       {isInCall ? (
         <div className="w-full px-2 md:px-4 py-4">
           <CallInterface

@@ -36,9 +36,9 @@ export const PrivacySecuritySettings = ({ isOpen, onClose }: PrivacySecuritySett
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-gray-800 border-gray-700 text-white max-w-md">
+      <DialogContent className="bg-[#06100b] border-green-500/20 text-white max-w-md">
         <DialogHeader>
-          <DialogTitle className="flex items-center space-x-2 text-green-400">
+          <DialogTitle className="flex items-center space-x-2 text-green-400 font-mono">
             <Shield className="w-5 h-5" />
             <span>Privacy & Security</span>
           </DialogTitle>
@@ -46,42 +46,42 @@ export const PrivacySecuritySettings = ({ isOpen, onClose }: PrivacySecuritySett
 
         <div className="space-y-6 py-4">
           {/* Biometric Lock */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between rounded border border-green-500/15 bg-green-500/5 p-3">
             <div className="flex items-center space-x-3">
               <Fingerprint className="w-5 h-5 text-purple-400" />
               <div>
                 <Label className="text-white font-medium">Biometric Lock</Label>
-                <p className="text-xs text-gray-400">Require Face ID/fingerprint to open app</p>
+                <p className="text-xs text-gray-400">Coming soon for supported mobile devices</p>
               </div>
             </div>
             <Switch
-              checked={localSettings.biometricLock}
-              onCheckedChange={(checked) => setLocalSettings({ ...localSettings, biometricLock: checked })}
+              checked={false}
+              disabled
             />
           </div>
 
           {/* Screenshot Protection */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between rounded border border-green-500/15 bg-green-500/5 p-3">
             <div className="flex items-center space-x-3">
               <Eye className="w-5 h-5 text-blue-400" />
               <div>
                 <Label className="text-white font-medium">Screenshot Protection</Label>
-                <p className="text-xs text-gray-400">Block screenshots in the app</p>
+                <p className="text-xs text-gray-400">Coming soon where the platform allows it</p>
               </div>
             </div>
             <Switch
-              checked={localSettings.screenshotProtection}
-              onCheckedChange={(checked) => setLocalSettings({ ...localSettings, screenshotProtection: checked })}
+              checked={false}
+              disabled
             />
           </div>
 
           {/* Auto-Delete Messages */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between rounded border border-green-500/15 bg-green-500/5 p-3">
             <div className="flex items-center space-x-3">
               <Timer className="w-5 h-5 text-orange-400" />
               <div>
                 <Label className="text-white font-medium">Auto-Delete Messages</Label>
-                <p className="text-xs text-gray-400">Automatically delete old messages</p>
+                <p className="text-xs text-gray-400">Default cleanup policy for future messages</p>
               </div>
             </div>
             <Switch
@@ -114,19 +114,19 @@ export const PrivacySecuritySettings = ({ isOpen, onClose }: PrivacySecuritySett
           )}
 
           {/* Encryption Info */}
-          <div className="bg-green-900/20 border border-green-700 rounded-lg p-3">
+          <div className="bg-green-900/20 border border-green-700/70 rounded p-3">
             <div className="flex items-center space-x-2 text-green-400 mb-1">
               <Lock className="w-4 h-4" />
-              <span className="text-sm font-medium">End-to-End Encrypted</span>
+              <span className="text-sm font-medium">Protected Channel</span>
             </div>
             <p className="text-xs text-gray-400">
-              All your messages are encrypted using AES-256. Only you and the recipient can read them.
+              Messages, locked payloads, and burn-after-read controls are protected by the app's current security rules and encryption workflow. Keep decryption keys separate from the chat.
             </p>
           </div>
         </div>
 
-        <div className="flex justify-end space-x-2 pt-4 border-t border-gray-700">
-          <Button variant="ghost" onClick={onClose} className="text-gray-300 hover:text-white hover:bg-gray-700">
+        <div className="flex justify-end space-x-2 pt-4 border-t border-green-500/15">
+          <Button variant="ghost" onClick={onClose} className="text-gray-300 hover:text-white hover:bg-green-500/10">
             Cancel
           </Button>
           <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700 text-white">

@@ -9,6 +9,7 @@ export type MessageMetadata = Record<string, unknown> & {
   burnOpenedAt?: unknown;
   burnExpiresAt?: unknown;
   burnOpenedBy?: string | null;
+  trafficMark?: 'normal' | 'sensitive' | 'locked';
 };
 
 export interface Message {

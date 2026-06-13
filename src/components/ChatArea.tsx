@@ -22,6 +22,7 @@ type MessageMetadata = Record<string, unknown> & {
   burnOpenedAt?: unknown;
   burnExpiresAt?: unknown;
   burnOpenedBy?: string | null;
+  trafficMark?: 'normal' | 'sensitive' | 'locked';
 };
 
 interface ChatAreaProps {
@@ -123,9 +124,9 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
   // If no active chat is selected, show welcome screen
   if (!activeChat) {
     return (
-      <div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-gray-900">
+      <div className="flex h-full min-h-0 w-full flex-col overflow-hidden fortress-shell">
         {/* Header for mobile */}
-        <div className="sticky top-0 z-30 bg-gray-800/95 backdrop-blur-sm md:hidden">
+        <div className="sticky top-0 z-30 bg-[#06100b]/95 backdrop-blur-sm md:hidden border-b border-green-500/15">
           <div className="p-4 flex items-center justify-between">
             <button
               onClick={onToggleSidebar}
@@ -145,21 +146,21 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
           <div className="text-center max-w-md">
             <div className="flex justify-center mb-6">
               <div className="relative">
-                <MessageSquare className="w-16 h-16 text-gray-600" />
+                <MessageSquare className="w-16 h-16 text-green-500/35" />
                 <Search className="w-6 h-6 text-green-500 absolute -top-1 -right-1" />
               </div>
             </div>
-            <h2 className="text-xl font-semibold text-white mb-4">
-              Welcome to SecureChat
+            <h2 className="text-xl font-semibold text-white mb-4 font-mono uppercase tracking-[0.12em]">
+              SecureChat Fortress
             </h2>
-            <p className="text-gray-400 mb-6 leading-relaxed">
-              Start a secure conversation by searching for users in the sidebar. 
-              All messages are end-to-end encrypted for your privacy.
+            <p className="text-green-500/65 mb-6 leading-relaxed text-sm font-mono">
+              Open a protected channel by searching for users in the sidebar.
+              Lock sensitive payloads and use burn-after-read when the traffic should not linger.
             </p>
-            <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4">
-              <p className="text-sm text-gray-300 flex items-center">
+            <div className="fortress-panel-muted rounded p-4">
+              <p className="text-sm text-green-300/80 flex items-center font-mono">
                 <Search className="w-4 h-4 mr-2 text-green-500" />
-                Use the search button in the sidebar to find and connect with other users
+                Use the sidebar search button to find and connect with operators.
               </p>
             </div>
           </div>
@@ -205,9 +206,9 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
   };
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-gray-900">
+    <div className="flex h-full min-h-0 w-full flex-col overflow-hidden fortress-shell">
       {/* Header - Always visible at top */}
-      <div className="sticky top-0 z-30 bg-gray-800/95 backdrop-blur-sm">
+      <div className="sticky top-0 z-30 bg-[#06100b]/95 backdrop-blur-sm">
         <ChatHeader
           contact={contact}
           onStartCall={onStartCall}
@@ -227,7 +228,7 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
       </div>
 
       {/* Message Input - Fixed at bottom */}
-      <div className="fixed bottom-0 left-0 right-0 md:left-80 z-20 bg-gray-800/95 backdrop-blur-sm">
+      <div className="fixed bottom-0 left-0 right-0 md:left-80 z-20 bg-[#06100b]/95 backdrop-blur-sm">
         <MessageInput 
           onSendMessage={handleSendMessage}
           replyingTo={replyingTo}

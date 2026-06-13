@@ -4,6 +4,7 @@ import { MessageSquare, Clock } from 'lucide-react';
 import { useDirectMessages } from '@/hooks/useDirectMessages';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { auth } from '@/integrations/firebase/client';
+import { Conversation } from '@/services/conversationService';
 
 interface ContactListProps {
   activeChat: string;
@@ -12,6 +13,18 @@ interface ContactListProps {
   includeDirectMessages?: boolean;
 }
 
+type ContactItem = {
+  id: string;
+  name: string;
+  status: string;
+  lastMessage: string;
+  time: string;
+  avatar: string;
+  type: 'direct';
+  conversationId: string;
+  unreadCount: number;
+};
+
 export const ContactList = ({
   activeChat,
   onChatSelect,
@@ -19,15 +32,15 @@ export const ContactList = ({
   includeDirectMessages = false
 }: ContactListProps) => {
   const { conversations, switchToConversation } = useDirectMessages();
-  const [filteredContacts, setFilteredContacts] = useState<any[]>([]);
+  const [filteredContacts, setFilteredContacts] = useState<ContactItem[]>([]);
 
   // Filter contacts based on search query
   useEffect(() => {
-    let allContacts: any[] = [];
+    let allContacts: ContactItem[] = [];
     const currentUserId = auth.currentUser?.uid;
 
     if (includeDirectMessages) {
-      const directConversations = conversations.map(conv => {
+      const directConversations = conversations.map((conv: Conversation): ContactItem => {
         // Find the other participant (not the current user)
         const otherParticipant = conv.participants?.find(p => p.user_id !== currentUserId);
         const participantName = otherParticipant?.profiles?.username ||
@@ -64,13 +77,9 @@ export const ContactList = ({
     }
   }, [searchQuery, conversations, includeDirectMessages]);
 
-  const handleContactClick = (contact: any) => {
-    if (contact.type === 'direct') {
-      switchToConversation(contact.conversationId);
-      onChatSelect(contact.conversationId);
-    } else {
-      onChatSelect(contact.id);
-    }
+  const handleContactClick = (contact: ContactItem) => {
+    switchToConversation(contact.conversationId);
+    onChatSelect(contact.conversationId);
   };
 
   const getContactInitials = (name: string) => {
@@ -80,12 +89,12 @@ export const ContactList = ({
   return (
     <div className="p-2">
       {filteredContacts.length === 0 ? (
-        <div className="text-center py-8 text-gray-400">
-          <MessageSquare className="w-12 h-12 mx-auto mb-2 opacity-50" />
-          <p className="text-sm">
+        <div className="text-center py-10 text-green-500/55 font-mono">
+          <MessageSquare className="w-10 h-10 mx-auto mb-3 opacity-45" />
+          <p className="text-xs leading-relaxed">
             {includeDirectMessages 
-              ? "No conversations yet. Search for users to start chatting!" 
-              : "No contacts found"
+              ? "No traffic yet. Search for users to open a channel."
+              : "No channels found"
             }
           </p>
         </div>
@@ -95,23 +104,23 @@ export const ContactList = ({
             <div
               key={contact.id}
               onClick={() => handleContactClick(contact)}
-              className={`p-3 rounded-lg cursor-pointer transition-colors group ${
+              className={`p-3 rounded cursor-pointer transition-colors group border-l-2 ${
                 activeChat === contact.id || activeChat === contact.conversationId
-                  ? 'bg-green-500/20 border-l-2 border-green-500'
-                  : 'hover:bg-gray-700/50'
+                  ? 'bg-green-500/13 border-green-400'
+                  : 'border-transparent hover:bg-green-500/7'
               }`}
             >
               <div className="flex items-center space-x-3">
                 <div className="relative">
-                  <Avatar className="w-10 h-10">
+                  <Avatar className="w-10 h-10 rounded">
                     <AvatarImage src={contact.avatar} />
-                    <AvatarFallback className="bg-gray-600 text-white text-sm">
+                    <AvatarFallback className="rounded bg-green-500/15 border border-green-500/25 text-green-200 text-sm font-mono font-bold">
                       {getContactInitials(contact.name)}
                     </AvatarFallback>
                   </Avatar>
                   
                   {/* Status indicator */}
-                  <div className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-gray-800 ${
+                  <div className={`absolute -bottom-1 -right-1 w-2.5 h-2.5 rounded-full border border-[#06100b] ${
                     contact.status === 'online' ? 'bg-green-500' : 
                     contact.status === 'away' ? 'bg-yellow-500' : 'bg-gray-500'
                   }`} />
@@ -120,19 +129,19 @@ export const ContactList = ({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <h3 className="font-medium text-white truncate">{contact.name}</h3>
+                      <h3 className="font-mono font-bold text-sm text-white truncate">{contact.name}</h3>
                       <div className="flex items-center space-x-1">
-                        <MessageSquare className="w-3 h-3 text-blue-400" />
+                        <span className="text-[10px] text-green-400/70 font-mono">VER</span>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
                       {contact.unreadCount > 0 && (
-                        <span className="min-w-[20px] h-5 px-1.5 bg-green-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                        <span className="min-w-[18px] h-5 px-1.5 bg-green-500 text-black text-xs font-bold rounded flex items-center justify-center">
                           {contact.unreadCount > 99 ? '99+' : contact.unreadCount}
                         </span>
                       )}
                       {contact.time && (
-                        <span className="text-xs text-gray-400 flex items-center">
+                        <span className="text-[10px] text-green-500/55 flex items-center font-mono">
                           <Clock className="w-3 h-3 mr-1" />
                           {contact.time}
                         </span>
@@ -140,7 +149,7 @@ export const ContactList = ({
                     </div>
                   </div>
                   
-                  <p className="text-sm text-gray-400 truncate mt-1">
+                  <p className="text-xs text-green-500/55 truncate mt-1 font-mono uppercase">
                     {contact.lastMessage}
                   </p>
                 </div>

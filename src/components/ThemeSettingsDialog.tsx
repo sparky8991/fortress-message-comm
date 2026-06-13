@@ -64,11 +64,11 @@ export const ThemeSettingsDialog = ({ isOpen, onClose }: ThemeSettingsDialogProp
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-gray-800 border-gray-700 text-white max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-[#06100b] border-green-500/20 text-white max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center space-x-2 text-purple-400">
+          <DialogTitle className="flex items-center space-x-2 text-purple-400 font-mono">
             <Palette className="w-5 h-5" />
-            <span>Theme Settings</span>
+            <span>Terminal Theme</span>
           </DialogTitle>
         </DialogHeader>
 
@@ -84,7 +84,7 @@ export const ThemeSettingsDialog = ({ isOpen, onClose }: ThemeSettingsDialogProp
                 <button
                   key={color.value}
                   onClick={() => setLocalSettings({ ...localSettings, accentColor: color.value })}
-                  className={`h-10 rounded-lg transition-all relative ${
+                  className={`h-10 rounded transition-all relative ${
                     localSettings.accentColor === color.value
                       ? 'ring-2 ring-white ring-offset-2 ring-offset-gray-800 scale-105'
                       : 'hover:scale-105'
@@ -111,7 +111,7 @@ export const ThemeSettingsDialog = ({ isOpen, onClose }: ThemeSettingsDialogProp
                 <button
                   key={style.value}
                   onClick={() => setLocalSettings({ ...localSettings, bubbleStyle: style.value as ThemeSettings['bubbleStyle'] })}
-                  className={`p-3 rounded-lg border transition-all ${
+                  className={`p-3 rounded border transition-all ${
                     localSettings.bubbleStyle === style.value
                       ? 'border-purple-500 bg-purple-500/20'
                       : 'border-gray-600 hover:border-gray-500 bg-gray-700/50'
@@ -145,7 +145,7 @@ export const ThemeSettingsDialog = ({ isOpen, onClose }: ThemeSettingsDialogProp
                 <button
                   key={bg.value}
                   onClick={() => setLocalSettings({ ...localSettings, chatBackground: bg.value })}
-                  className={`h-16 rounded-lg transition-all relative ${
+                  className={`h-16 rounded transition-all relative ${
                     localSettings.chatBackground === bg.value
                       ? 'ring-2 ring-white ring-offset-2 ring-offset-gray-800'
                       : 'hover:opacity-80'
@@ -172,7 +172,7 @@ export const ThemeSettingsDialog = ({ isOpen, onClose }: ThemeSettingsDialogProp
                 <button
                   key={font.value}
                   onClick={() => setLocalSettings({ ...localSettings, fontStyle: font.value as ThemeSettings['fontStyle'] })}
-                  className={`p-3 rounded-lg border transition-all ${
+                  className={`p-3 rounded border transition-all ${
                     localSettings.fontStyle === font.value
                       ? 'border-green-500 bg-green-500/20'
                       : 'border-gray-600 hover:border-gray-500 bg-gray-700/50'
@@ -193,7 +193,7 @@ export const ThemeSettingsDialog = ({ isOpen, onClose }: ThemeSettingsDialogProp
           <div className="space-y-3">
             <Label className="text-white font-medium">Preview</Label>
             <div
-              className="p-4 rounded-lg"
+              className="p-4 rounded border border-green-500/15"
               style={{
                 backgroundColor: CHAT_BACKGROUNDS.find(bg => bg.value === localSettings.chatBackground)?.color || '#111827'
               }}
@@ -234,11 +234,11 @@ export const ThemeSettingsDialog = ({ isOpen, onClose }: ThemeSettingsDialogProp
           </div>
         </div>
 
-        <div className="flex justify-end space-x-2 pt-4 border-t border-gray-700">
-          <Button variant="ghost" onClick={onClose} className="text-gray-300 hover:text-white hover:bg-gray-700">
+        <div className="flex justify-end space-x-2 pt-4 border-t border-green-500/15">
+          <Button variant="ghost" onClick={onClose} className="text-gray-300 hover:text-white hover:bg-green-500/10">
             Cancel
           </Button>
-          <Button onClick={handleSave} className="bg-purple-600 hover:bg-purple-700 text-white">
+          <Button onClick={handleSave} className="bg-green-600 hover:bg-green-500 text-white">
             Save Theme
           </Button>
         </div>

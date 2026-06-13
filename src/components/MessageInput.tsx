@@ -27,6 +27,7 @@ type MessageMetadata = Record<string, unknown> & {
   burnOpenedAt?: null;
   burnExpiresAt?: null;
   burnOpenedBy?: null;
+  trafficMark?: 'normal' | 'sensitive' | 'locked';
 };
 
 interface MessageInputProps {
@@ -44,6 +45,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
   const [showEncryptedUpload, setShowEncryptedUpload] = useState(false);
   const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
   const [burnAfterReadEnabled, setBurnAfterReadEnabled] = useState(false);
+  const [messageMark, setMessageMark] = useState<'normal' | 'sensitive' | 'locked'>('normal');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,6 +86,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
     setAttachment(encryptedFile);
     setEncryptionMetadata(metadata);
     setShowEncryptedUpload(false);
+    setMessageMark('locked');
     setMessage(buildEncryptedPayloadMessage(metadata));
   };
 
@@ -110,22 +113,31 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
   const handleSend = async () => {
     if (!message.trim() && !attachment) return;
     try {
+      const outgoingMark = encryptionMetadata ? 'locked' : messageMark;
       const safeMetadata = stripEncryptedPayloadSecrets(encryptionMetadata) as MessageMetadata | null;
+      const markedMetadata: MessageMetadata | null =
+        safeMetadata || outgoingMark !== 'normal'
+          ? {
+              ...(safeMetadata || {}),
+              trafficMark: outgoingMark,
+            }
+          : null;
       const metadataForSend: MessageMetadata | null = burnAfterReadEnabled
         ? {
-            ...(safeMetadata || {}),
+            ...(markedMetadata || {}),
             burnAfterRead: true,
             burnAfterReadSeconds: BURN_AFTER_READ_SECONDS,
             burnOpenedAt: null,
             burnExpiresAt: null,
             burnOpenedBy: null,
           }
-        : safeMetadata;
+        : markedMetadata;
       await onSendMessage(message.trim(), attachment, metadataForSend, replyingTo);
       setMessage('');
       setAttachment(null);
       setEncryptionMetadata(null);
       setBurnAfterReadEnabled(false);
+      setMessageMark('normal');
       setShowEmojiPicker(false);
       setShowGifPicker(false);
       if (onCancelReply) onCancelReply();
@@ -177,14 +189,19 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
       {showEncryptedUpload && (
         <EncryptedImageUpload
           onEncryptedImageReady={handleEncryptedImageReady}
-          onCancel={() => setShowEncryptedUpload(false)}
+          onCancel={() => {
+            setShowEncryptedUpload(false);
+            if (!encryptionMetadata) {
+              setMessageMark('normal');
+            }
+          }}
         />
       )}
 
-      <div className="border-t border-gray-700/80 bg-gray-800/95 backdrop-blur-sm w-full max-w-full overflow-visible">
+      <div className="border-t border-green-500/15 bg-[#06100b]/95 backdrop-blur-sm w-full max-w-full overflow-visible">
         {/* Voice Recorder */}
         {showVoiceRecorder && (
-          <div className="p-3 border-b border-gray-700/50">
+          <div className="p-3 border-b border-green-500/15">
             <VoiceRecorder
               onSend={handleVoiceSend}
               onCancel={() => setShowVoiceRecorder(false)}
@@ -197,8 +214,58 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
         />
 
         <div className="p-2.5 md:p-3 space-y-2.5 mx-2 md:mx-0">
+          <div className="flex flex-wrap items-center gap-2 px-1">
+            <span className="fortress-command">Mode</span>
+            {[
+              { key: 'normal', label: 'Normal' },
+              { key: 'sensitive', label: 'Sensitive' },
+              { key: 'locked', label: 'Locked' },
+            ].map((mark) => (
+              <button
+                key={mark.key}
+                type="button"
+                onClick={() => {
+                  if (mark.key === 'locked') {
+                    setMessageMark('locked');
+                    setShowEncryptedUpload(true);
+                    return;
+                  }
+                  setMessageMark(mark.key as 'normal' | 'sensitive');
+                }}
+                className={`rounded border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] transition-colors fortress-focus ${
+                  messageMark === mark.key
+                    ? mark.key === 'sensitive'
+                      ? 'border-amber-400/70 bg-amber-400/15 text-amber-300'
+                      : mark.key === 'locked'
+                        ? 'border-red-400/70 bg-red-500/15 text-red-300'
+                        : 'border-green-400/70 bg-green-500/15 text-green-300'
+                    : 'border-green-500/20 text-green-500/45 hover:border-green-500/40 hover:text-green-300'
+                }`}
+                aria-pressed={messageMark === mark.key}
+              >
+                {mark.label}
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={() => setBurnAfterReadEnabled((enabled) => !enabled)}
+              className={`rounded border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] transition-colors fortress-focus ${
+                burnAfterReadEnabled
+                  ? 'border-orange-400/70 bg-orange-500/15 text-orange-300'
+                  : 'border-green-500/20 text-green-500/45 hover:border-orange-500/50 hover:text-orange-300'
+              }`}
+              aria-pressed={burnAfterReadEnabled}
+              title="Burn after read: 2 minutes"
+            >
+              <span className="inline-flex items-center gap-1">
+                <Flame className="w-3 h-3" />
+                Burn: {burnAfterReadEnabled ? '2 min' : 'off'}
+              </span>
+            </button>
+          </div>
+
           {attachment && (
-            <div className="px-3 py-2 bg-black/90 border border-green-500/40 rounded-lg flex items-center justify-between animate-in fade-in-50 duration-200 min-w-0 shadow-lg shadow-green-500/10">
+            <div className="px-3 py-2 bg-black/90 border border-green-500/40 rounded flex items-center justify-between animate-in fade-in-50 duration-200 min-w-0 shadow-lg shadow-green-500/10">
               <div className="flex items-center space-x-2 overflow-hidden min-w-0 flex-1">
                 {isEncryptedFile ? (
                   <div className="p-1 bg-red-500/20 rounded">
@@ -234,6 +301,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                 onClick={() => {
                   setAttachment(null);
                   setEncryptionMetadata(null);
+                  setMessageMark('normal');
                   setMessage('');
                 }} 
                 className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-600/50 rounded transition-all duration-200 flex-shrink-0 ml-2 min-h-[32px] min-w-[32px] flex items-center justify-center"
@@ -250,7 +318,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
             <div className="flex space-x-1 flex-shrink-0">
               <button 
                 onClick={() => fileInputRef.current?.click()} 
-                className="p-2.5 text-gray-300 hover:text-white hover:bg-gray-700/80 rounded-lg transition-all duration-200 flex-shrink-0 min-h-[40px] min-w-[40px] flex items-center justify-center hover:scale-105 active:scale-95"
+                className="p-2.5 text-green-500/60 hover:text-green-300 hover:bg-green-500/10 rounded border border-green-500/15 transition-all duration-200 flex-shrink-0 min-h-[40px] min-w-[40px] flex items-center justify-center active:scale-95 fortress-focus"
                 title="Attach File"
                 aria-label="Attach file"
               >
@@ -259,7 +327,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
               
               <button
                 onClick={() => setShowEncryptedUpload(true)}
-                className="p-2.5 text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded-lg transition-all duration-200 flex-shrink-0 min-h-[40px] min-w-[40px] flex items-center justify-center hover:scale-105 active:scale-95"
+                className="p-2.5 text-red-400 hover:text-red-300 hover:bg-red-500/15 rounded border border-red-500/20 transition-all duration-200 flex-shrink-0 min-h-[40px] min-w-[40px] flex items-center justify-center active:scale-95 fortress-focus"
                 title="Encrypt Image"
                 aria-label="Encrypt and attach image"
               >
@@ -267,25 +335,11 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
               </button>
 
               <button
-                onClick={() => setBurnAfterReadEnabled((enabled) => !enabled)}
-                className={`p-2.5 rounded-lg transition-all duration-200 flex-shrink-0 min-h-[40px] min-w-[40px] flex items-center justify-center hover:scale-105 active:scale-95 ${
-                  burnAfterReadEnabled
-                    ? 'bg-orange-500 text-black shadow-lg shadow-orange-500/30'
-                    : 'text-orange-400 hover:text-orange-300 hover:bg-orange-500/20'
-                }`}
-                title="Burn after read: 2 minutes"
-                aria-label="Toggle burn after read"
-                aria-pressed={burnAfterReadEnabled}
-              >
-                <Flame className="w-4 h-4" />
-              </button>
-
-              <button
                 onClick={() => setShowVoiceRecorder(!showVoiceRecorder)}
-                className={`p-2.5 rounded-lg transition-all duration-200 flex-shrink-0 min-h-[40px] min-w-[40px] flex items-center justify-center hover:scale-105 active:scale-95 ${
+                className={`p-2.5 rounded border transition-all duration-200 flex-shrink-0 min-h-[40px] min-w-[40px] flex items-center justify-center active:scale-95 fortress-focus ${
                   showVoiceRecorder
-                    ? 'bg-green-500 text-black'
-                    : 'text-green-400 hover:text-green-300 hover:bg-green-500/20'
+                    ? 'bg-green-500/20 text-green-300 border-green-400/60'
+                    : 'text-green-400 hover:text-green-300 hover:bg-green-500/10 border-green-500/15'
                 }`}
                 title="Voice Message"
                 aria-label="Record voice message"
@@ -300,7 +354,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
-                className="w-full px-3 py-2.5 bg-black/95 border border-green-500/60 rounded-lg text-green-400 placeholder-green-600/60 focus:outline-none focus:ring-2 focus:ring-green-500/80 focus:border-green-400/80 pr-10 text-sm font-mono resize-none min-h-[40px] max-h-28 shadow-inner shadow-green-500/10 caret-green-400 transition-all duration-200"
+                className="w-full px-3 py-2.5 bg-black/95 border border-green-500/45 rounded text-green-300 placeholder-green-600/50 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-400/70 pr-10 text-sm font-mono resize-none min-h-[40px] max-h-28 shadow-inner shadow-green-500/10 caret-green-400 transition-all duration-200"
                 rows={message.split('\n').length > 1 ? Math.min(message.split('\n').length, 3) : 1}
                 style={{ 
                   fontFamily: "'Fira Code', 'Source Code Pro', 'Consolas', 'Monaco', 'Courier New', monospace",
@@ -346,7 +400,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
             
             <button
               onClick={handleSend}
-              className="p-2.5 bg-green-500 hover:bg-green-600 rounded-lg text-black transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 shadow-lg shadow-green-500/30 min-h-[40px] min-w-[40px] flex items-center justify-center hover:scale-105 active:scale-95 disabled:hover:scale-100 mr-2"
+              className="p-2.5 bg-green-500 hover:bg-green-400 rounded text-black transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 shadow-lg shadow-green-500/20 min-h-[40px] min-w-[40px] flex items-center justify-center active:scale-95 mr-2 fortress-focus"
               disabled={!message.trim() && !attachment}
               aria-label="Send message"
             >
@@ -366,7 +420,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                 <Shield className="w-3 h-3 flex-shrink-0 animate-pulse" />
               )}
               <span className="text-center font-medium">
-                {burnAfterReadEnabled ? 'BURNS 2 MIN AFTER OPEN' : 'END-TO-END ENCRYPTED'}
+              {burnAfterReadEnabled ? 'BURNS 2 MIN AFTER OPEN' : 'PROTECTED CHANNEL ACTIVE'}
               </span>
             </div>
           </div>

@@ -89,71 +89,71 @@ export const AppSettingsMenu = ({ triggerClassName }: AppSettingsMenuProps) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="end"
-          className="w-56 bg-gray-800 border-gray-700 text-white shadow-xl"
+          className="w-60 bg-[#06100b] border-green-500/20 text-white shadow-xl"
           sideOffset={8}
         >
-          <DropdownMenuLabel className="text-green-400 font-mono text-xs tracking-wider">
-            SETTINGS
+          <DropdownMenuLabel className="text-green-400 font-mono text-xs tracking-[0.16em] uppercase">
+            Terminal Settings
           </DropdownMenuLabel>
-          <DropdownMenuSeparator className="bg-gray-700" />
+          <DropdownMenuSeparator className="bg-green-500/15" />
 
           <DropdownMenuItem
             onClick={() => navigate('/profile-settings')}
-            className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer"
+            className="hover:bg-green-500/10 focus:bg-green-500/10 cursor-pointer"
           >
             <User className="mr-2 h-4 w-4 text-green-500" />
-            <span>Profile Settings</span>
+            <span>Operator Profile</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => setShowNotifications(true)}
-            className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer"
+            className="hover:bg-green-500/10 focus:bg-green-500/10 cursor-pointer"
           >
             <Bell className="mr-2 h-4 w-4 text-blue-500" />
             <span>Notifications</span>
           </DropdownMenuItem>
 
-          <DropdownMenuSeparator className="bg-gray-700" />
+          <DropdownMenuSeparator className="bg-green-500/15" />
 
           <DropdownMenuItem
             onClick={() => setShowPrivacySecurity(true)}
-            className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer"
+            className="hover:bg-green-500/10 focus:bg-green-500/10 cursor-pointer"
           >
             <Shield className="mr-2 h-4 w-4 text-purple-500" />
             <span>Privacy & Security</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => setShowCallSettings(true)}
-            className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer"
+            className="hover:bg-green-500/10 focus:bg-green-500/10 cursor-pointer"
           >
             <Phone className="mr-2 h-4 w-4 text-orange-500" />
             <span>Call Settings</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => setShowChatSettings(true)}
-            className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer"
+            className="hover:bg-green-500/10 focus:bg-green-500/10 cursor-pointer"
           >
             <MessageSquare className="mr-2 h-4 w-4 text-cyan-500" />
-            <span>Chat Settings</span>
+            <span>Chat Behavior</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => setShowThemeSettings(true)}
-            className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer"
+            className="hover:bg-green-500/10 focus:bg-green-500/10 cursor-pointer"
           >
             <Palette className="mr-2 h-4 w-4 text-pink-500" />
-            <span>Theme Settings</span>
+            <span>Terminal Theme</span>
           </DropdownMenuItem>
 
-          <DropdownMenuSeparator className="bg-gray-700" />
+          <DropdownMenuSeparator className="bg-green-500/15" />
 
           <DropdownMenuItem
             onClick={() => setShowAbout(true)}
-            className="hover:bg-gray-700 focus:bg-gray-700 cursor-pointer"
+            className="hover:bg-green-500/10 focus:bg-green-500/10 cursor-pointer"
           >
             <Info className="mr-2 h-4 w-4 text-gray-400" />
             <span>About SecureChat</span>
           </DropdownMenuItem>
 
-          <DropdownMenuSeparator className="bg-gray-700" />
+          <DropdownMenuSeparator className="bg-green-500/15" />
 
           <DropdownMenuItem
             onClick={handleLogout}

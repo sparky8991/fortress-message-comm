@@ -2,7 +2,7 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Shield, Lock, Heart, ExternalLink, Github, Mail } from 'lucide-react';
+import { Shield, Lock, Heart, ExternalLink, Mail, Sparkles } from 'lucide-react';
 
 interface AboutDialogProps {
   isOpen: boolean;
@@ -12,9 +12,9 @@ interface AboutDialogProps {
 export const AboutDialog = ({ isOpen, onClose }: AboutDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-gray-800 border-gray-700 text-white max-w-md">
+      <DialogContent className="bg-[#06100b] border-green-500/20 text-white max-w-md">
         <DialogHeader>
-          <DialogTitle className="flex items-center space-x-2 text-green-400">
+          <DialogTitle className="flex items-center space-x-2 text-green-400 font-mono">
             <Shield className="w-5 h-5" />
             <span>About SecureChat</span>
           </DialogTitle>
@@ -23,18 +23,18 @@ export const AboutDialog = ({ isOpen, onClose }: AboutDialogProps) => {
         <div className="space-y-6 py-4">
           {/* Logo and Version */}
           <div className="text-center">
-            <div className="w-20 h-20 mx-auto bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg shadow-green-500/30 mb-4">
-              <Shield className="w-10 h-10 text-white" />
+            <div className="w-20 h-20 mx-auto bg-green-500/15 border border-green-400/50 rounded flex items-center justify-center shadow-lg shadow-green-500/20 mb-4">
+              <Shield className="w-10 h-10 text-green-300" />
             </div>
-            <h2 className="text-2xl font-bold text-white">SecureChat</h2>
-            <p className="text-sm text-gray-400 mt-1">Version 1.0.0</p>
+            <h2 className="text-2xl font-bold text-white font-mono tracking-[0.14em]">SECURECHAT FORTRESS</h2>
+            <p className="text-sm text-green-500/55 mt-1 font-mono">Version 1.0.0</p>
           </div>
 
           {/* Description */}
-          <div className="bg-gray-700/50 rounded-lg p-4">
-            <p className="text-sm text-gray-300 text-center">
-              A secure team messaging application featuring end-to-end encryption,
-              ghost mode sessions, and military-grade security for your private communications.
+          <div className="bg-green-500/7 border border-green-500/15 rounded p-4">
+            <p className="text-sm text-gray-300 text-center leading-relaxed">
+              A private team messaging workspace with protected channels, locked payloads,
+              burn-after-read messages, media sharing, and call-sign based identity.
             </p>
           </div>
 
@@ -42,20 +42,23 @@ export const AboutDialog = ({ isOpen, onClose }: AboutDialogProps) => {
           <div className="space-y-3">
             <div className="flex items-center space-x-3 text-gray-300">
               <Lock className="w-4 h-4 text-green-400" />
-              <span className="text-sm">End-to-end encryption (AES-256)</span>
+              <span className="text-sm">Protected message channels</span>
+              <span className="ml-auto text-[10px] font-mono uppercase text-green-400">Available</span>
             </div>
             <div className="flex items-center space-x-3 text-gray-300">
               <Shield className="w-4 h-4 text-purple-400" />
-              <span className="text-sm">Ghost Mode for sensitive conversations</span>
+              <span className="text-sm">Key-locked encrypted payloads</span>
+              <span className="ml-auto text-[10px] font-mono uppercase text-green-400">Available</span>
             </div>
             <div className="flex items-center space-x-3 text-gray-300">
-              <Lock className="w-4 h-4 text-blue-400" />
-              <span className="text-sm">Biometric authentication support</span>
+              <Sparkles className="w-4 h-4 text-amber-400" />
+              <span className="text-sm">Biometric unlock and identity verification</span>
+              <span className="ml-auto text-[10px] font-mono uppercase text-amber-400">Coming soon</span>
             </div>
           </div>
 
           {/* Credits */}
-          <div className="border-t border-gray-700 pt-4">
+          <div className="border-t border-green-500/15 pt-4">
             <div className="flex items-center justify-center space-x-2 text-gray-400">
               <span className="text-sm">Built with</span>
               <Heart className="w-4 h-4 text-red-500" />
@@ -85,13 +88,13 @@ export const AboutDialog = ({ isOpen, onClose }: AboutDialogProps) => {
 
           {/* Legal */}
           <div className="text-center text-xs text-gray-500">
-            <p>&copy; 2024 SecureChat. All rights reserved.</p>
-            <p className="mt-1">Your privacy is our priority.</p>
+            <p>&copy; 2026 SecureChat. All rights reserved.</p>
+            <p className="mt-1">Share keys separately. Use secure judgment.</p>
           </div>
         </div>
 
-        <div className="flex justify-center pt-4 border-t border-gray-700">
-          <Button onClick={onClose} className="bg-green-600 hover:bg-green-700 text-white px-8">
+        <div className="flex justify-center pt-4 border-t border-green-500/15">
+          <Button onClick={onClose} className="bg-green-600 hover:bg-green-500 text-white px-8">
             Got it
           </Button>
         </div>
