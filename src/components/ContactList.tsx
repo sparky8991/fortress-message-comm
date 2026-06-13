@@ -87,11 +87,11 @@ export const ContactList = ({
   };
 
   return (
-    <div className="p-2">
+    <div className="py-2">
       {filteredContacts.length === 0 ? (
-        <div className="text-center py-10 text-green-500/55 font-mono">
-          <MessageSquare className="w-10 h-10 mx-auto mb-3 opacity-45" />
-          <p className="text-xs leading-relaxed">
+        <div className="text-center px-5 py-9 text-green-500/55 font-mono">
+          <MessageSquare className="w-8 h-8 mx-auto mb-3 opacity-45" />
+          <p className="text-[10px] uppercase leading-relaxed tracking-[0.12em]">
             {includeDirectMessages 
               ? "No traffic yet. Search for users to open a channel."
               : "No channels found"
@@ -99,28 +99,28 @@ export const ContactList = ({
           </p>
         </div>
       ) : (
-        <div className="space-y-1">
+        <div className="space-y-0.5">
           {filteredContacts.map((contact) => (
             <div
               key={contact.id}
               onClick={() => handleContactClick(contact)}
-              className={`p-3 rounded cursor-pointer transition-colors group border-l-2 ${
+              className={`cursor-pointer border-l-2 px-3 py-2.5 transition-colors group ${
                 activeChat === contact.id || activeChat === contact.conversationId
                   ? 'bg-green-500/13 border-green-400'
                   : 'border-transparent hover:bg-green-500/7'
               }`}
             >
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2.5">
                 <div className="relative">
-                  <Avatar className="w-10 h-10 rounded">
+                  <Avatar className="w-9 h-9 rounded-sm">
                     <AvatarImage src={contact.avatar} />
-                    <AvatarFallback className="rounded bg-green-500/15 border border-green-500/25 text-green-200 text-sm font-mono font-bold">
+                    <AvatarFallback className="rounded-sm bg-green-500/15 border border-green-500/25 text-green-200 text-xs font-mono font-bold">
                       {getContactInitials(contact.name)}
                     </AvatarFallback>
                   </Avatar>
                   
                   {/* Status indicator */}
-                  <div className={`absolute -bottom-1 -right-1 w-2.5 h-2.5 rounded-full border border-[#06100b] ${
+                  <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border border-[#06100b] ${
                     contact.status === 'online' ? 'bg-green-500' : 
                     contact.status === 'away' ? 'bg-yellow-500' : 'bg-gray-500'
                   }`} />
@@ -129,27 +129,27 @@ export const ContactList = ({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <h3 className="font-mono font-bold text-sm text-white truncate">{contact.name}</h3>
+                      <h3 className="font-mono font-bold text-[13px] text-white truncate">{contact.name}</h3>
                       <div className="flex items-center space-x-1">
-                        <span className="text-[10px] text-green-400/70 font-mono">VER</span>
+                        <span className="text-[8px] text-green-400/70 font-mono font-bold uppercase tracking-[0.12em]">VER</span>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-1.5">
                       {contact.unreadCount > 0 && (
-                        <span className="min-w-[18px] h-5 px-1.5 bg-green-500 text-black text-xs font-bold rounded flex items-center justify-center">
+                        <span className="min-w-4 h-4 px-1 bg-green-500 text-black text-[10px] font-black rounded-full flex items-center justify-center">
                           {contact.unreadCount > 99 ? '99+' : contact.unreadCount}
                         </span>
                       )}
                       {contact.time && (
-                        <span className="text-[10px] text-green-500/55 flex items-center font-mono">
-                          <Clock className="w-3 h-3 mr-1" />
+                        <span className="text-[9px] text-green-500/55 flex items-center font-mono">
+                          <Clock className="w-2.5 h-2.5 mr-1" />
                           {contact.time}
                         </span>
                       )}
                     </div>
                   </div>
                   
-                  <p className="text-xs text-green-500/55 truncate mt-1 font-mono uppercase">
+                  <p className="text-[10px] text-green-500/55 truncate mt-0.5 font-mono uppercase tracking-[0.08em]">
                     {contact.lastMessage}
                   </p>
                 </div>
