@@ -30,6 +30,8 @@ import {
   AUTO_DELETE_WINDOWS,
   BG_PRESETS,
   FORTRESS,
+  FORTRESS_BUILD,
+  FORTRESS_VERSION,
   alpha,
 } from '@/lib/fortress';
 import { Chip, SettingRow, Toggle } from '@/components/tactical';
@@ -107,14 +109,14 @@ const DEFAULT_THEME: ThemeSettings = {
 };
 
 const SubLabel = ({ children }: { children: React.ReactNode }) => (
-  <div className="mb-2 font-mono text-[7px] uppercase tracking-[0.2em]" style={{ color: FORTRESS.textDim }}>
+  <div className="mb-2 font-mono text-[8px] uppercase tracking-[2px]" style={{ color: FORTRESS.textDim }}>
     {children}
   </div>
 );
 
 const StatusPill = ({ children }: { children: React.ReactNode }) => (
   <span
-    className="rounded-sm border px-2 py-1 font-mono text-[7px] font-extrabold uppercase tracking-[0.14em]"
+    className="rounded-sm border px-2 py-1 font-mono text-[8px] font-extrabold uppercase tracking-[1.5px]"
     style={{ borderColor: FORTRESS.amberBorder, color: FORTRESS.amber, background: alpha(FORTRESS.amber, 0.06) }}
   >
     {children}
@@ -175,23 +177,23 @@ export const SettingsDialog = ({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
-        className="max-h-[88vh] max-w-[min(94vw,760px)] overflow-hidden p-0 font-mono"
+        className="h-[560px] max-h-[92vh] w-[740px] max-w-[94vw] overflow-hidden rounded-sm p-0 font-mono"
         style={{ background: FORTRESS.surface, borderColor: FORTRESS.borderGreen, color: FORTRESS.text }}
       >
         <DialogHeader
-          className="flex-row items-center justify-between border-b px-4 py-2.5 pr-12"
+          className="flex-row items-center justify-between border-b px-4 py-[14px] pr-12"
           style={{ borderColor: FORTRESS.borderFaint }}
         >
-          <DialogTitle className="font-mono text-[10px] font-extrabold uppercase tracking-[0.2em] text-green-400">
+          <DialogTitle className="font-mono text-[10px] font-extrabold uppercase tracking-[2px] text-green-400">
             Terminal Settings
           </DialogTitle>
-          <span className="hidden font-mono text-[7px] uppercase tracking-[0.16em] sm:inline" style={{ color: FORTRESS.textFaint }}>
+          <span className="hidden font-mono text-[8px] uppercase tracking-[1px] sm:inline" style={{ color: FORTRESS.textFaint }}>
             Synced to account settings
           </span>
         </DialogHeader>
 
-        <div className="grid min-h-[500px] grid-cols-1 md:grid-cols-[180px_1fr]">
-          <nav className="flex gap-1 overflow-x-auto border-b p-3 md:flex-col md:overflow-visible md:border-b-0 md:border-r" style={{ borderColor: FORTRESS.borderFaint }}>
+        <div className="flex min-h-0 flex-1">
+          <nav className="flex w-[190px] flex-none flex-col gap-1.5 border-r px-2.5 py-3" style={{ borderColor: FORTRESS.borderFaint }}>
             {SECTIONS.map(({ id, label, icon: Icon }) => {
               const active = section === id;
               return (
@@ -199,7 +201,7 @@ export const SettingsDialog = ({
                   key={id}
                   type="button"
                   onClick={() => setSection(id)}
-                  className="flex shrink-0 items-center gap-2 rounded-sm border px-2.5 py-2 text-left font-mono text-[8px] font-bold uppercase tracking-[0.13em] transition-colors fortress-focus"
+                  className="flex items-center gap-2 rounded-sm border px-2.5 py-2 text-left font-mono text-[9px] font-bold uppercase tracking-[1.5px] transition-colors fortress-focus"
                   style={{
                     background: active ? alpha(accent, 0.1) : 'transparent',
                     borderColor: active ? alpha(accent, 0.5) : 'transparent',
@@ -213,11 +215,11 @@ export const SettingsDialog = ({
             })}
           </nav>
 
-          <div className="min-w-0 overflow-y-auto p-3.5">
+          <div className="min-w-0 flex-1 overflow-y-auto px-[18px] py-4">
             {section === 'profile' && (
               <div className="flex flex-col gap-3">
                 <div className="flex flex-col gap-3 rounded-sm border p-3 sm:flex-row sm:items-center" style={{ borderColor: FORTRESS.border, background: FORTRESS.surfaceRaised }}>
-                  <div className="grid h-14 w-14 flex-none place-items-center rounded-sm border font-mono text-lg font-extrabold" style={{ borderColor: FORTRESS.borderGreen, background: '#12301F', color: FORTRESS.greenSoft }}>
+                  <div className="grid h-16 w-16 flex-none place-items-center rounded-sm border font-mono text-[22px] font-extrabold" style={{ borderColor: FORTRESS.borderGreen, background: '#12301F', color: FORTRESS.greenSoft }}>
                     {initials}
                   </div>
                   <div className="min-w-0 flex-1">
@@ -230,7 +232,7 @@ export const SettingsDialog = ({
                     <Button
                       type="button"
                       onClick={onEditProfile}
-                      className="mt-2 h-auto bg-transparent px-2.5 py-1.5 font-mono text-[7px] font-extrabold uppercase tracking-wide text-green-400 hover:bg-green-500/10"
+                      className="mt-2 h-auto bg-transparent px-2.5 py-1.5 font-mono text-[8px] font-extrabold uppercase tracking-[1.5px] text-green-400 hover:bg-green-500/10"
                       style={{ border: `1px solid ${FORTRESS.borderGreen}` }}
                     >
                       Edit profile
@@ -251,7 +253,7 @@ export const SettingsDialog = ({
                     type="button"
                     onClick={onEditCallSign}
                     disabled={remainingCallSignChanges <= 0}
-                    className="mt-2.5 h-auto w-full bg-transparent py-1.5 font-mono text-[7px] font-extrabold uppercase tracking-[0.15em] text-amber-300 hover:bg-amber-400/10 disabled:opacity-40"
+                    className="mt-2.5 h-auto w-full bg-transparent py-1.5 font-mono text-[8px] font-extrabold uppercase tracking-[1.5px] text-amber-300 hover:bg-amber-400/10 disabled:opacity-40"
                     style={{ border: `1px solid ${FORTRESS.amberBorder}` }}
                   >
                     Change call sign
@@ -373,7 +375,7 @@ export const SettingsDialog = ({
                     ))}
                   </div>
                 </div>
-                <div className="grid grid-cols-4 gap-2 text-center font-mono text-[7px] uppercase tracking-wide text-green-400/70">
+                <div className="grid grid-cols-4 gap-2 text-center font-mono text-[8px] uppercase tracking-wide text-green-400/70">
                   <Volume2 className="mx-auto h-3.5 w-3.5" />
                   <Vibrate className="mx-auto h-3.5 w-3.5" />
                   <Mic className="mx-auto h-3.5 w-3.5" />
@@ -489,11 +491,11 @@ export const SettingsDialog = ({
                 <div className="mb-1.5 grid h-11 w-11 place-items-center rounded-sm border border-green-500 bg-green-500/10 p-3">
                   <ShieldCheck className="h-5 w-5 text-green-400" />
                 </div>
-                <div className="font-mono text-sm font-extrabold tracking-[0.2em]" style={{ color: FORTRESS.textBright }}>
+                <div className="font-mono text-[16px] font-extrabold uppercase tracking-[3px]" style={{ color: FORTRESS.textBright }}>
                   SECURECHAT FORTRESS
                 </div>
-                <div className="font-mono text-[7px] uppercase tracking-[0.2em]" style={{ color: FORTRESS.textFaint }}>
-                  Terminal v1.0.0
+                <div className="font-mono text-[8px] uppercase tracking-[2px]" style={{ color: FORTRESS.textFaint }}>
+                  Terminal {FORTRESS_VERSION} · Build {FORTRESS_BUILD}
                 </div>
                 <div className="mt-2.5 max-w-md rounded-sm border p-3 font-mono text-[8px] leading-relaxed tracking-wide" style={{ borderColor: FORTRESS.border, background: FORTRESS.surfaceRaised, color: FORTRESS.textDim }}>
                   Private team messaging with protected channels, key-locked payloads, burn-after-read controls,
@@ -512,14 +514,14 @@ export const SettingsDialog = ({
           </div>
         </div>
 
-        <div className="flex items-center justify-between border-t px-4 py-2.5" style={{ borderColor: FORTRESS.borderFaint }}>
-          <span className="font-mono text-[7px] uppercase tracking-[0.15em]" style={{ color: FORTRESS.textFaint }}>
+        <div className="flex items-center justify-between border-t px-4 py-3" style={{ borderColor: FORTRESS.borderFaint }}>
+          <span className="font-mono text-[7px] uppercase tracking-[1.5px]" style={{ color: FORTRESS.textFaint }}>
             Changes sync to your account settings
           </span>
           <Button
             type="button"
             onClick={onClose}
-            className="h-auto rounded-sm px-5 py-2 font-mono text-[8px] font-extrabold uppercase tracking-[0.2em] text-[#06130B]"
+            className="h-auto rounded-sm px-5 py-2 font-mono text-[9px] font-extrabold uppercase tracking-[2px] text-[#06130B]"
             style={{ background: accent }}
           >
             Done

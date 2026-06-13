@@ -360,7 +360,6 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                 className="h-9 min-h-9 max-h-28 w-full resize-none rounded-sm border border-[#1C2B22] bg-[#0F1612] px-3 py-2 font-mono text-[12px] text-[#36E27B] shadow-[inset_0_1px_8px_rgba(54,226,123,0.06)] caret-[#36E27B] transition-colors placeholder:text-[#76897D]/60 focus:border-[#1E5C3C] focus:outline-none focus:ring-1 focus:ring-[#36E27B]/25"
                 rows={message.split('\n').length > 1 ? Math.min(message.split('\n').length, 3) : 1}
                 style={{
-                  fontFamily: "'Fira Code', 'Source Code Pro', 'Consolas', 'Monaco', 'Courier New', monospace",
                   letterSpacing: '0.8px',
                   lineHeight: '1.3'
                 }}

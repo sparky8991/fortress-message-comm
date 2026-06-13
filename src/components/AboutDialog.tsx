@@ -3,6 +3,7 @@ import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Shield, Lock, Heart, ExternalLink, Mail, Sparkles } from 'lucide-react';
+import { FORTRESS_BUILD, FORTRESS_VERSION } from '@/lib/fortress';
 
 interface AboutDialogProps {
   isOpen: boolean;
@@ -27,7 +28,9 @@ export const AboutDialog = ({ isOpen, onClose }: AboutDialogProps) => {
               <Shield className="w-10 h-10 text-green-300" />
             </div>
             <h2 className="text-2xl font-bold text-white font-mono tracking-[0.14em]">SECURECHAT FORTRESS</h2>
-            <p className="text-sm text-green-500/55 mt-1 font-mono">Version 1.0.0</p>
+            <p className="mt-1 font-mono text-[8px] uppercase tracking-[2px] text-green-500/55">
+              Terminal {FORTRESS_VERSION} · Build {FORTRESS_BUILD}
+            </p>
           </div>
 
           {/* Description */}

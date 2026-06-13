@@ -16,6 +16,7 @@ import { useUserRisk } from '@/contexts/UserRiskContext';
 import { Button } from '@/components/ui/button';
 import { StatusUser } from '@/services/statusService';
 import { AppSettingsMenu } from './AppSettingsMenu';
+import { FORTRESS_VERSION } from '@/lib/fortress';
 
 interface SidebarProps {
   activeChat: string;
@@ -91,11 +92,11 @@ export const Sidebar = ({
             <Shield className="h-4 w-4 text-[#36E27B]" />
           </div>
           <div className="min-w-0 flex-1">
-            <h1 className="font-mono text-sm font-black uppercase leading-none tracking-[0.16em] text-[#ECF7F0]">
+            <h1 className="font-mono text-[14px] font-extrabold uppercase leading-none tracking-[2px] text-[#ECF7F0]">
               SECURECHAT
             </h1>
-            <div className="mt-1 font-mono text-[8px] uppercase tracking-[0.22em] text-[#76897D]">
-              FORTRESS TERMINAL v2.4
+            <div className="mt-1 whitespace-nowrap font-mono text-[8px] uppercase tracking-[2px] text-[#76897D]">
+              FORTRESS TERMINAL {FORTRESS_VERSION}
             </div>
           </div>
           <div className="flex flex-none items-center gap-1.5 rounded-sm border border-[#1E5C3C] bg-[#36E27B]/10 px-2 py-1">
@@ -103,7 +104,7 @@ export const Sidebar = ({
             <span className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-[#36E27B]">SECURE</span>
           </div>
         </div>
-        <div className="mt-2 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.12em] text-[#4A5A50]">
+        <div className="mt-2 flex items-center justify-between font-mono text-[9px] uppercase tracking-[1px] text-[#4A5A50]">
           <span className="text-[#76897D]">{utcTime}</span>
           <span>X25519 · AES-256-GCM</span>
         </div>

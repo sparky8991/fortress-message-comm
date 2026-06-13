@@ -42,7 +42,7 @@ export const ChatHeader = ({ contact, onStartCall, onToggleSidebar }: ChatHeader
 
             <div className="min-w-0 flex-1">
               <div className="flex min-w-0 items-center gap-2">
-                <h2 className="truncate font-mono text-sm font-black leading-none tracking-[0.02em] text-[#ECF7F0]">{contact?.name}</h2>
+                <h2 className="truncate font-mono text-[14px] font-bold leading-none text-[#ECF7F0]">{contact?.name}</h2>
                 <span className="hidden rounded-sm border border-[#F2B43C]/45 bg-[#F2B43C]/10 px-1.5 py-0.5 font-mono text-[7px] font-black uppercase tracking-[0.18em] text-[#F2B43C] sm:inline-flex">
                   UNVERIFIED
                 </span>
@@ -62,7 +62,7 @@ export const ChatHeader = ({ contact, onStartCall, onToggleSidebar }: ChatHeader
                   <div className="flex items-center space-x-1.5 font-mono text-[9px] font-bold uppercase tracking-[0.12em] text-[#36E27B]">
                     <Lock className="h-2.5 w-2.5 flex-shrink-0" />
                     <span className="truncate">
-                      E2E ENCRYPTED - PROTECTED CHANNEL - AES-256-GCM
+                      E2E ENCRYPTED · SIGNAL PROTOCOL · AES-256-GCM
                     </span>
                   </div>
                 </div>

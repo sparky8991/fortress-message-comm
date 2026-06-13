@@ -181,7 +181,7 @@ const Index = () => {
       ) : (
         <>
           <div className="fortress-classification-strip hidden md:flex">
-            SECRET//NOFORN - CLASSIFIED CHANNEL - AUTHORIZED PERSONNEL ONLY
+            SECRET//NOFORN — CLASSIFIED CHANNEL — AUTHORIZED PERSONNEL ONLY
           </div>
           <div className={cn(
             "flex min-h-0 w-full flex-1 overflow-hidden",

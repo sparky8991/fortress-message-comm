@@ -134,10 +134,7 @@ export const MessageList = ({
                         ? 'border-[#1E5C3C] bg-black/95 text-[#36E27B] shadow-[0_0_18px_rgba(54,226,123,0.12)] hover:border-[#36E27B]'
                         : 'border-[#1C2B22] bg-[#101814] text-[#ECF7F0] shadow-lg hover:border-[#36513F]'
                     }`}
-                    style={{ 
-                      fontFamily: "'Fira Code', 'Source Code Pro', 'Consolas', 'Monaco', 'Courier New', monospace",
-                      letterSpacing: '0.3px'
-                    }}
+                    style={{ letterSpacing: '0.3px' }}
                   >
                     <BurnAfterReadMessage message={message}>
                       {/* Reply indicator */}
