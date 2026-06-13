@@ -26,26 +26,28 @@ export const EmojiPicker = ({ onEmojiSelect, isOpen, onClose }: EmojiPickerProps
   return (
     <>
       <div className="fixed inset-0 z-[50]" onClick={onClose} />
-      <div className="absolute bottom-full right-0 mb-2 bg-gray-800/98 backdrop-blur-sm border border-gray-600/80 rounded-lg p-3 shadow-2xl z-[60] w-64">
+      <div className="absolute bottom-full right-0 z-[60] mb-2 w-64 border border-[#1E5C3C] bg-[#0C120F]/98 p-3 font-mono text-[#DCEAE1] shadow-[0_0_35px_rgba(0,0,0,0.55)] backdrop-blur-sm">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-xs font-medium text-gray-200 font-mono">EMOJIS</h3>
-          <button 
+          <h3 className="font-mono text-[9px] font-black uppercase tracking-[0.18em] text-[#ECF7F0]">Emoji Relay</h3>
+          <button
+            type="button"
             onClick={onClose}
-            className="text-gray-400 hover:text-white text-xs font-mono hover:bg-gray-700/50 px-1 py-0.5 rounded"
+            className="fortress-focus px-1 py-0.5 font-mono text-[10px] text-[#76897D] hover:bg-[#36E27B]/10 hover:text-[#DCEAE1]"
             aria-label="Close emoji picker"
           >
             ✕
           </button>
         </div>
-        <div className="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-gray-600">
+        <div className="grid max-h-48 grid-cols-8 gap-1 overflow-y-auto scrollbar-thin scrollbar-track-[#070B09] scrollbar-thumb-[#1E5C3C]">
           {emojis.map((emoji) => (
             <button
+              type="button"
               key={emoji}
               onClick={() => {
                 onEmojiSelect(emoji);
                 onClose();
               }}
-              className="text-base hover:bg-gray-700/80 rounded p-1.5 transition-all duration-200 hover:scale-110 active:scale-95 min-h-[32px] flex items-center justify-center"
+              className="fortress-focus flex min-h-[30px] items-center justify-center rounded-sm border border-transparent p-1.5 text-base transition-all duration-200 hover:scale-105 hover:border-[#1E5C3C] hover:bg-[#36E27B]/10 active:scale-95"
               aria-label={`Insert ${emoji} emoji`}
             >
               {emoji}

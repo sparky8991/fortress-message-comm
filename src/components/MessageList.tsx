@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { Shield, Lock, Check, CheckCheck, Clock } from 'lucide-react';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { Shield, Check, CheckCheck, Clock } from 'lucide-react';
 import { AttachmentPreview } from './AttachmentPreview';
 import { MessageContextMenu } from './MessageContextMenu';
 import { VoiceMessagePlayer } from './VoiceMessagePlayer';
@@ -48,6 +48,15 @@ export const MessageList = ({
 }: MessageListProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
+  const sessionTime = useMemo(() => {
+    const time = new Intl.DateTimeFormat('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: 'UTC',
+    }).format(new Date());
+    return `${time.replace(':', '')}Z`;
+  }, []);
 
   useEffect(() => {
     const scrollToBottom = () => {
@@ -60,29 +69,22 @@ export const MessageList = ({
   const getStatusIcon = (status: Message['status']) => {
     switch (status) {
       case 'sending':
-        return <Clock className="w-2.5 h-2.5 md:w-3 md:h-3 text-gray-400 animate-pulse" />;
+        return <Clock className="w-2.5 h-2.5 md:w-3 md:h-3 text-[#76897D] animate-pulse" />;
       case 'sent':
-        return <Check className="w-2.5 h-2.5 md:w-3 md:h-3 text-gray-400" />;
+        return <Check className="w-2.5 h-2.5 md:w-3 md:h-3 text-[#76897D]" />;
       case 'delivered':
-        return <CheckCheck className="w-2.5 h-2.5 md:w-3 md:h-3 text-gray-400" />;
+        return <CheckCheck className="w-2.5 h-2.5 md:w-3 md:h-3 text-[#76897D]" />;
       case 'read':
-        return <CheckCheck className="w-2.5 h-2.5 md:w-3 md:h-3 text-green-500" />;
+        return <CheckCheck className="w-2.5 h-2.5 md:w-3 md:h-3 text-[#36E27B]" />;
     }
   };
 
   return (
-    <div className="px-2 md:px-6 py-2 md:py-4 max-w-6xl mx-auto w-full">
+    <div className="mx-auto w-full max-w-6xl px-3 py-2 md:px-6 md:py-4">
       <div className="space-y-3 md:space-y-4">
-        {/* Enhanced Encryption Notice */}
-        <div className="flex items-center justify-center py-3 md:py-5">
-          <div className="bg-black/95 border border-green-500/45 px-3 md:px-4 py-2 rounded flex items-center space-x-2 md:space-x-3 shadow-2xl shadow-green-500/15 backdrop-blur-sm">
-            <div className="relative">
-              <Lock className="w-3 h-3 md:w-5 md:h-5 text-green-500 animate-pulse" />
-              <div className="absolute inset-0 bg-green-500/20 rounded-full animate-ping"></div>
-            </div>
-            <span className="text-xs md:text-sm text-green-500 font-mono font-semibold tracking-[0.12em] uppercase">
-              {isMobile ? 'Protected' : 'Protected_Channel_Active'}
-            </span>
+        <div className="flex items-center justify-center py-2 md:py-3">
+          <div className="font-mono text-[8px] uppercase tracking-[0.28em] text-[#36513F]">
+            {isMobile ? '-- SESSION ACTIVE --' : `-- SESSION ESTABLISHED ${sessionTime} - PROTECTED CHANNEL READY --`}
           </div>
         </div>
 
@@ -92,25 +94,25 @@ export const MessageList = ({
           const isConsecutive = index > 0 && messages[index - 1].sender === message.sender;
           const trafficMark = (message.metadata?.trafficMark as string | undefined) || 'normal';
           const markLabel =
-            trafficMark === 'locked' ? 'Locked' :
-            trafficMark === 'sensitive' ? 'Sensitive' :
-            'Normal';
+            trafficMark === 'locked' ? 'SECRET' :
+            trafficMark === 'sensitive' ? 'CONF' :
+            'UNCLASS';
           const markClass =
             trafficMark === 'locked'
-              ? 'border-red-400/50 bg-red-500/10 text-red-300'
+              ? 'border-[#FF6B61]/50 bg-[#8C1D18]/20 text-[#FF6B61]'
               : trafficMark === 'sensitive'
-                ? 'border-amber-400/50 bg-amber-500/10 text-amber-300'
-                : 'border-green-400/35 bg-green-500/10 text-green-300';
+                ? 'border-[#F2B43C]/50 bg-[#1A1507] text-[#F2B43C]'
+                : 'border-[#1E5C3C] bg-[#36E27B]/10 text-[#36E27B]';
           
           return (
-            <div key={message.id} className={`space-y-1 md:space-y-2 ${isConsecutive ? 'mt-1 md:mt-2' : 'mt-3 md:mt-6'}`}>
+            <div key={message.id} className={`space-y-1 ${isConsecutive ? 'mt-1.5' : 'mt-4 md:mt-5'}`}>
               {showUsername && (
                 <div className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'}`}>
-                  <div className="flex items-center space-x-2 md:space-x-3">
-                    <span className="text-xs md:text-sm text-green-400/90 px-2 md:px-3 py-1 bg-green-500/10 rounded border border-green-500/30 font-mono font-medium">
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-sm border border-[#1E5C3C] bg-[#36E27B]/10 px-2.5 py-1 font-mono text-[11px] font-bold text-[#36E27B]">
                       {message.sender === 'me' ? 'You' : contactName}
                     </span>
-                    <span className="text-xs text-gray-400 font-mono">
+                    <span className="font-mono text-[9px] uppercase tracking-[0.08em] text-[#76897D]">
                       {message.timestamp}
                     </span>
                   </div>
@@ -127,10 +129,10 @@ export const MessageList = ({
                   contactName={contactName}
                 >
                   <div
-                    className={`max-w-[90%] md:max-w-[85%] lg:max-w-xl px-3 md:px-4 py-2 md:py-3 rounded cursor-pointer select-none border transition-all duration-200 hover:scale-[1.005] ${
+                    className={`max-w-[90%] cursor-pointer select-none rounded-sm border px-3 py-2 transition-colors md:max-w-[85%] md:px-4 md:py-3 lg:max-w-xl ${
                       message.sender === 'me'
-                        ? 'bg-black/95 text-green-300 border-green-500/55 shadow-lg shadow-green-500/15 hover:shadow-green-500/20'
-                        : 'bg-[#0b1510]/95 text-gray-100 border-green-500/15 shadow-lg hover:border-green-500/25'
+                        ? 'border-[#1E5C3C] bg-black/95 text-[#36E27B] shadow-[0_0_18px_rgba(54,226,123,0.12)] hover:border-[#36E27B]'
+                        : 'border-[#1C2B22] bg-[#101814] text-[#ECF7F0] shadow-lg hover:border-[#36513F]'
                     }`}
                     style={{ 
                       fontFamily: "'Fira Code', 'Source Code Pro', 'Consolas', 'Monaco', 'Courier New', monospace",
@@ -140,15 +142,15 @@ export const MessageList = ({
                     <BurnAfterReadMessage message={message}>
                       {/* Reply indicator */}
                       {message.replyTo && (
-                        <div className="mb-2 md:mb-3 p-2 md:p-3 bg-black/60 rounded-md md:rounded-lg border-l-2 border-green-400 shadow-inner">
-                          <p className="text-xs text-green-300 font-semibold mb-1 font-mono flex items-center space-x-1">
-                            <span className="text-green-500">{'>'}</span>
-                            <span>{message.replyTo.sender}</span>
-                          </p>
-                          <p className="text-xs opacity-90 truncate font-mono leading-relaxed">
-                            {message.replyTo.messageText}
-                          </p>
-                        </div>
+                          <div className="mb-2 border-l-2 border-[#36E27B] bg-black/60 p-2 shadow-inner">
+                            <p className="mb-1 flex items-center space-x-1 font-mono text-[10px] font-bold text-[#7BEFA9]">
+                              <span className="text-[#36E27B]">{'>'}</span>
+                              <span>{message.replyTo.sender}</span>
+                            </p>
+                            <p className="truncate font-mono text-[10px] leading-relaxed opacity-90">
+                              {message.replyTo.messageText}
+                            </p>
+                          </div>
                       )}
 
                       {message.attachment && (
@@ -167,38 +169,38 @@ export const MessageList = ({
 
                       {message.text && (
                         isGifUrl(message.text) ? (
-                          <div className="rounded-lg overflow-hidden">
+                          <div className="overflow-hidden rounded-sm">
                             <img
                               src={message.text}
                               alt="GIF"
-                              className="max-w-full h-auto rounded-lg"
+                              className="h-auto max-w-full rounded-sm"
                               style={{ maxHeight: '200px' }}
                               loading="lazy"
                             />
                           </div>
                         ) : (
-                          <p className="text-xs md:text-sm break-words font-mono leading-relaxed whitespace-pre-wrap">
+                          <p className="break-words font-mono text-[12px] leading-relaxed tracking-[0.03em] whitespace-pre-wrap md:text-[13px]">
                             {message.text}
                           </p>
                         )
                       )}
 
-                      <div className="flex items-center justify-between mt-2 md:mt-3 pt-1.5 md:pt-2 border-t border-green-500/10">
+                      <div className="mt-2 flex items-center justify-between border-t border-[#1C2B22]/70 pt-1.5">
                         <div className="flex items-center space-x-2 md:space-x-3">
-                          <span className={`rounded border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] ${markClass}`}>
+                          <span className={`rounded-sm border px-1.5 py-0.5 font-mono text-[8px] font-black uppercase tracking-[0.14em] ${markClass}`}>
                             {markLabel}
                           </span>
                           {message.encrypted && (
                             <div className="flex items-center space-x-1 md:space-x-1.5">
-                              <Shield className="w-2.5 h-2.5 md:w-3 md:h-3 text-green-400/80 animate-pulse" />
-                              <span className="text-xs text-green-400/70 font-mono font-medium">
+                              <Shield className="h-2.5 w-2.5 animate-pulse text-[#36E27B]/80 md:h-3 md:w-3" />
+                              <span className="font-mono text-[9px] font-bold uppercase tracking-[0.12em] text-[#36E27B]/70">
                                 {isMobile ? 'ENC' : 'PROTECTED'}
                               </span>
                             </div>
                           )}
                           {!showUsername && (
-                            <span className={`text-xs font-mono ${
-                              message.sender === 'me' ? 'text-green-300/60' : 'text-gray-400'
+                            <span className={`font-mono text-[9px] ${
+                              message.sender === 'me' ? 'text-[#36E27B]/60' : 'text-[#76897D]'
                             }`}>
                               {message.timestamp}
                             </span>
@@ -218,7 +220,7 @@ export const MessageList = ({
               {/* Subtle separator for consecutive messages */}
               {isConsecutive && index < messages.length - 1 && messages[index + 1].sender === message.sender && (
                 <div className="flex justify-center">
-                  <div className="w-1 h-1 bg-gray-600/30 rounded-full"></div>
+                  <div className="h-1 w-1 rounded-full bg-[#36513F]/40"></div>
                 </div>
               )}
             </div>

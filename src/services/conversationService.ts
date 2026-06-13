@@ -61,6 +61,7 @@ export interface Conversation {
       user_number: number;
       avatar_url: string | null;
       show_avatar?: boolean;
+      verified?: boolean;
     };
   }[];
 }
@@ -301,7 +302,8 @@ export const conversationService = {
             full_name: `${profileData.firstName || ''} ${profileData.lastName || ''}`.trim(),
             user_number: 0,
             avatar_url: profileData.showAvatar !== false ? (profileData.avatarUrl || null) : null,
-            show_avatar: profileData.showAvatar !== false
+            show_avatar: profileData.showAvatar !== false,
+            verified: !!profileData.verified
           } : null
         });
       }

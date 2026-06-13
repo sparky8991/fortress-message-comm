@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { MessageSquare, Clock } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
 import { useDirectMessages } from '@/hooks/useDirectMessages';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { auth } from '@/integrations/firebase/client';
@@ -23,6 +23,7 @@ type ContactItem = {
   type: 'direct';
   conversationId: string;
   unreadCount: number;
+  verified: boolean;
 };
 
 export const ContactList = ({
@@ -47,12 +48,14 @@ export const ContactList = ({
                                otherParticipant?.profiles?.full_name ||
                                'Unknown User';
         const participantAvatar = otherParticipant?.profiles?.avatar_url || '';
+        const lastMessage = conv.last_message_preview || 'NO TRAFFIC YET';
+        const verified = !!otherParticipant?.profiles?.verified;
 
         return {
           id: conv.id,
           name: participantName,
           status: 'online',
-          lastMessage: conv.last_message_preview || 'No messages yet',
+          lastMessage,
           time: conv.last_message_at ? new Date(conv.last_message_at).toLocaleTimeString([], {
             hour: '2-digit',
             minute: '2-digit'
@@ -60,7 +63,8 @@ export const ContactList = ({
           avatar: participantAvatar,
           type: 'direct',
           conversationId: conv.id,
-          unreadCount: conv.unread_count || 0
+          unreadCount: conv.unread_count || 0,
+          verified
         };
       });
       allContacts = [...directConversations];
@@ -87,69 +91,72 @@ export const ContactList = ({
   };
 
   return (
-    <div className="py-2">
+    <div className="py-0">
       {filteredContacts.length === 0 ? (
-        <div className="text-center px-5 py-9 text-green-500/55 font-mono">
-          <MessageSquare className="w-8 h-8 mx-auto mb-3 opacity-45" />
-          <p className="text-[10px] uppercase leading-relaxed tracking-[0.12em]">
+        <div className="px-5 py-9 text-center font-mono text-[#76897D]">
+          <MessageSquare className="mx-auto mb-3 h-8 w-8 opacity-45" />
+          <p className="text-[9px] uppercase leading-relaxed tracking-[0.18em]">
             {includeDirectMessages 
-              ? "No traffic yet. Search for users to open a channel."
-              : "No channels found"
+              ? "NO TRAFFIC YET. SEARCH CHANNELS TO OPEN COMMS."
+              : "NO CHANNELS FOUND"
             }
           </p>
         </div>
       ) : (
-        <div className="space-y-0.5">
+        <div>
           {filteredContacts.map((contact) => (
             <div
               key={contact.id}
               onClick={() => handleContactClick(contact)}
-              className={`cursor-pointer border-l-2 px-3 py-2.5 transition-colors group ${
+              className={`group cursor-pointer border-l-2 px-3.5 py-2.5 transition-colors ${
                 activeChat === contact.id || activeChat === contact.conversationId
-                  ? 'bg-green-500/13 border-green-400'
-                  : 'border-transparent hover:bg-green-500/7'
+                  ? 'border-[#36E27B] bg-[#0E2A1A]'
+                  : 'border-transparent hover:bg-[#101814]'
               }`}
             >
-              <div className="flex items-center space-x-2.5">
-                <div className="relative">
-                  <Avatar className="w-9 h-9 rounded-sm">
+              <div className="flex items-center gap-2.5">
+                <div className="relative flex-none">
+                  <Avatar className="h-[38px] w-[38px] rounded-sm">
                     <AvatarImage src={contact.avatar} />
-                    <AvatarFallback className="rounded-sm bg-green-500/15 border border-green-500/25 text-green-200 text-xs font-mono font-bold">
+                    <AvatarFallback className="rounded-sm border border-[#1E5C3C] bg-[#12301F] font-mono text-[13px] font-black text-[#7BEFA9]">
                       {getContactInitials(contact.name)}
                     </AvatarFallback>
                   </Avatar>
                   
                   {/* Status indicator */}
-                  <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border border-[#06100b] ${
-                    contact.status === 'online' ? 'bg-green-500' : 
-                    contact.status === 'away' ? 'bg-yellow-500' : 'bg-gray-500'
+                  <div className={`absolute -bottom-[3px] -right-[3px] h-[9px] w-[9px] rounded-full border-2 border-[#07100b] ${
+                    contact.status === 'online' ? 'bg-[#36E27B]' :
+                    contact.status === 'away' ? 'bg-[#F2B43C]' : 'bg-[#4A5A50]'
                   }`} />
                 </div>
                 
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <h3 className="font-mono font-bold text-[13px] text-white truncate">{contact.name}</h3>
-                      <div className="flex items-center space-x-1">
-                        <span className="text-[8px] text-green-400/70 font-mono font-bold uppercase tracking-[0.12em]">VER</span>
-                      </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-baseline gap-1.5">
+                    <div className="flex min-w-0 items-baseline gap-1.5">
+                      <h3 className="truncate font-mono text-[12px] font-black text-[#ECF7F0]">{contact.name}</h3>
+                      <span
+                        className={`flex-none font-mono text-[8px] font-black uppercase tracking-[0.12em] ${
+                          contact.verified ? 'text-[#36E27B]' : 'text-[#F2B43C]'
+                        }`}
+                      >
+                        {contact.verified ? 'VER' : 'UNVER'}
+                      </span>
                     </div>
-                    <div className="flex items-center space-x-1.5">
+                    <div className="ml-auto flex flex-none items-center gap-1.5">
                       {contact.unreadCount > 0 && (
-                        <span className="min-w-4 h-4 px-1 bg-green-500 text-black text-[10px] font-black rounded-full flex items-center justify-center">
+                        <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-[#36E27B] px-1.5 font-mono text-[8px] font-black text-[#06130B]">
                           {contact.unreadCount > 99 ? '99+' : contact.unreadCount}
                         </span>
                       )}
                       {contact.time && (
-                        <span className="text-[9px] text-green-500/55 flex items-center font-mono">
-                          <Clock className="w-2.5 h-2.5 mr-1" />
+                        <span className="font-mono text-[8px] uppercase tracking-[0.08em] text-[#4A5A50]">
                           {contact.time}
                         </span>
                       )}
                     </div>
                   </div>
                   
-                  <p className="text-[10px] text-green-500/55 truncate mt-0.5 font-mono uppercase tracking-[0.08em]">
+                  <p className="mt-1 truncate font-mono text-[10px] uppercase tracking-[0.08em] text-[#76897D]">
                     {contact.lastMessage}
                   </p>
                 </div>

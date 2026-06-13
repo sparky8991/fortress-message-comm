@@ -1,18 +1,62 @@
 
 import React, { useState, useEffect } from 'react';
-import { Shield, Key, Lock, Eye, EyeOff, Fingerprint, Smartphone, Wifi, Loader2, AlertTriangle, KeyRound, Settings } from 'lucide-react';
-import { Switch } from '@/components/ui/switch';
+import { Shield, Key, Lock, EyeOff, Fingerprint, Smartphone, Wifi, Loader2, AlertTriangle, KeyRound, Settings } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useUserSettings } from '@/hooks/useUserSettings';
 import { useUserRisk } from '@/contexts/UserRiskContext';
 import { HoldPanicButton } from './HoldPanicButton';
 import { PinSetup } from './ScreenLock';
+import { Chip, Toggle } from './tactical';
+
+const SectionTitle = ({
+  icon: Icon,
+  children,
+}: {
+  icon: React.ElementType;
+  children: React.ReactNode;
+}) => (
+  <div className="flex items-center gap-2 border-b border-[#141E18] pb-2">
+    <Icon className="h-3.5 w-3.5 text-[#36E27B]" />
+    <h3 className="font-mono text-[9px] font-black uppercase tracking-[0.18em] text-[#ECF7F0]">
+      {children}
+    </h3>
+  </div>
+);
+
+const StatusLine = ({ label, value, muted }: { label: string; value: string; muted?: boolean }) => (
+  <div className="flex items-center justify-between gap-3 font-mono">
+    <span className="text-[8px] uppercase tracking-[0.14em] text-[#76897D]">{label}</span>
+    <span className={`text-right text-[8px] font-black uppercase tracking-[0.12em] ${muted ? 'text-[#76897D]' : 'text-[#36E27B]'}`}>
+      {value}
+    </span>
+  </div>
+);
+
+const SecurityRow = ({
+  icon: Icon,
+  title,
+  description,
+  children,
+}: {
+  icon: React.ElementType;
+  title: string;
+  description: string;
+  children: React.ReactNode;
+}) => (
+  <div className="flex items-center gap-2.5 rounded-sm border border-[#1C2B22] bg-[#101814] px-3 py-2.5">
+    <Icon className="h-4 w-4 flex-none text-[#36E27B]" />
+    <div className="min-w-0 flex-1">
+      <div className="font-mono text-[9px] font-black uppercase tracking-[0.12em] text-[#ECF7F0]">{title}</div>
+      <div className="mt-0.5 font-mono text-[8px] uppercase tracking-[0.08em] text-[#76897D]">{description}</div>
+    </div>
+    {children}
+  </div>
+);
 
 export const SecurityPanel = () => {
   const { settings: userSettings, updateSecuritySettings, loading } = useUserSettings();
-  const { riskLevel, isFeatureVisible, setRiskLevel } = useUserRisk();
+  const { riskLevel, setRiskLevel } = useUserRisk();
   const [autoDeleteMessages, setAutoDeleteMessages] = useState(true);
   const [screenshotProtection, setScreenshotProtection] = useState(true);
   const [biometricLock, setBiometricLock] = useState(true);
@@ -36,7 +80,7 @@ export const SecurityPanel = () => {
     }
   }, [userSettings]);
 
-  const handleSettingChange = (setter: (value: any) => void, value: any) => {
+  const handleSettingChange = <T,>(setter: (value: T) => void, value: T) => {
     setter(value);
     setHasChanges(true);
   };
@@ -59,286 +103,208 @@ export const SecurityPanel = () => {
   };
 
   return (
-    <div className="p-4 space-y-6">
-      {/* Security Status */}
-      <div className="bg-green-500 bg-opacity-10 border border-green-500 rounded-lg p-4">
-        <div className="flex items-center space-x-3 mb-3">
-          <Shield className="w-6 h-6 text-green-500" />
-          <h3 className="text-lg font-semibold text-white">Security Status</h3>
-          {loading && <Loader2 className="w-4 h-4 animate-spin text-green-500" />}
+    <div className="space-y-4 px-3 py-3 font-mono text-[#DCEAE1]">
+      <section className="rounded-sm border border-[#1E5C3C] bg-[#36E27B]/[0.06] p-3">
+        <div className="mb-3 flex items-center gap-2">
+          <Shield className="h-4 w-4 text-[#36E27B]" />
+          <h3 className="font-mono text-[10px] font-black uppercase tracking-[0.18em] text-[#ECF7F0]">
+            Security Status
+          </h3>
+          {loading && <Loader2 className="ml-auto h-3.5 w-3.5 animate-spin text-[#36E27B]" />}
         </div>
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-gray-300">Encryption Level</span>
-            <span className="text-green-500 font-medium">Military Grade</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-gray-300">Key Exchange</span>
-            <span className="text-green-500 font-medium">Verified</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-gray-300">Forward Secrecy</span>
-            <span className="text-green-500 font-medium">Active</span>
-          </div>
+          <StatusLine label="Channel" value="Protected" />
+          <StatusLine label="Key exchange" value="Active" />
+          <StatusLine label="Locked payloads" value="Separate keys" />
         </div>
-      </div>
+      </section>
 
-      {/* Security Settings */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-white flex items-center space-x-2">
-            <Key className="w-5 h-5" />
-            <span>Security Settings</span>
-          </h3>
+      <section className="space-y-2.5">
+        <div className="flex items-center justify-between gap-2">
+          <SectionTitle icon={Key}>Security Settings</SectionTitle>
           {hasChanges && (
-            <Button 
-              onClick={handleSaveSettings} 
+            <Button
+              onClick={handleSaveSettings}
               disabled={saving || loading}
-              className="bg-green-600 hover:bg-green-700 text-sm"
+              className="h-7 rounded-sm bg-[#36E27B] px-2.5 font-mono text-[8px] font-black uppercase tracking-[0.12em] text-[#06130B] hover:bg-[#7BEFA9]"
             >
-              {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              Save Changes
+              {saving && <Loader2 className="mr-1.5 h-3 w-3 animate-spin" />}
+              Save
             </Button>
           )}
         </div>
-        
-        <div className="space-y-3">
-          <div className="flex items-center justify-between p-3 bg-gray-800 rounded-lg">
-            <div className="flex items-center space-x-3">
-              <Lock className="w-5 h-5 text-green-500" />
-              <div>
-                <p className="text-white font-medium">Auto-delete Messages</p>
-                <p className="text-gray-400 text-sm">Messages deleted after {autoDeleteTimer} hours</p>
-              </div>
+
+        <SecurityRow
+          icon={Lock}
+          title="Auto-delete"
+          description={`Default cleanup after ${autoDeleteTimer} hours`}
+        >
+          <Toggle
+            on={autoDeleteMessages}
+            onClick={() => handleSettingChange(setAutoDeleteMessages, !autoDeleteMessages)}
+            aria-label="Toggle auto delete"
+          />
+        </SecurityRow>
+
+        {autoDeleteMessages && (
+          <div className="rounded-sm border border-[#1C2B22] bg-[#0F1612] p-2.5">
+            <div className="mb-2 font-mono text-[8px] uppercase tracking-[0.2em] text-[#76897D]">
+              Cleanup window
             </div>
-            <Switch
-              checked={autoDeleteMessages}
-              onCheckedChange={(checked) => handleSettingChange(setAutoDeleteMessages, checked)}
+            <div className="flex flex-wrap gap-1.5">
+              {[1, 24, 168].map((hours) => (
+                <Chip
+                  key={hours}
+                  label={hours === 1 ? '1H' : hours === 24 ? '24H' : '7D'}
+                  active={autoDeleteTimer === hours}
+                  onClick={() => handleSettingChange(setAutoDeleteTimer, hours)}
+                />
+              ))}
+            </div>
+            <Input
+              id="autoDeleteTimer"
+              type="number"
+              min="1"
+              max="168"
+              value={autoDeleteTimer}
+              onChange={(e) => handleSettingChange(setAutoDeleteTimer, Number(e.target.value))}
+              className="mt-2 h-8 rounded-sm border-[#1C2B22] bg-[#101814] font-mono text-[10px] text-[#DCEAE1] focus-visible:ring-[#36E27B]"
               disabled={loading}
             />
           </div>
+        )}
 
-          {autoDeleteMessages && (
-            <div className="ml-8 p-3 bg-gray-700 rounded-lg">
-              <Label htmlFor="autoDeleteTimer" className="text-white text-sm">
-                Auto-delete timer (hours)
-              </Label>
-              <Input
-                id="autoDeleteTimer"
-                type="number"
-                min="1"
-                max="168"
-                value={autoDeleteTimer}
-                onChange={(e) => handleSettingChange(setAutoDeleteTimer, Number(e.target.value))}
-                className="mt-2 bg-gray-600 border-gray-500 text-white"
-                disabled={loading}
-              />
-            </div>
-          )}
+        <SecurityRow
+          icon={EyeOff}
+          title="Screenshot protection"
+          description="Stored preference for supported builds"
+        >
+          <Toggle
+            on={screenshotProtection}
+            onClick={() => handleSettingChange(setScreenshotProtection, !screenshotProtection)}
+            aria-label="Toggle screenshot protection"
+          />
+        </SecurityRow>
 
-          <div className="flex items-center justify-between p-3 bg-gray-800 rounded-lg">
-            <div className="flex items-center space-x-3">
-              <EyeOff className="w-5 h-5 text-green-500" />
-              <div>
-                <p className="text-white font-medium">Screenshot Protection</p>
-                <p className="text-gray-400 text-sm">Prevent screenshots in chats</p>
-              </div>
-            </div>
-            <Switch
-              checked={screenshotProtection}
-              onCheckedChange={(checked) => handleSettingChange(setScreenshotProtection, checked)}
-              disabled={loading}
-            />
-          </div>
+        <SecurityRow
+          icon={Fingerprint}
+          title="Biometric lock"
+          description="Planned mobile unlock preference"
+        >
+          <Toggle
+            on={biometricLock}
+            onClick={() => handleSettingChange(setBiometricLock, !biometricLock)}
+            aria-label="Toggle biometric lock"
+          />
+        </SecurityRow>
+      </section>
 
-          <div className="flex items-center justify-between p-3 bg-gray-800 rounded-lg">
-            <div className="flex items-center space-x-3">
-              <Fingerprint className="w-5 h-5 text-green-500" />
-              <div>
-                <p className="text-white font-medium">Biometric Lock</p>
-                <p className="text-gray-400 text-sm">Require fingerprint to open</p>
-              </div>
-            </div>
-            <Switch
-              checked={biometricLock}
-              onCheckedChange={(checked) => handleSettingChange(setBiometricLock, checked)}
-              disabled={loading}
-            />
-          </div>
+      <section className="space-y-2.5">
+        <SectionTitle icon={Smartphone}>Device Security</SectionTitle>
+        <div className="space-y-2 rounded-sm border border-[#1C2B22] bg-[#101814] p-3">
+          <StatusLine label="This device" value="Verified" />
+          <StatusLine label="Last verified" value="2 minutes ago" muted />
+          <StatusLine label="Device ID" value="DEV-A7B9C2E1" muted />
         </div>
-      </div>
+      </section>
 
-      {/* Device Security */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-white flex items-center space-x-2">
-          <Smartphone className="w-5 h-5" />
-          <span>Device Security</span>
-        </h3>
-        
-        <div className="bg-gray-800 rounded-lg p-4">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-gray-300">This Device</span>
-              <span className="text-green-500 font-medium">Verified</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-300">Last Verified</span>
-              <span className="text-gray-300">2 minutes ago</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-300">Device ID</span>
-              <span className="text-gray-300 font-mono text-sm">DEV-A7B9C2E1</span>
-            </div>
-          </div>
+      <section className="space-y-2.5">
+        <SectionTitle icon={Wifi}>Network Security</SectionTitle>
+        <div className="space-y-2 rounded-sm border border-[#1C2B22] bg-[#101814] p-3">
+          <StatusLine label="Connection" value="Secure" />
+          <StatusLine label="Transport" value="TLS" />
+          <StatusLine label="Routing" value="Standard web" muted />
         </div>
-      </div>
+      </section>
 
-      {/* Network Security */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-white flex items-center space-x-2">
-          <Wifi className="w-5 h-5" />
-          <span>Network Security</span>
-        </h3>
+      <section className="space-y-2.5">
+        <SectionTitle icon={KeyRound}>App Lock</SectionTitle>
+        <SecurityRow
+          icon={Lock}
+          title="PIN lock"
+          description={pinEnabled ? 'PIN protection is enabled' : 'Require PIN to open app'}
+        >
+          <button
+            type="button"
+            onClick={() => setShowPinSetup(true)}
+            className="fortress-focus rounded-sm border border-[#1E5C3C] px-2 py-1 font-mono text-[8px] font-black uppercase tracking-[0.12em] text-[#36E27B] hover:bg-[#36E27B]/10"
+          >
+            {pinEnabled ? 'Change' : 'Set up'}
+          </button>
+        </SecurityRow>
 
-        <div className="bg-gray-800 rounded-lg p-4">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-gray-300">Connection</span>
-              <span className="text-green-500 font-medium">Secure</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-300">VPN Status</span>
-              <span className="text-green-500 font-medium">Active</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-300">Tor Routing</span>
-              <span className="text-green-500 font-medium">Enabled</span>
-            </div>
-          </div>
-        </div>
-      </div>
+        <SecurityRow
+          icon={AlertTriangle}
+          title="Panic PIN"
+          description={panicPinEnabled ? 'Decoy PIN is set' : 'Set a high-risk decoy PIN'}
+        >
+          <button
+            type="button"
+            onClick={() => setShowPanicPinSetup(true)}
+            className="fortress-focus rounded-sm border border-[#5C2420] px-2 py-1 font-mono text-[8px] font-black uppercase tracking-[0.12em] text-[#FF6B61] hover:bg-red-500/10"
+          >
+            {panicPinEnabled ? 'Change' : 'Set up'}
+          </button>
+        </SecurityRow>
 
-      {/* PIN Lock */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-white flex items-center space-x-2">
-          <KeyRound className="w-5 h-5" />
-          <span>App Lock</span>
-        </h3>
+        {pinEnabled && (
+          <button
+            type="button"
+            onClick={() => {
+              localStorage.removeItem('securechat_pin');
+              setPinEnabled(false);
+            }}
+            className="fortress-focus w-full rounded-sm border border-[#1C2B22] bg-transparent px-3 py-2 font-mono text-[8px] font-black uppercase tracking-[0.14em] text-[#76897D] hover:border-[#5C2420] hover:text-[#FF6B61]"
+          >
+            Disable PIN lock
+          </button>
+        )}
+      </section>
 
-        <div className="space-y-3">
-          <div className="flex items-center justify-between p-3 bg-gray-800 rounded-lg">
-            <div className="flex items-center space-x-3">
-              <Lock className="w-5 h-5 text-green-500" />
-              <div>
-                <p className="text-white font-medium">PIN Lock</p>
-                <p className="text-gray-400 text-sm">
-                  {pinEnabled ? 'PIN protection is enabled' : 'Require PIN to open app'}
-                </p>
-              </div>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowPinSetup(true)}
-              className="border-green-600 text-green-400 hover:bg-green-600/20"
-            >
-              {pinEnabled ? 'Change' : 'Set Up'}
-            </Button>
-          </div>
-
-          <div className="flex items-center justify-between p-3 bg-gray-800 rounded-lg">
-            <div className="flex items-center space-x-3">
-              <AlertTriangle className="w-5 h-5 text-red-500" />
-              <div>
-                <p className="text-white font-medium">Panic PIN</p>
-                <p className="text-gray-400 text-sm">
-                  {panicPinEnabled ? 'Decoy PIN is set' : 'Set a PIN that wipes all data'}
-                </p>
-              </div>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowPanicPinSetup(true)}
-              className="border-red-600 text-red-400 hover:bg-red-600/20"
-            >
-              {panicPinEnabled ? 'Change' : 'Set Up'}
-            </Button>
-          </div>
-
-          {pinEnabled && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                localStorage.removeItem('securechat_pin');
-                setPinEnabled(false);
-              }}
-              className="w-full text-gray-400 hover:text-red-400"
-            >
-              Disable PIN Lock
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {/* Emergency Actions - Always accessible, prominence varies by risk level */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-white flex items-center space-x-2">
-          <AlertTriangle className="w-5 h-5 text-red-500" />
-          <span>Emergency</span>
-        </h3>
-
-        <div className="bg-red-900/20 border border-red-800/50 rounded-xl p-4">
-          <p className="text-gray-300 text-sm mb-4">
+      <section className="space-y-2.5">
+        <SectionTitle icon={AlertTriangle}>Emergency</SectionTitle>
+        <div className="rounded-sm border border-[#5C2420] bg-red-950/15 p-3">
+          <p className="mb-3 font-mono text-[8px] uppercase leading-relaxed tracking-[0.1em] text-red-200/80">
             {riskLevel === 'high-risk'
-              ? 'Hold the button below for 3 seconds to wipe all your messages, conversations, and local data. This action cannot be undone.'
-              : 'Emergency data wipe is available if you need to quickly clear all your data. This action cannot be undone.'}
+              ? 'Hold for 3 seconds to wipe messages, conversations, and local data.'
+              : 'Emergency wipe is available when sensitive data must be cleared quickly.'}
           </p>
           <HoldPanicButton variant="full" />
         </div>
-      </div>
+      </section>
 
-      {/* Security Experience Toggle */}
-      <div className="space-y-4 pt-4 border-t border-gray-700">
-        <h3 className="text-lg font-semibold text-white flex items-center space-x-2">
-          <Settings className="w-5 h-5" />
-          <span>Security Experience</span>
-        </h3>
-
-        <div className="bg-gray-800 rounded-xl p-4 space-y-3">
-          <p className="text-gray-400 text-sm">
-            Adjust which security features are shown based on your needs.
+      <section className="space-y-2.5 border-t border-[#141E18] pt-4">
+        <SectionTitle icon={Settings}>Security Experience</SectionTitle>
+        <div className="rounded-sm border border-[#1C2B22] bg-[#101814] p-3">
+          <p className="mb-3 font-mono text-[8px] uppercase tracking-[0.1em] text-[#76897D]">
+            Adjust which advanced controls are visible in the app.
           </p>
-          <div className="flex gap-2">
+          <div className="grid grid-cols-2 gap-1.5">
             <button
+              type="button"
               onClick={() => setRiskLevel('normal')}
-              className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${
+              className={`fortress-focus rounded-sm border px-3 py-2 font-mono text-[8px] font-black uppercase tracking-[0.14em] transition-colors ${
                 riskLevel === 'normal'
-                  ? 'bg-green-600 text-black'
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  ? 'border-[#36E27B] bg-[#36E27B]/15 text-[#36E27B]'
+                  : 'border-[#1C2B22] text-[#76897D] hover:border-[#1E5C3C] hover:text-[#DCEAE1]'
               }`}
             >
               Standard
             </button>
             <button
+              type="button"
               onClick={() => setRiskLevel('high-risk')}
-              className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${
+              className={`fortress-focus rounded-sm border px-3 py-2 font-mono text-[8px] font-black uppercase tracking-[0.14em] transition-colors ${
                 riskLevel === 'high-risk'
-                  ? 'bg-green-600 text-black'
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  ? 'border-[#36E27B] bg-[#36E27B]/15 text-[#36E27B]'
+                  : 'border-[#1C2B22] text-[#76897D] hover:border-[#1E5C3C] hover:text-[#DCEAE1]'
               }`}
             >
-              High-Risk
+              High Risk
             </button>
           </div>
-          <p className="text-gray-500 text-xs">
-            {riskLevel === 'high-risk'
-              ? 'Advanced protection features are enabled for sensitive situations.'
-              : 'Simple experience with strong default privacy.'}
-          </p>
         </div>
-      </div>
+      </section>
 
       {/* PIN Setup Modal */}
       {showPinSetup && (

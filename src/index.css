@@ -99,6 +99,8 @@
 
   body {
     @apply bg-background text-foreground;
+    background: #030806;
+    color: #DCEAE1;
   }
 }
 
@@ -172,26 +174,26 @@
 
   .fortress-shell {
     background:
-      linear-gradient(rgba(34, 197, 94, 0.035) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(34, 197, 94, 0.025) 1px, transparent 1px),
+      linear-gradient(rgba(54, 226, 123, 0.018) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(54, 226, 123, 0.015) 1px, transparent 1px),
       #030806;
-    background-size: 42px 42px;
+    background-size: 44px 44px;
   }
 
   .fortress-panel {
-    @apply border border-green-500/20 bg-[#06100b]/95 shadow-[0_0_0_1px_rgba(34,197,94,0.04),0_16px_48px_rgba(0,0,0,0.28)];
+    @apply border border-[#1C2B22] bg-[#101814] shadow-[0_0_0_1px_rgba(54,226,123,0.035),0_16px_48px_rgba(0,0,0,0.28)];
   }
 
   .fortress-panel-muted {
-    @apply border border-green-500/15 bg-[#08120d]/85;
+    @apply border border-[#1C2B22] bg-[#0F1612]/90;
   }
 
   .fortress-command {
-    @apply font-mono uppercase tracking-[0.18em] text-[10px] text-green-400/75;
+    @apply font-mono uppercase tracking-[0.2em] text-[8px] text-[#76897D];
   }
 
   .fortress-command-strong {
-    @apply font-mono uppercase tracking-[0.16em] text-[11px] font-semibold text-green-300;
+    @apply font-mono uppercase tracking-[0.16em] text-[9px] font-extrabold text-[#36E27B];
   }
 
   .fortress-focus {

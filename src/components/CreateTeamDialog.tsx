@@ -3,11 +3,11 @@ import React, { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { auth, db } from '@/integrations/firebase/client';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from 'lucide-react';
+import { Loader2, Users } from 'lucide-react';
 
 const createTeam = async (teamName: string) => {
   const user = auth.currentUser;
@@ -77,32 +77,53 @@ export const CreateTeamDialog = ({ isOpen, onOpenChange }: CreateTeamDialogProps
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-gray-800 border-gray-700 text-white">
+      <DialogContent className="max-w-[440px] rounded-sm border-[#1E5C3C] bg-[#0C120F] p-0 font-mono text-[#DCEAE1] shadow-[0_0_50px_rgba(0,0,0,0.55)]">
         <DialogHeader>
-          <DialogTitle>Create a New Team</DialogTitle>
-          <DialogDescription className="text-gray-400">
-            Enter a name for your new team. You can invite members later.
+          <div className="border-b border-[#1C2B22] px-4 py-3">
+            <DialogTitle className="flex items-center gap-2 font-mono text-[11px] font-black uppercase tracking-[0.18em] text-[#36E27B]">
+              <Users className="h-4 w-4" />
+              Create Team Channel
+            </DialogTitle>
+          </div>
+          <DialogDescription className="px-4 pt-3 font-mono text-[8px] uppercase leading-relaxed tracking-[0.12em] text-[#76897D]">
+            Enter a team name. You can invite operators after the channel is created.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
+        <form onSubmit={handleSubmit} className="px-4 pb-4 pt-3">
+          <div className="grid gap-2">
+            <label htmlFor="name" className="font-mono text-[8px] font-black uppercase tracking-[0.18em] text-[#76897D]">
+              Team name
+            </label>
             <Input
               id="name"
               value={teamName}
               onChange={(e) => setTeamName(e.target.value)}
-              placeholder="Team Name (e.g., Alpha Squad)"
-              className="bg-gray-700 border-gray-600 text-white"
+              placeholder="ALPHA SQUAD"
+              className="h-10 rounded-sm border-[#1C2B22] bg-[#070B09] font-mono text-[12px] text-[#ECF7F0] placeholder:text-[#4A5A50] focus-visible:ring-[#36E27B]"
             />
+            <p className="font-mono text-[8px] uppercase tracking-[0.12em] text-[#76897D]">
+              Minimum 3 characters. Team creator receives owner role.
+            </p>
           </div>
-          <DialogFooter>
+          <div className="mt-5 flex justify-end gap-2 border-t border-[#1C2B22] pt-4">
             <DialogClose asChild>
-              <Button type="button" variant="ghost">Cancel</Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="h-9 rounded-sm border-[#1C2B22] bg-transparent px-4 font-mono text-[8px] font-black uppercase tracking-[0.16em] text-[#76897D] hover:border-[#1E5C3C] hover:bg-[#36E27B]/10 hover:text-[#DCEAE1]"
+              >
+                Cancel
+              </Button>
             </DialogClose>
-            <Button type="submit" disabled={mutation.isPending} className="bg-green-500 hover:bg-green-600">
-              {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Create Team
+            <Button
+              type="submit"
+              disabled={mutation.isPending}
+              className="h-9 rounded-sm bg-[#36E27B] px-4 font-mono text-[8px] font-black uppercase tracking-[0.16em] text-[#06130B] hover:bg-[#7BEFA9]"
+            >
+              {mutation.isPending && <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />}
+              Create
             </Button>
-          </DialogFooter>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

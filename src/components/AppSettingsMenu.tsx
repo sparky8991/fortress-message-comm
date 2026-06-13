@@ -37,6 +37,11 @@ interface AppSettingsMenuProps {
 const getErrorMessage = (error: unknown) =>
   error instanceof Error ? error.message : 'Failed to log out. Please try again.';
 
+const menuItemClass =
+  'cursor-pointer rounded-sm px-2.5 py-2 font-mono text-[9px] font-bold uppercase tracking-[0.12em] text-[#DCEAE1] hover:bg-[#36E27B]/10 hover:text-[#36E27B] focus:bg-[#36E27B]/10 focus:text-[#36E27B]';
+
+const menuIconClass = 'mr-2 h-3.5 w-3.5 text-[#76897D]';
+
 export const AppSettingsMenu = ({ triggerClassName, profile, onEditCallSign }: AppSettingsMenuProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -92,82 +97,82 @@ export const AppSettingsMenu = ({ triggerClassName, profile, onEditCallSign }: A
             title="Open settings"
             aria-label="Open settings menu"
           >
-            <Settings className="w-4 h-4" />
+            <Settings className="h-3.5 w-3.5" />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="end"
-          className="w-60 bg-[#06100b] border-green-500/20 text-white shadow-xl"
+          className="w-64 rounded-sm border-[#1C2B22] bg-[#0C120F] p-1 font-mono text-[#DCEAE1] shadow-[0_18px_60px_rgba(0,0,0,0.55)]"
           sideOffset={8}
         >
-          <DropdownMenuLabel className="text-green-400 font-mono text-xs tracking-[0.16em] uppercase">
+          <DropdownMenuLabel className="px-2.5 py-2 font-mono text-[9px] font-black uppercase tracking-[0.2em] text-[#36E27B]">
             Terminal Settings
           </DropdownMenuLabel>
-          <DropdownMenuSeparator className="bg-green-500/15" />
+          <DropdownMenuSeparator className="bg-[#141E18]" />
 
           <DropdownMenuItem
             onClick={() => openSettings('profile')}
-            className="hover:bg-green-500/10 focus:bg-green-500/10 cursor-pointer"
+            className={menuItemClass}
           >
-            <User className="mr-2 h-4 w-4 text-green-500" />
+            <User className={menuIconClass} />
             <span>Operator Profile</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => openSettings('notifications')}
-            className="hover:bg-green-500/10 focus:bg-green-500/10 cursor-pointer"
+            className={menuItemClass}
           >
-            <Bell className="mr-2 h-4 w-4 text-blue-500" />
+            <Bell className={menuIconClass} />
             <span>Notifications</span>
           </DropdownMenuItem>
 
-          <DropdownMenuSeparator className="bg-green-500/15" />
+          <DropdownMenuSeparator className="bg-[#141E18]" />
 
           <DropdownMenuItem
             onClick={() => openSettings('security')}
-            className="hover:bg-green-500/10 focus:bg-green-500/10 cursor-pointer"
+            className={menuItemClass}
           >
-            <Shield className="mr-2 h-4 w-4 text-purple-500" />
+            <Shield className={menuIconClass} />
             <span>Privacy & Security</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => openSettings('calls')}
-            className="hover:bg-green-500/10 focus:bg-green-500/10 cursor-pointer"
+            className={menuItemClass}
           >
-            <Phone className="mr-2 h-4 w-4 text-orange-500" />
+            <Phone className={menuIconClass} />
             <span>Call Settings</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => openSettings('chat')}
-            className="hover:bg-green-500/10 focus:bg-green-500/10 cursor-pointer"
+            className={menuItemClass}
           >
-            <MessageSquare className="mr-2 h-4 w-4 text-cyan-500" />
+            <MessageSquare className={menuIconClass} />
             <span>Chat Behavior</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => openSettings('theme')}
-            className="hover:bg-green-500/10 focus:bg-green-500/10 cursor-pointer"
+            className={menuItemClass}
           >
-            <Palette className="mr-2 h-4 w-4 text-pink-500" />
+            <Palette className={menuIconClass} />
             <span>Terminal Theme</span>
           </DropdownMenuItem>
 
-          <DropdownMenuSeparator className="bg-green-500/15" />
+          <DropdownMenuSeparator className="bg-[#141E18]" />
 
           <DropdownMenuItem
             onClick={() => openSettings('about')}
-            className="hover:bg-green-500/10 focus:bg-green-500/10 cursor-pointer"
+            className={menuItemClass}
           >
-            <Info className="mr-2 h-4 w-4 text-gray-400" />
+            <Info className={menuIconClass} />
             <span>About SecureChat</span>
           </DropdownMenuItem>
 
-          <DropdownMenuSeparator className="bg-green-500/15" />
+          <DropdownMenuSeparator className="bg-[#141E18]" />
 
           <DropdownMenuItem
             onClick={handleLogout}
-            className="hover:bg-red-900/50 focus:bg-red-900/50 cursor-pointer text-red-400 hover:text-red-300"
+            className="cursor-pointer rounded-sm px-2.5 py-2 font-mono text-[9px] font-bold uppercase tracking-[0.12em] text-[#FF6B61] hover:bg-red-500/10 hover:text-[#FF8A82] focus:bg-red-500/10 focus:text-[#FF8A82]"
           >
-            <LogOut className="mr-2 h-4 w-4" />
+            <LogOut className="mr-2 h-3.5 w-3.5" />
             <span>Logout</span>
           </DropdownMenuItem>
         </DropdownMenuContent>

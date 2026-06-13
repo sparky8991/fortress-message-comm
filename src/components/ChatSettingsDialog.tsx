@@ -1,12 +1,11 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { MessageSquare } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, Send, Eye, CheckCheck, Image, Bell } from 'lucide-react';
 import { useUserSettings } from '@/hooks/useUserSettings';
 import { ChatSettings } from '@/services/userSettingsService';
+import { FORTRESS } from '@/lib/fortress';
+import { SettingRow, Toggle } from '@/components/tactical';
 
 interface ChatSettingsDialogProps {
   isOpen: boolean;
@@ -19,8 +18,8 @@ export const ChatSettingsDialog = ({ isOpen, onClose }: ChatSettingsDialogProps)
     enterToSend: true,
     showTypingIndicator: true,
     showReadReceipts: true,
-    messagePreview: true,
-    mediaAutoDownload: true
+    messagePreview: false,
+    mediaAutoDownload: true,
   });
 
   useEffect(() => {
@@ -29,105 +28,102 @@ export const ChatSettingsDialog = ({ isOpen, onClose }: ChatSettingsDialogProps)
     }
   }, [settings]);
 
+  const setLocal = (patch: Partial<ChatSettings>) => {
+    setLocalSettings((current) => ({ ...current, ...patch }));
+  };
+
   const handleSave = async () => {
     await updateChatSettings(localSettings);
     onClose();
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-gray-800 border-gray-700 text-white max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center space-x-2 text-cyan-400">
-            <MessageSquare className="w-5 h-5" />
-            <span>Chat Settings</span>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent
+        className="max-w-md overflow-hidden rounded-sm p-0 font-mono shadow-[0_18px_80px_rgba(0,0,0,0.65)]"
+        style={{ background: FORTRESS.surface, borderColor: FORTRESS.borderGreen, color: FORTRESS.text }}
+      >
+        <DialogHeader
+          className="flex-row items-center justify-between border-b px-4 py-3 pr-12"
+          style={{ borderColor: FORTRESS.borderFaint }}
+        >
+          <DialogTitle className="flex items-center gap-2 font-mono text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#36E27B]">
+            <MessageSquare className="h-3.5 w-3.5" />
+            Chat Behavior
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
-          {/* Enter to Send */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Send className="w-5 h-5 text-green-400" />
-              <div>
-                <Label className="text-white font-medium">Enter to Send</Label>
-                <p className="text-xs text-gray-400">Press Enter to send messages</p>
-              </div>
-            </div>
-            <Switch
-              checked={localSettings.enterToSend}
-              onCheckedChange={(checked) => setLocalSettings({ ...localSettings, enterToSend: checked })}
+        <div className="space-y-2 p-4">
+          <SettingRow title="Enter to Send" desc="Press Enter to transmit messages.">
+            <Toggle
+              on={localSettings.enterToSend}
+              onClick={() => setLocal({ enterToSend: !localSettings.enterToSend })}
+              aria-label="Toggle enter to send"
             />
-          </div>
+          </SettingRow>
 
-          {/* Typing Indicator */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Eye className="w-5 h-5 text-blue-400" />
-              <div>
-                <Label className="text-white font-medium">Typing Indicator</Label>
-                <p className="text-xs text-gray-400">Show when you're typing</p>
-              </div>
-            </div>
-            <Switch
-              checked={localSettings.showTypingIndicator}
-              onCheckedChange={(checked) => setLocalSettings({ ...localSettings, showTypingIndicator: checked })}
+          <SettingRow title="Typing Indicator" desc="Show when operators are transmitting.">
+            <Toggle
+              on={localSettings.showTypingIndicator}
+              onClick={() => setLocal({ showTypingIndicator: !localSettings.showTypingIndicator })}
+              aria-label="Toggle typing indicator"
             />
-          </div>
+          </SettingRow>
 
-          {/* Read Receipts */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <CheckCheck className="w-5 h-5 text-purple-400" />
-              <div>
-                <Label className="text-white font-medium">Read Receipts</Label>
-                <p className="text-xs text-gray-400">Let others know when you've read messages</p>
-              </div>
-            </div>
-            <Switch
-              checked={localSettings.showReadReceipts}
-              onCheckedChange={(checked) => setLocalSettings({ ...localSettings, showReadReceipts: checked })}
+          <SettingRow title="Read Receipts" desc="Confirm to senders when traffic has been read.">
+            <Toggle
+              on={localSettings.showReadReceipts}
+              onClick={() => setLocal({ showReadReceipts: !localSettings.showReadReceipts })}
+              aria-label="Toggle read receipts"
             />
-          </div>
+          </SettingRow>
 
-          {/* Message Preview */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Bell className="w-5 h-5 text-orange-400" />
-              <div>
-                <Label className="text-white font-medium">Message Preview</Label>
-                <p className="text-xs text-gray-400">Show message content in notifications</p>
-              </div>
-            </div>
-            <Switch
-              checked={localSettings.messagePreview}
-              onCheckedChange={(checked) => setLocalSettings({ ...localSettings, messagePreview: checked })}
+          <SettingRow title="Message Preview" desc="Show message content in notifications.">
+            <Toggle
+              on={localSettings.messagePreview}
+              onClick={() => setLocal({ messagePreview: !localSettings.messagePreview })}
+              aria-label="Toggle message preview"
             />
-          </div>
+          </SettingRow>
 
-          {/* Media Auto-Download */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Image className="w-5 h-5 text-cyan-400" />
-              <div>
-                <Label className="text-white font-medium">Auto-Download Media</Label>
-                <p className="text-xs text-gray-400">Automatically download images and files</p>
-              </div>
-            </div>
-            <Switch
-              checked={localSettings.mediaAutoDownload}
-              onCheckedChange={(checked) => setLocalSettings({ ...localSettings, mediaAutoDownload: checked })}
+          <SettingRow title="Auto-Download Media" desc="Fetch images and files automatically when supported.">
+            <Toggle
+              on={localSettings.mediaAutoDownload}
+              onClick={() => setLocal({ mediaAutoDownload: !localSettings.mediaAutoDownload })}
+              aria-label="Toggle media auto-download"
             />
+          </SettingRow>
+
+          <div
+            className="rounded-sm border px-3 py-2.5 font-mono text-[8px] uppercase leading-relaxed tracking-[0.12em]"
+            style={{ borderColor: FORTRESS.borderGreen, background: 'rgba(54,226,123,0.05)', color: FORTRESS.textDim }}
+          >
+            Content stays sealed unless message preview is enabled.
           </div>
         </div>
 
-        <div className="flex justify-end space-x-2 pt-4 border-t border-gray-700">
-          <Button variant="ghost" onClick={onClose} className="text-gray-300 hover:text-white hover:bg-gray-700">
-            Cancel
-          </Button>
-          <Button onClick={handleSave} className="bg-cyan-600 hover:bg-cyan-700 text-white">
-            Save Settings
-          </Button>
+        <div className="flex items-center justify-between border-t px-4 py-3" style={{ borderColor: FORTRESS.borderFaint }}>
+          <span className="font-mono text-[7px] uppercase tracking-[0.18em]" style={{ color: FORTRESS.textFaint }}>
+            Changes sync to account settings
+          </span>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={onClose}
+              className="h-auto rounded-sm px-3 py-2 font-mono text-[8px] font-bold uppercase tracking-[0.16em] text-[#76897D] hover:bg-[#36E27B]/10 hover:text-[#DCEAE1]"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleSave}
+              className="h-auto rounded-sm px-4 py-2 font-mono text-[8px] font-extrabold uppercase tracking-[0.16em] text-[#06130B]"
+              style={{ background: FORTRESS.green }}
+            >
+              Save
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

@@ -33,11 +33,11 @@ export const AttachmentPreview = ({ attachment }: AttachmentPreviewProps) => {
 
   if (isImage) {
     return (
-      <a href={attachment.url} target="_blank" rel="noopener noreferrer" className="block my-2">
+      <a href={attachment.url} target="_blank" rel="noopener noreferrer" className="my-2 block rounded-sm border border-[#1C2B22] bg-black/80 p-2 hover:border-[#1E5C3C]">
         <img
           src={attachment.url}
           alt={attachment.name}
-          className="w-full h-auto object-contain border border-gray-700 rounded-lg max-h-[250px] sm:max-h-[300px]"
+          className="h-auto w-full rounded-sm border border-[#1C2B22] object-contain max-h-[250px] sm:max-h-[300px]"
         />
       </a>
     );
@@ -45,8 +45,8 @@ export const AttachmentPreview = ({ attachment }: AttachmentPreviewProps) => {
 
   if (isVideo) {
     return (
-      <div className="my-2">
-        <video controls src={attachment.url} className="w-full h-auto rounded-lg border border-gray-700 max-h-[250px] sm:max-h-[300px]">
+      <div className="my-2 rounded-sm border border-[#1C2B22] bg-black/80 p-2">
+        <video controls src={attachment.url} className="h-auto w-full rounded-sm border border-[#1C2B22] max-h-[250px] sm:max-h-[300px]">
           Your browser does not support the video tag.
         </video>
       </div>
@@ -55,7 +55,7 @@ export const AttachmentPreview = ({ attachment }: AttachmentPreviewProps) => {
 
   if (isAudio) {
     return (
-      <div className="my-2">
+      <div className="my-2 rounded-sm border border-[#1C2B22] bg-black/80 p-2">
         <audio controls src={attachment.url} className="w-full">
           Your browser does not support the audio element.
         </audio>
@@ -69,13 +69,13 @@ export const AttachmentPreview = ({ attachment }: AttachmentPreviewProps) => {
       download={attachment.name} 
       target="_blank" 
       rel="noopener noreferrer" 
-      className="bg-gray-600/50 p-3 rounded-lg flex items-center space-x-3 my-2 hover:bg-gray-500/50 transition-colors"
+      className="my-2 flex items-center space-x-3 rounded-sm border border-[#1C2B22] bg-[#0F1612] p-3 font-mono transition-colors hover:border-[#1E5C3C] hover:bg-[#101814]"
     >
-      <FileText className="w-8 h-8 text-white flex-shrink-0" />
+      <FileText className="h-7 w-7 flex-shrink-0 text-[#36E27B]" />
       <div className="flex-1 overflow-hidden">
-        <p className="text-sm font-medium text-white truncate">{attachment.name}</p>
+        <p className="truncate text-[11px] font-bold uppercase tracking-[0.08em] text-[#ECF7F0]">{attachment.name}</p>
       </div>
-      <Download className="w-5 h-5 text-gray-300 flex-shrink-0" />
+      <Download className="h-4 w-4 flex-shrink-0 text-[#76897D]" />
     </a>
   );
 };

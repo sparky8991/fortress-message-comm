@@ -49,7 +49,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
   const [burnAfterReadEnabled, setBurnAfterReadEnabled] = useState(false);
   const [messageMark, setMessageMark] = useState<TrafficMark>('normal');
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const actionButtonClass = "fortress-focus h-10 w-10 flex-none border border-green-500/20 bg-[#0a1510] text-green-500/70 transition-all duration-200 hover:border-green-400/60 hover:bg-green-500/10 hover:text-green-200 active:scale-95";
+  const actionButtonClass = "fortress-focus h-9 w-9 flex-none rounded-sm border border-[#1C2B22] bg-[#0F1612] text-[#76897D] transition-colors hover:border-[#1E5C3C] hover:bg-[#36E27B]/10 hover:text-[#36E27B] active:scale-95";
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -202,10 +202,10 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
         />
       )}
 
-      <div className="border-t border-green-500/15 bg-[#06100b]/95 backdrop-blur-sm w-full max-w-full overflow-visible">
+      <div className="w-full max-w-full overflow-visible border-t border-[#1C2B22] bg-[#0C120F]/98 backdrop-blur-sm">
         {/* Voice Recorder */}
         {showVoiceRecorder && (
-          <div className="p-3 border-b border-green-500/15">
+          <div className="border-b border-[#141E18] p-3">
             <VoiceRecorder
               onSend={handleVoiceSend}
               onCancel={() => setShowVoiceRecorder(false)}
@@ -217,8 +217,8 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
           onCancelReply={onCancelReply || (() => {})} 
         />
 
-        <div className="mx-2 space-y-2 px-2 py-2 md:mx-0 md:px-4">
-          <div className="flex items-center justify-between gap-3 overflow-x-auto pb-0.5">
+        <div className="space-y-2 px-3 py-2 md:px-4">
+          <div className="flex items-center justify-between gap-3 overflow-x-auto">
             <ComposerModeBar
               messageMark={messageMark}
               onSelectMark={setMessageMark}
@@ -229,36 +229,36 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
               burnEnabled={burnAfterReadEnabled}
               onToggleBurn={() => setBurnAfterReadEnabled((enabled) => !enabled)}
             />
-            <span className="hidden flex-none font-mono text-[8px] uppercase tracking-[0.22em] text-green-500/35 lg:inline">
-              Outbound marked {MARK_META[outboundMark].label}
+            <span className="hidden flex-none font-mono text-[7px] uppercase tracking-[0.24em] text-[#4A5A50] lg:inline">
+              OUTBOUND MARKED {MARK_META[outboundMark].label}
             </span>
           </div>
 
           {attachment && (
-            <div className="px-3 py-2 bg-black/90 border border-green-500/40 rounded flex items-center justify-between animate-in fade-in-50 duration-200 min-w-0 shadow-lg shadow-green-500/10">
+            <div className="flex min-w-0 animate-in items-center justify-between rounded-sm border border-[#1E5C3C] bg-black/90 px-3 py-2 shadow-[0_0_18px_rgba(54,226,123,0.12)] duration-200 fade-in-50">
               <div className="flex items-center space-x-2 overflow-hidden min-w-0 flex-1">
                 {isEncryptedFile ? (
-                  <div className="p-1 bg-red-500/20 rounded">
-                    <Terminal className="w-3 h-3 text-red-400 animate-pulse" />
+                  <div className="rounded-sm bg-[#8C1D18]/25 p-1">
+                    <Terminal className="h-3 w-3 animate-pulse text-[#FF6B61]" />
                   </div>
                 ) : (
-                  <div className="p-1 bg-gray-600/40 rounded">
-                    <FileText className="w-3 h-3 text-gray-300" />
+                  <div className="rounded-sm bg-[#1C2B22] p-1">
+                    <FileText className="h-3 w-3 text-[#DCEAE1]" />
                   </div>
                 )}
                 <div className="min-w-0 flex-1">
-                  <span className="text-xs text-white font-medium font-mono block truncate">
+                  <span className="block truncate font-mono text-[11px] font-black text-[#ECF7F0]">
                     {isEncryptedFile ? `[ENCRYPTED]: ${encryptionMetadata?.originalName || 'PAYLOAD'}` : `${attachment.name}`}
                   </span>
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                    <span className="text-xs text-gray-400 font-mono">
+                    <span className="font-mono text-[9px] text-[#76897D]">
                       {(attachment.size / 1024 / 1024).toFixed(2)} MB
                     </span>
                     {isEncryptedFile && typeof encryptionMetadata?.shareCode === 'string' && (
                       <button
                         type="button"
                         onClick={copyEncryptedKey}
-                        className="inline-flex items-center gap-1 text-xs text-green-300 hover:text-green-200 font-mono rounded px-1.5 py-0.5 bg-green-500/10 border border-green-500/25"
+                        className="inline-flex items-center gap-1 rounded-sm border border-[#1E5C3C] bg-[#36E27B]/10 px-1.5 py-0.5 font-mono text-[9px] text-[#7BEFA9] hover:text-[#ECF7F0]"
                       >
                         <Copy className="w-3 h-3" />
                         Copy decryption key
@@ -274,7 +274,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                   setMessageMark('normal');
                   setMessage('');
                 }} 
-                className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-600/50 rounded transition-all duration-200 flex-shrink-0 ml-2 min-h-[32px] min-w-[32px] flex items-center justify-center"
+                className="ml-2 flex min-h-8 min-w-8 flex-shrink-0 items-center justify-center rounded-sm p-1.5 text-[#76897D] transition-colors hover:bg-[#101814] hover:text-[#ECF7F0]"
                 aria-label="Remove attachment"
               >
                 <X className="w-3 h-3" />
@@ -282,10 +282,10 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
             </div>
           )}
           
-          <div className="flex items-stretch gap-2 w-full min-w-0">
+          <div className="flex w-full min-w-0 items-stretch gap-2">
             <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
             
-            <div className="flex flex-none gap-1">
+            <div className="flex flex-none gap-1.5">
               <button 
                 type="button"
                 onClick={() => fileInputRef.current?.click()} 
@@ -293,7 +293,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                 title="Attach File"
                 aria-label="Attach file"
               >
-                <Paperclip className="w-4 h-4" />
+                <Paperclip className="h-3.5 w-3.5" />
               </button>
 
               <button
@@ -301,13 +301,13 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                 onClick={() => setShowVoiceRecorder(!showVoiceRecorder)}
                 className={`${actionButtonClass} ${
                   showVoiceRecorder
-                    ? 'border-green-300/70 bg-green-500/20 text-green-100'
+                    ? 'border-[#36E27B] bg-[#36E27B]/15 text-[#ECF7F0]'
                     : ''
                 }`}
                 title="Voice Message"
                 aria-label="Record voice message"
               >
-                <Mic className="w-4 h-4" />
+                <Mic className="h-3.5 w-3.5" />
               </button>
 
               <div className="relative">
@@ -321,7 +321,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                   aria-label="Add emoji"
                   title="Add emoji"
                 >
-                  <Smile className="w-4 h-4" />
+                  <Smile className="h-3.5 w-3.5" />
                 </button>
                 <EmojiPicker
                   onEmojiSelect={handleEmojiSelect}
@@ -337,7 +337,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                     setShowGifPicker(!showGifPicker);
                     setShowEmojiPicker(false);
                   }}
-                  className={`${actionButtonClass} font-mono text-[10px] font-bold uppercase tracking-[0.1em]`}
+                  className={`${actionButtonClass} font-mono text-[9px] font-black uppercase tracking-[0.1em]`}
                   aria-label="Add GIF"
                   title="Send GIF"
                 >
@@ -351,17 +351,17 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
               </div>
             </div>
             
-            <div className="flex-1 relative min-w-0">
+            <div className="relative min-w-0 flex-1">
               <textarea
                 placeholder="SECURE MESSAGE..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
-                className="h-10 w-full resize-none border border-green-500/20 bg-[#07100b] px-3 py-2.5 font-mono text-sm text-green-300 placeholder:text-green-500/45 focus:border-green-400/70 focus:outline-none focus:ring-1 focus:ring-green-500/40 min-h-[40px] max-h-28 shadow-inner shadow-green-500/5 caret-green-400 transition-all duration-200"
+                className="h-9 min-h-9 max-h-28 w-full resize-none rounded-sm border border-[#1C2B22] bg-[#0F1612] px-3 py-2 font-mono text-[12px] text-[#36E27B] shadow-[inset_0_1px_8px_rgba(54,226,123,0.06)] caret-[#36E27B] transition-colors placeholder:text-[#76897D]/60 focus:border-[#1E5C3C] focus:outline-none focus:ring-1 focus:ring-[#36E27B]/25"
                 rows={message.split('\n').length > 1 ? Math.min(message.split('\n').length, 3) : 1}
                 style={{
                   fontFamily: "'Fira Code', 'Source Code Pro', 'Consolas', 'Monaco', 'Courier New', monospace",
-                  letterSpacing: '0.1px',
+                  letterSpacing: '0.8px',
                   lineHeight: '1.3'
                 }}
                 aria-label="Message input"
@@ -371,19 +371,19 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
             <button
               type="button"
               onClick={handleSend}
-              className="fortress-focus h-10 w-10 flex-none bg-green-500 text-black shadow-lg shadow-green-500/20 transition-all duration-200 hover:bg-green-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-45"
+              className="fortress-focus h-9 w-10 flex-none rounded-sm bg-[#36E27B] text-[#06130B] shadow-[0_0_18px_rgba(54,226,123,0.18)] transition-colors hover:bg-[#7BEFA9] active:scale-95 disabled:cursor-not-allowed disabled:opacity-45"
               disabled={!message.trim() && !attachment}
               aria-label="Send message"
             >
-              <Send className="w-4 h-4" />
+              <Send className="h-4 w-4" />
             </button>
           </div>
           
-          <div className="flex items-center justify-center border-t border-green-500/10 pt-1">
+          <div className="flex items-center justify-center border-t border-[#141E18] pt-1">
             <div className={`flex items-center gap-1.5 font-mono text-[8px] uppercase tracking-[0.2em] ${
               burnAfterReadEnabled
-                ? 'text-orange-300/80'
-                : 'text-green-500/45'
+                ? 'text-[#F2B43C]'
+                : 'text-[#4A5A50]'
             }`}>
               {burnAfterReadEnabled ? (
                 <Flame className="w-3 h-3 flex-shrink-0" />

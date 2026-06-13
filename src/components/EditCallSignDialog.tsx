@@ -184,7 +184,7 @@ export const EditCallSignDialog = ({
 
       onCallSignUpdated(newCallSign.trim());
       onClose();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error updating call sign:', err);
       setError('Failed to update call sign. Please try again.');
     } finally {
@@ -197,49 +197,50 @@ export const EditCallSignDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-gray-800 border-gray-700 text-white max-w-md">
+      <DialogContent className="max-w-[460px] rounded-sm border-[#1E5C3C] bg-[#0C120F] p-0 font-mono text-[#DCEAE1] shadow-[0_0_50px_rgba(0,0,0,0.55)]">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <UserCheck className="w-5 h-5 text-green-500" />
-            Edit Call Sign
-          </DialogTitle>
-          <DialogDescription className="text-gray-400">
-            Your call sign is how others identify you in SecureChat.
+          <div className="border-b border-[#1C2B22] px-4 py-3">
+            <DialogTitle className="flex items-center gap-2 font-mono text-[11px] font-black uppercase tracking-[0.18em] text-[#36E27B]">
+              <UserCheck className="h-4 w-4" />
+              Change Call Sign
+            </DialogTitle>
+          </div>
+          <DialogDescription className="px-4 pt-3 font-mono text-[8px] uppercase leading-relaxed tracking-[0.12em] text-[#76897D]">
+            Your call sign is the operator handle other users see inside SecureChat.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 mt-4">
-          {/* Warning about limits */}
-          <div className="p-3 bg-yellow-900/30 border border-yellow-700/50 rounded-lg">
+        <div className="space-y-4 px-4 pb-4 pt-3">
+          <div className="border border-[#6B4B18] bg-[#1A1507] p-3">
             <div className="flex items-start gap-2">
-              <AlertTriangle className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
-              <div className="text-sm">
-                <p className="text-yellow-400 font-medium">Change Limits</p>
-                <ul className="text-yellow-300/80 text-xs mt-1 space-y-1">
-                  <li>You can only change your call sign once per month</li>
+              <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#F2B43C]" />
+              <div>
+                <p className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-[#F2B43C]">
+                  Change limits
+                </p>
+                <ul className="mt-2 space-y-1 font-mono text-[8px] uppercase leading-relaxed tracking-[0.1em] text-[#FFE0A8]/75">
+                  <li>Once per month</li>
                   <li>Maximum 3 changes per year</li>
-                  <li className="font-medium">
-                    Changes remaining this year: {remainingChanges}
-                  </li>
+                  <li className="text-[#FFE0A8]">Changes remaining this year: {remainingChanges}</li>
                 </ul>
               </div>
             </div>
           </div>
 
-          {/* Restriction message if they can't change */}
           {!canChange && changeRestrictionMessage && (
-            <div className="p-3 bg-red-900/30 border border-red-700/50 rounded-lg">
+            <div className="border border-[#5C2420] bg-[#8C1D18]/20 p-3">
               <div className="flex items-start gap-2">
-                <Info className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-                <p className="text-red-400 text-sm">{changeRestrictionMessage}</p>
+                <Info className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#FF6B61]" />
+                <p className="font-mono text-[8px] uppercase leading-relaxed tracking-[0.1em] text-[#FFE0DC]/85">
+                  {changeRestrictionMessage}
+                </p>
               </div>
             </div>
           )}
 
-          {/* Input field */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              New Call Sign
+            <label className="mb-2 block font-mono text-[8px] font-black uppercase tracking-[0.18em] text-[#76897D]">
+              New call sign
             </label>
             <Input
               type="text"
@@ -248,49 +249,47 @@ export const EditCallSignDialog = ({
                 setNewCallSign(e.target.value);
                 setError(null);
               }}
-              placeholder="Enter new call sign"
-              className="bg-gray-700 border-gray-600 text-white"
+              placeholder="ENTER CALL SIGN"
+              className="h-10 rounded-sm border-[#1C2B22] bg-[#070B09] font-mono text-[12px] text-[#ECF7F0] placeholder:text-[#4A5A50] focus-visible:ring-[#36E27B]"
               disabled={!canChange || saving || checking}
               maxLength={20}
             />
-            <p className="text-xs text-gray-500 mt-1">
-              2-20 characters. Letters, numbers, underscores, and hyphens only.
+            <p className="mt-2 font-mono text-[8px] uppercase tracking-[0.12em] text-[#76897D]">
+              2-20 characters - letters, numbers, underscores, and hyphens only.
             </p>
           </div>
 
-          {/* Error message */}
           {error && (
-            <div className="p-3 bg-red-900/30 border border-red-700/50 rounded-lg">
-              <p className="text-red-400 text-sm">{error}</p>
+            <div className="border border-[#5C2420] bg-[#8C1D18]/20 p-3">
+              <p className="font-mono text-[8px] uppercase leading-relaxed tracking-[0.1em] text-[#FF6B61]">{error}</p>
             </div>
           )}
 
-          {/* Action buttons */}
-          <div className="flex justify-end gap-3 pt-2">
+          <div className="flex justify-end gap-2 border-t border-[#1C2B22] pt-4">
             <Button
               variant="outline"
               onClick={onClose}
-              className="border-gray-600 text-gray-300 hover:bg-gray-700"
+              className="h-9 rounded-sm border-[#1C2B22] bg-transparent px-4 font-mono text-[8px] font-black uppercase tracking-[0.16em] text-[#76897D] hover:border-[#1E5C3C] hover:bg-[#36E27B]/10 hover:text-[#DCEAE1]"
             >
               Cancel
             </Button>
             <Button
               onClick={handleSave}
               disabled={!canChange || saving || checking || newCallSign.trim() === currentCallSign}
-              className="bg-green-600 hover:bg-green-700 text-white"
+              className="h-9 rounded-sm bg-[#36E27B] px-4 font-mono text-[8px] font-black uppercase tracking-[0.16em] text-[#06130B] hover:bg-[#7BEFA9]"
             >
               {checking ? (
                 <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Checking...
+                  <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                  Checking
                 </>
               ) : saving ? (
                 <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Saving...
+                  <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                  Saving
                 </>
               ) : (
-                'Save Changes'
+                'Save'
               )}
             </Button>
           </div>

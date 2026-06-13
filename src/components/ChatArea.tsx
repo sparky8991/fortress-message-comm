@@ -126,7 +126,7 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
     return (
       <div className="flex h-full min-h-0 w-full flex-col overflow-hidden fortress-shell">
         {/* Header for mobile */}
-        <div className="sticky top-0 z-30 bg-[#06100b]/95 backdrop-blur-sm md:hidden border-b border-green-500/15">
+        <div className="sticky top-0 z-30 border-b border-[#1C2B22] bg-[#07100b]/95 backdrop-blur-sm md:hidden">
           <div className="p-4 flex items-center justify-between">
             <button
               onClick={onToggleSidebar}
@@ -146,20 +146,20 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
           <div className="text-center max-w-md">
             <div className="flex justify-center mb-6">
               <div className="relative">
-                <MessageSquare className="w-16 h-16 text-green-500/35" />
-                <Search className="w-6 h-6 text-green-500 absolute -top-1 -right-1" />
+                <MessageSquare className="h-16 w-16 text-[#36E27B]/35" />
+                <Search className="absolute -right-1 -top-1 h-6 w-6 text-[#36E27B]" />
               </div>
             </div>
-            <h2 className="text-xl font-semibold text-white mb-4 font-mono uppercase tracking-[0.12em]">
+            <h2 className="mb-4 font-mono text-xl font-black uppercase tracking-[0.16em] text-[#ECF7F0]">
               SecureChat Fortress
             </h2>
-            <p className="text-green-500/65 mb-6 leading-relaxed text-sm font-mono">
+            <p className="mb-6 font-mono text-sm leading-relaxed text-[#76897D]">
               Open a protected channel by searching for users in the sidebar.
               Lock sensitive payloads and use burn-after-read when the traffic should not linger.
             </p>
             <div className="fortress-panel-muted rounded p-4">
-              <p className="text-sm text-green-300/80 flex items-center font-mono">
-                <Search className="w-4 h-4 mr-2 text-green-500" />
+              <p className="flex items-center font-mono text-sm text-[#7BEFA9]">
+                <Search className="mr-2 h-4 w-4 text-[#36E27B]" />
                 Use the sidebar search button to find and connect with operators.
               </p>
             </div>
@@ -208,7 +208,7 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
   return (
     <div className="flex h-full min-h-0 w-full flex-col overflow-hidden fortress-shell">
       {/* Header - Always visible at top */}
-      <div className="sticky top-0 z-30 bg-[#06100b]/95 backdrop-blur-sm">
+        <div className="sticky top-0 z-30 bg-[#0C120F]/95 backdrop-blur-sm">
         <ChatHeader
           contact={contact}
           onStartCall={onStartCall}
@@ -228,7 +228,7 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
       </div>
 
       {/* Message Input - Fixed at bottom */}
-      <div className="fixed bottom-0 left-0 right-0 md:left-80 z-20 bg-[#06100b]/95 backdrop-blur-sm">
+      <div className="fixed bottom-0 left-0 right-0 z-20 bg-[#0C120F]/95 backdrop-blur-sm md:left-80">
         <MessageInput 
           onSendMessage={handleSendMessage}
           replyingTo={replyingTo}
