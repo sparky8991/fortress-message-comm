@@ -55,7 +55,7 @@ export const MessageList = ({
       hour12: false,
       timeZone: 'UTC',
     }).format(new Date());
-    return `${time.replace(':', '')}Z`;
+    return `${time.replace(/:/g, '')}Z`;
   }, []);
 
   useEffect(() => {
