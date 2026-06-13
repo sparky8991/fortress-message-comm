@@ -21,7 +21,7 @@ export const FORTRESS = {
 } as const;
 
 export const alpha = (hex: string, opacity: number): string => {
-  const value = parseInt(hex.replace('#', ''), 16);
+  const value = parseInt(hex.replace(/#/g, ''), 16);
   return `rgba(${(value >> 16) & 255}, ${(value >> 8) & 255}, ${value & 255}, ${opacity})`;
 };
 
