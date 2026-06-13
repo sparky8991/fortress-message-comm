@@ -49,7 +49,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
   const [burnAfterReadEnabled, setBurnAfterReadEnabled] = useState(false);
   const [messageMark, setMessageMark] = useState<TrafficMark>('normal');
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const actionButtonClass = "fortress-focus h-9 w-9 flex-none rounded-sm border border-[#1C2B22] bg-[#0F1612] text-[#76897D] transition-colors hover:border-[#1E5C3C] hover:bg-[#36E27B]/10 hover:text-[#36E27B] active:scale-95";
+  const actionButtonClass = "fortress-focus grid h-[38px] w-[38px] flex-none place-items-center rounded border border-[#1C2B22] bg-transparent text-[#76897D] transition-colors hover:border-[#1E5C3C] hover:text-[#36E27B] active:scale-95";
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -202,7 +202,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
         />
       )}
 
-      <div className="w-full max-w-full overflow-visible border-t border-[#1C2B22] bg-[#0C120F]/98 backdrop-blur-sm">
+      <div className="w-full max-w-full overflow-visible border-t border-[#1C2B22] bg-[#0C120F]">
         {/* Voice Recorder */}
         {showVoiceRecorder && (
           <div className="border-b border-[#141E18] p-3">
@@ -217,8 +217,8 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
           onCancelReply={onCancelReply || (() => {})} 
         />
 
-        <div className="space-y-2 px-3 py-2 md:px-4">
-          <div className="flex items-center justify-between gap-3 overflow-x-auto">
+        <div className="px-4 pb-2 pt-2.5">
+          <div className="mb-2 flex items-center justify-between gap-2 overflow-x-auto">
             <ComposerModeBar
               messageMark={messageMark}
               onSelectMark={setMessageMark}
@@ -229,7 +229,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
               burnEnabled={burnAfterReadEnabled}
               onToggleBurn={() => setBurnAfterReadEnabled((enabled) => !enabled)}
             />
-            <span className="hidden flex-none font-mono text-[7px] uppercase tracking-[0.24em] text-[#4A5A50] lg:inline">
+            <span className="hidden flex-none font-mono text-[7px] uppercase tracking-[1px] text-[#4A5A50] lg:inline">
               OUTBOUND MARKED {MARK_META[outboundMark].label}
             </span>
           </div>
@@ -285,7 +285,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
           <div className="flex w-full min-w-0 items-stretch gap-2">
             <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
             
-            <div className="flex flex-none gap-1.5">
+            <div className="flex flex-none gap-2">
               <button 
                 type="button"
                 onClick={() => fileInputRef.current?.click()} 
@@ -293,7 +293,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                 title="Attach File"
                 aria-label="Attach file"
               >
-                <Paperclip className="h-3.5 w-3.5" />
+                <Paperclip className="h-[15px] w-[15px]" />
               </button>
 
               <button
@@ -307,7 +307,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                 title="Voice Message"
                 aria-label="Record voice message"
               >
-                <Mic className="h-3.5 w-3.5" />
+                <Mic className="h-[15px] w-[15px]" />
               </button>
 
               <div className="relative">
@@ -321,7 +321,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                   aria-label="Add emoji"
                   title="Add emoji"
                 >
-                  <Smile className="h-3.5 w-3.5" />
+                  <Smile className="h-[15px] w-[15px]" />
                 </button>
                 <EmojiPicker
                   onEmojiSelect={handleEmojiSelect}
@@ -337,7 +337,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                     setShowGifPicker(!showGifPicker);
                     setShowEmojiPicker(false);
                   }}
-                  className={`${actionButtonClass} font-mono text-[9px] font-black uppercase tracking-[0.1em]`}
+                  className={`${actionButtonClass} font-mono text-[8px] font-extrabold uppercase tracking-[1px]`}
                   aria-label="Add GIF"
                   title="Send GIF"
                 >
@@ -357,11 +357,11 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
-                className="h-9 min-h-9 max-h-28 w-full resize-none rounded-sm border border-[#1C2B22] bg-[#0F1612] px-3 py-2 font-mono text-[12px] text-[#36E27B] shadow-[inset_0_1px_8px_rgba(54,226,123,0.06)] caret-[#36E27B] transition-colors placeholder:text-[#76897D]/60 focus:border-[#1E5C3C] focus:outline-none focus:ring-1 focus:ring-[#36E27B]/25"
+                className="h-[38px] min-h-[38px] max-h-28 w-full resize-none rounded border border-[#1C2B22] bg-[#0F1612] px-3 py-[11px] font-mono text-[12px] text-[#DCEAE1] shadow-[inset_0_1px_8px_rgba(54,226,123,0.06)] caret-[#36E27B] transition-colors placeholder:text-[#76897D]/60 focus:border-[#1E5C3C] focus:outline-none focus:ring-1 focus:ring-[#36E27B]/25"
                 rows={message.split('\n').length > 1 ? Math.min(message.split('\n').length, 3) : 1}
                 style={{
-                  letterSpacing: '0.8px',
-                  lineHeight: '1.3'
+                  letterSpacing: '0.5px',
+                  lineHeight: '1.15'
                 }}
                 aria-label="Message input"
               />
@@ -370,16 +370,16 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
             <button
               type="button"
               onClick={handleSend}
-              className="fortress-focus h-9 w-10 flex-none rounded-sm bg-[#36E27B] text-[#06130B] shadow-[0_0_18px_rgba(54,226,123,0.18)] transition-colors hover:bg-[#7BEFA9] active:scale-95 disabled:cursor-not-allowed disabled:opacity-45"
+              className="fortress-focus grid h-[38px] w-[42px] flex-none place-items-center rounded bg-[#36E27B] text-[#06130B] shadow-[0_0_18px_rgba(54,226,123,0.18)] transition-colors hover:bg-[#7BEFA9] active:scale-95 disabled:cursor-not-allowed disabled:opacity-45"
               disabled={!message.trim() && !attachment}
               aria-label="Send message"
             >
-              <Send className="h-4 w-4" />
+              <Send className="h-[15px] w-[15px]" />
             </button>
           </div>
           
-          <div className="flex items-center justify-center border-t border-[#141E18] pt-1">
-            <div className={`flex items-center gap-1.5 font-mono text-[8px] uppercase tracking-[0.2em] ${
+          <div className="mt-[7px] flex items-center justify-center">
+            <div className={`flex items-center gap-1.5 font-mono text-[7px] uppercase tracking-[2px] ${
               burnAfterReadEnabled
                 ? 'text-[#F2B43C]'
                 : 'text-[#4A5A50]'
@@ -392,7 +392,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
               <span className="text-center font-medium">
                 {burnAfterReadEnabled
                   ? 'BURN ARMED - DELETES 2 MIN AFTER OPEN'
-                  : 'END-TO-END ENCRYPTED - LOCKED PAYLOADS USE SEPARATE KEYS - BURN TIMER AVAILABLE'}
+                  : 'END-TO-END ENCRYPTED - KEYS HELD ON DEVICE ONLY - NO SERVER COPIES'}
               </span>
             </div>
           </div>
