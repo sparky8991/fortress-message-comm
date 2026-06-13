@@ -200,3 +200,76 @@
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#030806];
   }
 }
+
+.fortress-classification-strip {
+  min-height: 1.5rem;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #5C2420;
+  background: #8C1D18;
+  padding: 0.2rem 1rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: clamp(0.68rem, 0.6rem + 0.18vw, 0.8rem);
+  font-weight: 900;
+  letter-spacing: 0.34em;
+  line-height: 1.1;
+  text-align: center;
+  text-transform: uppercase;
+  color: #FFE0DC;
+}
+
+.fortress-shell {
+  --fortress-text-7: clamp(0.66rem, 0.59rem + 0.16vw, 0.76rem);
+  --fortress-text-8: clamp(0.7rem, 0.62rem + 0.18vw, 0.8rem);
+  --fortress-text-9: clamp(0.74rem, 0.66rem + 0.2vw, 0.86rem);
+  --fortress-text-10: clamp(0.78rem, 0.7rem + 0.2vw, 0.92rem);
+  --fortress-text-11: clamp(0.84rem, 0.76rem + 0.2vw, 1rem);
+  --fortress-text-12: clamp(0.9rem, 0.82rem + 0.22vw, 1.06rem);
+  --fortress-text-13: clamp(0.95rem, 0.88rem + 0.2vw, 1.12rem);
+  --fortress-text-14: clamp(1rem, 0.92rem + 0.18vw, 1.16rem);
+}
+
+.fortress-shell .text-\[7px\] {
+  font-size: var(--fortress-text-7) !important;
+}
+
+.fortress-shell .text-\[8px\] {
+  font-size: var(--fortress-text-8) !important;
+}
+
+.fortress-shell .text-\[9px\] {
+  font-size: var(--fortress-text-9) !important;
+}
+
+.fortress-shell .text-\[10px\] {
+  font-size: var(--fortress-text-10) !important;
+}
+
+.fortress-shell .text-\[11px\] {
+  font-size: var(--fortress-text-11) !important;
+}
+
+.fortress-shell .text-\[12px\] {
+  font-size: var(--fortress-text-12) !important;
+}
+
+.fortress-shell .text-\[13px\] {
+  font-size: var(--fortress-text-13) !important;
+}
+
+.fortress-shell .text-\[14px\] {
+  font-size: var(--fortress-text-14) !important;
+}
+
+@media (max-width: 767px) {
+  .fortress-shell {
+    --fortress-text-7: 0.72rem;
+    --fortress-text-8: 0.75rem;
+    --fortress-text-9: 0.8rem;
+    --fortress-text-10: 0.84rem;
+    --fortress-text-11: 0.9rem;
+    --fortress-text-12: 0.95rem;
+    --fortress-text-13: 1rem;
+    --fortress-text-14: 1.05rem;
+  }
+}

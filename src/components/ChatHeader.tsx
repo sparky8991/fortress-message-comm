@@ -24,11 +24,6 @@ export const ChatHeader = ({ contact, onStartCall, onToggleSidebar }: ChatHeader
   return (
     <>
       <div className="border-b border-[#1C2B22] bg-[#0C120F]/98 backdrop-blur-sm">
-        <div className="hidden h-5 items-center justify-center border-b border-[#5C2420] bg-[#8C1D18] md:flex">
-          <span className="font-mono text-[8px] font-black uppercase tracking-[0.34em] text-[#FFE0DC]">
-            SECRET//NOFORN - CLASSIFIED CHANNEL - AUTHORIZED PERSONNEL ONLY
-          </span>
-        </div>
         <div className="flex h-16 items-center justify-between px-3 md:px-4">
           <div className="flex min-w-0 flex-1 items-center gap-3">
             {/* Avatar as sidebar toggle on mobile */}

@@ -169,7 +169,7 @@ const Index = () => {
   const currentChat = getCurrentChatInfo();
 
   return (
-    <div className="h-dvh overflow-hidden fortress-shell safe-area-inset">
+    <div className="flex h-dvh flex-col overflow-hidden fortress-shell safe-area-inset">
       {isInCall ? (
         <div className="w-full px-2 md:px-4 py-4">
           <CallInterface
@@ -180,8 +180,11 @@ const Index = () => {
         </div>
       ) : (
         <>
+          <div className="fortress-classification-strip hidden md:flex">
+            SECRET//NOFORN - CLASSIFIED CHANNEL - AUTHORIZED PERSONNEL ONLY
+          </div>
           <div className={cn(
-            "flex w-full h-dvh overflow-hidden",
+            "flex min-h-0 w-full flex-1 overflow-hidden",
             isMobile && "pb-16" // Make room for bottom nav
           )}>
             {/* Sidebar - hidden on mobile, shown on desktop */}
