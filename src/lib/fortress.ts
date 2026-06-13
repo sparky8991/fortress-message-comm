@@ -37,21 +37,21 @@ export interface MarkMeta {
 
 export const MARK_META: Record<TrafficMark, MarkMeta> = {
   normal: {
-    label: 'Normal',
+    label: 'Unclass',
     accent: FORTRESS.green,
     tipTitle: 'Normal traffic',
     tipBody: 'Standard protected channel message with no extra handling.',
     onClass: 'border-green-400/70 bg-green-500/15 text-green-300',
   },
   sensitive: {
-    label: 'Sensitive',
+    label: 'Conf',
     accent: FORTRESS.amber,
     tipTitle: 'Sensitive traffic',
     tipBody: 'Marks the message as need-to-know inside the conversation.',
     onClass: 'border-amber-400/70 bg-amber-400/15 text-amber-300',
   },
   locked: {
-    label: 'Locked',
+    label: 'Secret',
     accent: FORTRESS.red,
     tipTitle: 'Locked payload',
     tipBody: 'Opens the encrypted payload flow and creates a separate decryption key.',

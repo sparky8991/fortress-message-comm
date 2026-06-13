@@ -1,6 +1,6 @@
 
 import React, { useState, useRef } from 'react';
-import { Send, Paperclip, Smile, FileText, X, Shield, Lock, Terminal, ImageIcon, Mic, Copy, Flame } from 'lucide-react';
+import { Send, Paperclip, Smile, FileText, X, Shield, Terminal, Mic, Copy, Flame } from 'lucide-react';
 import { EmojiPicker } from './EmojiPicker';
 import { GifPicker } from './GifPicker';
 import { EncryptedImageUpload } from './EncryptedImageUpload';
@@ -8,7 +8,7 @@ import { ReplyPreview } from './ReplyPreview';
 import { VoiceRecorder } from './VoiceRecorder';
 import { ComposerModeBar } from './tactical';
 import { toast } from '@/hooks/use-toast';
-import type { TrafficMark } from '@/lib/fortress';
+import { MARK_META, type TrafficMark } from '@/lib/fortress';
 import { buildEncryptedPayloadMessage, stripEncryptedPayloadSecrets } from '@/utils/encryptedPayloadMessage';
 import { BURN_AFTER_READ_SECONDS } from '@/utils/burnAfterRead.js';
 
@@ -49,6 +49,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
   const [burnAfterReadEnabled, setBurnAfterReadEnabled] = useState(false);
   const [messageMark, setMessageMark] = useState<TrafficMark>('normal');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const actionButtonClass = "fortress-focus h-10 w-10 flex-none border border-green-500/20 bg-[#0a1510] text-green-500/70 transition-all duration-200 hover:border-green-400/60 hover:bg-green-500/10 hover:text-green-200 active:scale-95";
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -185,6 +186,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
   };
 
   const isEncryptedFile = attachment?.name.includes('encrypted_') && attachment?.name.endsWith('.enc');
+  const outboundMark = encryptionMetadata ? 'locked' : messageMark;
 
   return (
     <>
@@ -215,17 +217,22 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
           onCancelReply={onCancelReply || (() => {})} 
         />
 
-        <div className="p-2.5 md:p-3 space-y-2.5 mx-2 md:mx-0">
-          <ComposerModeBar
-            messageMark={messageMark}
-            onSelectMark={setMessageMark}
-            onLockedSelect={() => {
-              setMessageMark('locked');
-              setShowEncryptedUpload(true);
-            }}
-            burnEnabled={burnAfterReadEnabled}
-            onToggleBurn={() => setBurnAfterReadEnabled((enabled) => !enabled)}
-          />
+        <div className="mx-2 space-y-2 px-2 py-2 md:mx-0 md:px-4">
+          <div className="flex items-center justify-between gap-3 overflow-x-auto pb-0.5">
+            <ComposerModeBar
+              messageMark={messageMark}
+              onSelectMark={setMessageMark}
+              onLockedSelect={() => {
+                setMessageMark('locked');
+                setShowEncryptedUpload(true);
+              }}
+              burnEnabled={burnAfterReadEnabled}
+              onToggleBurn={() => setBurnAfterReadEnabled((enabled) => !enabled)}
+            />
+            <span className="hidden flex-none font-mono text-[8px] uppercase tracking-[0.22em] text-green-500/35 lg:inline">
+              Outbound marked {MARK_META[outboundMark].label}
+            </span>
+          </div>
 
           {attachment && (
             <div className="px-3 py-2 bg-black/90 border border-green-500/40 rounded flex items-center justify-between animate-in fade-in-50 duration-200 min-w-0 shadow-lg shadow-green-500/10">
@@ -275,76 +282,44 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
             </div>
           )}
           
-          <div className="flex items-end space-x-2 w-full min-w-0">
+          <div className="flex items-stretch gap-2 w-full min-w-0">
             <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
             
-            <div className="flex space-x-1 flex-shrink-0">
+            <div className="flex flex-none gap-1">
               <button 
+                type="button"
                 onClick={() => fileInputRef.current?.click()} 
-                className="p-2.5 text-green-500/60 hover:text-green-300 hover:bg-green-500/10 rounded border border-green-500/15 transition-all duration-200 flex-shrink-0 min-h-[40px] min-w-[40px] flex items-center justify-center active:scale-95 fortress-focus"
+                className={actionButtonClass}
                 title="Attach File"
                 aria-label="Attach file"
               >
                 <Paperclip className="w-4 h-4" />
               </button>
-              
-              <button
-                onClick={() => setShowEncryptedUpload(true)}
-                className="p-2.5 text-red-400 hover:text-red-300 hover:bg-red-500/15 rounded border border-red-500/20 transition-all duration-200 flex-shrink-0 min-h-[40px] min-w-[40px] flex items-center justify-center active:scale-95 fortress-focus"
-                title="Encrypt Image"
-                aria-label="Encrypt and attach image"
-              >
-                <Lock className="w-4 h-4 animate-pulse" />
-              </button>
 
               <button
+                type="button"
                 onClick={() => setShowVoiceRecorder(!showVoiceRecorder)}
-                className={`p-2.5 rounded border transition-all duration-200 flex-shrink-0 min-h-[40px] min-w-[40px] flex items-center justify-center active:scale-95 fortress-focus ${
+                className={`${actionButtonClass} ${
                   showVoiceRecorder
-                    ? 'bg-green-500/20 text-green-300 border-green-400/60'
-                    : 'text-green-400 hover:text-green-300 hover:bg-green-500/10 border-green-500/15'
+                    ? 'border-green-300/70 bg-green-500/20 text-green-100'
+                    : ''
                 }`}
                 title="Voice Message"
                 aria-label="Record voice message"
               >
                 <Mic className="w-4 h-4" />
               </button>
-            </div>
-            
-            <div className="flex-1 relative min-w-0 mr-2">
-              <textarea
-                placeholder="Secure message..."
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
-                className="w-full px-3 py-2.5 bg-black/95 border border-green-500/45 rounded text-green-300 placeholder-green-600/50 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-400/70 pr-10 text-sm font-mono resize-none min-h-[40px] max-h-28 shadow-inner shadow-green-500/10 caret-green-400 transition-all duration-200"
-                rows={message.split('\n').length > 1 ? Math.min(message.split('\n').length, 3) : 1}
-                style={{ 
-                  fontFamily: "'Fira Code', 'Source Code Pro', 'Consolas', 'Monaco', 'Courier New', monospace",
-                  letterSpacing: '0.1px',
-                  lineHeight: '1.3'
-                }}
-                aria-label="Message input"
-              />
-              <div className="absolute right-2.5 top-2.5 flex items-center space-x-1">
+
+              <div className="relative">
                 <button
-                  onClick={() => {
-                    setShowGifPicker(!showGifPicker);
-                    setShowEmojiPicker(false);
-                  }}
-                  className="p-1.5 text-purple-400 hover:text-purple-300 hover:bg-purple-500/20 rounded transition-all duration-200 min-h-[28px] min-w-[28px] flex items-center justify-center"
-                  aria-label="Add GIF"
-                  title="Send GIF"
-                >
-                  <ImageIcon className="w-4 h-4" />
-                </button>
-                <button
+                  type="button"
                   onClick={() => {
                     setShowEmojiPicker(!showEmojiPicker);
                     setShowGifPicker(false);
                   }}
-                  className="p-1.5 text-green-400 hover:text-green-300 hover:bg-green-500/20 rounded transition-all duration-200 min-h-[28px] min-w-[28px] flex items-center justify-center"
+                  className={actionButtonClass}
                   aria-label="Add emoji"
+                  title="Add emoji"
                 >
                   <Smile className="w-4 h-4" />
                 </button>
@@ -353,6 +328,21 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                   isOpen={showEmojiPicker}
                   onClose={() => setShowEmojiPicker(false)}
                 />
+              </div>
+
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowGifPicker(!showGifPicker);
+                    setShowEmojiPicker(false);
+                  }}
+                  className={`${actionButtonClass} font-mono text-[10px] font-bold uppercase tracking-[0.1em]`}
+                  aria-label="Add GIF"
+                  title="Send GIF"
+                >
+                  GIF
+                </button>
                 <GifPicker
                   isOpen={showGifPicker}
                   onClose={() => setShowGifPicker(false)}
@@ -361,9 +351,27 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
               </div>
             </div>
             
+            <div className="flex-1 relative min-w-0">
+              <textarea
+                placeholder="SECURE MESSAGE..."
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
+                className="h-10 w-full resize-none border border-green-500/20 bg-[#07100b] px-3 py-2.5 font-mono text-sm text-green-300 placeholder:text-green-500/45 focus:border-green-400/70 focus:outline-none focus:ring-1 focus:ring-green-500/40 min-h-[40px] max-h-28 shadow-inner shadow-green-500/5 caret-green-400 transition-all duration-200"
+                rows={message.split('\n').length > 1 ? Math.min(message.split('\n').length, 3) : 1}
+                style={{
+                  fontFamily: "'Fira Code', 'Source Code Pro', 'Consolas', 'Monaco', 'Courier New', monospace",
+                  letterSpacing: '0.1px',
+                  lineHeight: '1.3'
+                }}
+                aria-label="Message input"
+              />
+            </div>
+
             <button
+              type="button"
               onClick={handleSend}
-              className="p-2.5 bg-green-500 hover:bg-green-400 rounded text-black transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 shadow-lg shadow-green-500/20 min-h-[40px] min-w-[40px] flex items-center justify-center active:scale-95 mr-2 fortress-focus"
+              className="fortress-focus h-10 w-10 flex-none bg-green-500 text-black shadow-lg shadow-green-500/20 transition-all duration-200 hover:bg-green-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-45"
               disabled={!message.trim() && !attachment}
               aria-label="Send message"
             >
@@ -371,19 +379,21 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
             </button>
           </div>
           
-          <div className="flex items-center justify-center pt-1">
-            <div className={`flex items-center space-x-1.5 text-xs font-mono px-2.5 py-1 rounded-full border ${
+          <div className="flex items-center justify-center border-t border-green-500/10 pt-1">
+            <div className={`flex items-center gap-1.5 font-mono text-[8px] uppercase tracking-[0.2em] ${
               burnAfterReadEnabled
-                ? 'text-orange-300 bg-orange-500/10 border-orange-500/30'
-                : 'text-green-500/80 bg-green-500/10 border-green-500/20'
+                ? 'text-orange-300/80'
+                : 'text-green-500/45'
             }`}>
               {burnAfterReadEnabled ? (
-                <Flame className="w-3 h-3 flex-shrink-0 animate-pulse" />
+                <Flame className="w-3 h-3 flex-shrink-0" />
               ) : (
-                <Shield className="w-3 h-3 flex-shrink-0 animate-pulse" />
+                <Shield className="w-3 h-3 flex-shrink-0" />
               )}
               <span className="text-center font-medium">
-              {burnAfterReadEnabled ? 'BURNS 2 MIN AFTER OPEN' : 'PROTECTED CHANNEL ACTIVE'}
+                {burnAfterReadEnabled
+                  ? 'BURN ARMED - DELETES 2 MIN AFTER OPEN'
+                  : 'END-TO-END ENCRYPTED - LOCKED PAYLOADS USE SEPARATE KEYS - BURN TIMER AVAILABLE'}
               </span>
             </div>
           </div>
