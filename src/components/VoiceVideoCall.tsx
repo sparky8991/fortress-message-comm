@@ -251,7 +251,7 @@ export const VoiceVideoCall = ({ conversationId, remoteName, remoteAvatar, remot
               )}
             </div>
             <div>
-              <p className="text-white text-lg font-medium">{incomingCall.fromName}</p>
+              <p className="text-white ft-head font-medium">{incomingCall.fromName}</p>
               <p className="text-gray-400">Incoming {incomingCall.isVideo ? 'video' : 'voice'} call</p>
             </div>
             <div className="flex justify-center gap-4">
@@ -309,7 +309,7 @@ export const VoiceVideoCall = ({ conversationId, remoteName, remoteAvatar, remot
                     {callState.remoteUser?.name?.charAt(0) || '?'}
                   </AvatarFallback>
                 </Avatar>
-                <p className="text-white text-xl font-medium">{callState.remoteUser?.name}</p>
+                <p className="text-white ft-head font-medium">{callState.remoteUser?.name}</p>
                 <p className="text-green-400 mt-2">{formatDuration(callState.callDuration)}</p>
               </div>
             </div>

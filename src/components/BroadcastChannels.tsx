@@ -260,9 +260,9 @@ export const BroadcastChannels = () => {
                 )}
               </div>
               {selectedChannel.description && (
-                <p className="text-gray-400 text-sm">{selectedChannel.description}</p>
+                <p className="text-gray-400 ft-body">{selectedChannel.description}</p>
               )}
-              <p className="text-gray-500 text-xs mt-1">
+              <p className="text-gray-500 ft-meta mt-1">
                 <Users className="w-3 h-3 inline mr-1" />
                 {selectedChannel.subscriberCount || 0} subscribers
               </p>
@@ -276,8 +276,8 @@ export const BroadcastChannels = () => {
                 <div className="space-y-3">
                   {messages.map((msg) => (
                     <div key={msg.id} className="p-2 bg-gray-700/50 rounded">
-                      <p className="text-white text-sm">{msg.content}</p>
-                      <p className="text-gray-500 text-xs mt-1">
+                      <p className="text-white ft-body">{msg.content}</p>
+                      <p className="text-gray-500 ft-meta mt-1">
                         {msg.senderName} • {msg.createdAt?.toLocaleString()}
                       </p>
                     </div>
@@ -326,7 +326,7 @@ export const BroadcastChannels = () => {
                         <span className="text-white font-medium truncate">{channel.name}</span>
                         {isCreator && <Crown className="w-3 h-3 text-yellow-500" />}
                       </div>
-                      <p className="text-gray-500 text-xs">
+                      <p className="text-gray-500 ft-meta">
                         {channel.subscriberCount || 0} subscribers
                       </p>
                     </div>

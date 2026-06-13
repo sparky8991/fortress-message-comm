@@ -49,14 +49,14 @@ export const CallInterface = ({ callType, onEndCall, contactName }: CallInterfac
           {/* Picture in Picture */}
           <div className="absolute top-4 right-4 w-32 h-24 bg-gray-700 rounded-lg overflow-hidden border-2 border-gray-600">
             <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center">
-              <span className="text-white text-sm font-bold">You</span>
+              <span className="text-white ft-body font-bold">You</span>
             </div>
           </div>
           
           {/* Encryption Indicator */}
           <div className="absolute top-4 left-4 bg-green-500 bg-opacity-90 px-3 py-1 rounded-full flex items-center space-x-2">
             <Shield className="w-4 h-4 text-white" />
-            <span className="text-white text-sm font-medium">Encrypted</span>
+            <span className="text-white ft-mini font-medium uppercase tracking-[0.16em]">Encrypted</span>
           </div>
         </div>
       )}
@@ -76,8 +76,8 @@ export const CallInterface = ({ callType, onEndCall, contactName }: CallInterfac
 
       {/* Call Info */}
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-white mb-2">{contactName}</h2>
-        <p className="text-green-500 text-lg mb-1">Connected</p>
+        <h2 className="text-[24px] font-bold text-white mb-2 tracking-[0.04em]">{contactName}</h2>
+        <p className="text-green-500 ft-head mb-1 uppercase tracking-[0.16em]">Connected</p>
         <p className="text-gray-400">{formatDuration(duration)}</p>
       </div>
 
@@ -125,7 +125,7 @@ export const CallInterface = ({ callType, onEndCall, contactName }: CallInterfac
 
       {/* Security Notice */}
       <div className="mt-8 text-center">
-        <p className="text-gray-400 text-sm">
+        <p className="text-gray-400 ft-body">
           This call is protected with end-to-end encryption
         </p>
       </div>

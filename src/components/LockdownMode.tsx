@@ -263,8 +263,8 @@ const LockdownAuthScreen = ({ onBiometricAuth, onPINAuth }: LockdownAuthScreenPr
           <div className="mx-auto w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mb-4">
             <Shield className="w-10 h-10 text-red-500" />
           </div>
-          <CardTitle className="text-white text-xl">Lockdown Mode Active</CardTitle>
-          <p className="text-gray-400 text-sm mt-2">
+          <CardTitle className="text-white ft-head">Lockdown Mode Active</CardTitle>
+          <p className="text-gray-400 ft-body mt-2">
             Authenticate to view messages
           </p>
         </CardHeader>
@@ -273,7 +273,7 @@ const LockdownAuthScreen = ({ onBiometricAuth, onPINAuth }: LockdownAuthScreenPr
             <div className="text-center p-4 bg-red-500/20 rounded-lg">
               <AlertTriangle className="w-8 h-8 text-red-500 mx-auto mb-2" />
               <p className="text-red-400">Too many failed attempts</p>
-              <p className="text-white text-2xl font-mono mt-2">{lockoutTime}s</p>
+              <p className="text-white ft-head font-mono mt-2">{lockoutTime}s</p>
             </div>
           ) : showPINInput ? (
             <>
@@ -301,7 +301,7 @@ const LockdownAuthScreen = ({ onBiometricAuth, onPINAuth }: LockdownAuthScreenPr
                   <Button
                     key={i}
                     variant={digit === '⌫' ? 'outline' : 'default'}
-                    className={`h-14 text-xl ${
+                    className={`h-14 ft-head ${
                       digit === '' ? 'invisible' : ''
                     } ${digit === '⌫' ? 'border-gray-600' : 'bg-gray-700 hover:bg-gray-600'}`}
                     onClick={() => {
@@ -349,7 +349,7 @@ const LockdownAuthScreen = ({ onBiometricAuth, onPINAuth }: LockdownAuthScreenPr
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-700" />
                 </div>
-                <div className="relative flex justify-center text-sm">
+                <div className="relative flex justify-center ft-body">
                   <span className="px-2 bg-gray-800 text-gray-500">or</span>
                 </div>
               </div>
@@ -422,7 +422,7 @@ export const LockdownSettings = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <p className="text-gray-400 text-sm">
+        <p className="text-gray-400 ft-body">
           Require Face ID or PIN to view messages. Perfect for maximum privacy.
         </p>
 
@@ -436,7 +436,7 @@ export const LockdownSettings = () => {
             )}
             <div>
               <p className="text-white font-medium">Enable Lockdown</p>
-              <p className="text-gray-400 text-xs">
+              <p className="text-gray-400 ft-meta">
                 {isLockdownEnabled ? 'Messages are protected' : 'Messages visible to anyone'}
               </p>
             </div>
@@ -463,7 +463,7 @@ export const LockdownSettings = () => {
         {showPINSetup && (
           <div className="p-4 bg-gray-700/50 rounded-lg space-y-3">
             <p className="text-white font-medium">Set Backup PIN</p>
-            <p className="text-gray-400 text-xs">
+            <p className="text-gray-400 ft-meta">
               This PIN is used if Face ID fails
             </p>
             <Input
@@ -514,8 +514,8 @@ export const LockdownSettings = () => {
 
         {/* How it works */}
         <div className="p-3 bg-blue-500/20 rounded-lg space-y-2">
-          <p className="text-blue-400 text-sm font-medium">How it works:</p>
-          <ul className="text-blue-300 text-xs space-y-1">
+          <p className="text-blue-400 ft-body font-medium">How it works:</p>
+          <ul className="text-blue-300 ft-meta space-y-1">
             <li>• Face ID / Touch ID required to view messages</li>
             <li>• PIN fallback if biometric fails</li>
             <li>• Auto-locks after 5 minutes of inactivity</li>
@@ -559,7 +559,7 @@ export const ProtectedMessage = ({ children, blur = true }: ProtectedMessageProp
       <div className="absolute inset-0 flex items-center justify-center bg-gray-800/80 rounded">
         <div className="text-center">
           <Lock className="w-6 h-6 text-red-500 mx-auto mb-1" />
-          <p className="text-gray-400 text-xs">Tap to unlock</p>
+          <p className="text-gray-400 ft-meta">Tap to unlock</p>
         </div>
       </div>
     </div>

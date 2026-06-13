@@ -103,7 +103,8 @@
     color: #DCEAE1;
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     -webkit-font-smoothing: antialiased;
-    text-rendering: geometricPrecision;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 }
 
@@ -201,6 +202,38 @@
 
   .fortress-focus {
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#030806];
+  }
+
+  .ft-nano  { @apply font-mono text-[7px] leading-[1.5]; }
+  .ft-micro { @apply font-mono text-[8px] leading-[1.5]; }
+  .ft-mini  { @apply font-mono text-[9px] leading-[1.5]; }
+  .ft-meta  { @apply font-mono text-[10px] leading-[1.5]; }
+  .ft-cap   { @apply font-mono text-[11px] leading-[1.5]; }
+  .ft-body  { @apply font-mono text-[12px] leading-[1.6]; }
+  .ft-emph  { @apply font-mono text-[13px] leading-[1.4]; }
+  .ft-head  { @apply font-mono text-[14px] leading-[1.2]; }
+
+  .ft-label {
+    @apply font-mono text-[8px] font-bold uppercase tracking-[0.2em] text-[#76897D];
+  }
+
+  .ft-label-strong {
+    @apply font-mono text-[9px] font-extrabold uppercase tracking-[0.16em] text-[#36E27B];
+  }
+
+  [role="dialog"] h2.text-lg {
+    @apply text-[11px] font-extrabold uppercase tracking-[0.2em];
+  }
+
+  .fortress-panel .text-sm,
+  .fortress-panel-muted .text-sm {
+    font-size: 9px;
+  }
+
+  @media (min-width: 768px) {
+    input.md\:text-sm:not(.mobile-input) {
+      font-size: 12px;
+    }
   }
 }
 

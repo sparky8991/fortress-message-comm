@@ -152,7 +152,7 @@ export const DeadManSwitch = () => {
             <Clock className="w-5 h-5 text-orange-500" />
             Dead Man's Switch
           </CardTitle>
-          <p className="text-gray-400 text-sm">
+          <p className="text-gray-400 ft-body">
             Automatically send messages if you're inactive for a set period
           </p>
         </CardHeader>
@@ -169,7 +169,7 @@ export const DeadManSwitch = () => {
           {/* Warning */}
           <div className="p-3 bg-orange-500/20 rounded-lg flex items-start gap-2">
             <AlertTriangle className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
-            <p className="text-orange-300 text-sm">
+            <p className="text-orange-300 ft-body">
               Messages will be sent automatically if you don't check in within the specified time.
               Make sure to check in regularly to prevent accidental sends.
             </p>
@@ -192,9 +192,9 @@ export const DeadManSwitch = () => {
                     onCheckedChange={() => toggleEnabled(message)}
                   />
                 </div>
-                <p className="text-gray-400 text-sm truncate">{message.message}</p>
+                <p className="text-gray-400 ft-body truncate">{message.message}</p>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500">
+                  <span className="ft-meta text-gray-500">
                     Sends after {message.inactivityDays} days of inactivity
                   </span>
                   <div className="flex gap-1">
@@ -239,7 +239,7 @@ export const DeadManSwitch = () => {
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm text-gray-400">Recipient Name</label>
+                  <label className="ft-body text-gray-400">Recipient Name</label>
                   <Input
                     value={formData.recipientName}
                     onChange={(e) => setFormData({ ...formData, recipientName: e.target.value })}
@@ -248,7 +248,7 @@ export const DeadManSwitch = () => {
                   />
                 </div>
                 <div>
-                  <label className="text-sm text-gray-400">Message</label>
+                  <label className="ft-body text-gray-400">Message</label>
                   <Textarea
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
@@ -257,7 +257,7 @@ export const DeadManSwitch = () => {
                   />
                 </div>
                 <div>
-                  <label className="text-sm text-gray-400">Send After Inactivity</label>
+                  <label className="ft-body text-gray-400">Send After Inactivity</label>
                   <Select
                     value={formData.inactivityDays}
                     onValueChange={(value) => setFormData({ ...formData, inactivityDays: value })}

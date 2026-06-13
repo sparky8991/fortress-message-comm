@@ -95,8 +95,8 @@ export const BiometricAuth = ({ onSuccess, onFallback }: BiometricAuthProps) => 
           <div className="mx-auto w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mb-4">
             <Shield className="w-10 h-10 text-green-500" />
           </div>
-          <CardTitle className="text-white text-xl">Biometric Authentication</CardTitle>
-          <p className="text-gray-400 text-sm mt-2">
+          <CardTitle className="text-white ft-head">Biometric Authentication</CardTitle>
+          <p className="text-gray-400 ft-body mt-2">
             {biometricType === 'face' ? 'Use Face ID' : 'Use your fingerprint'} to unlock
           </p>
         </CardHeader>
@@ -113,7 +113,7 @@ export const BiometricAuth = ({ onSuccess, onFallback }: BiometricAuthProps) => 
           ) : (
             <div className="text-center space-y-4">
               <div className="p-4 bg-yellow-500/20 rounded-lg">
-                <p className="text-yellow-400 text-sm">
+                <p className="text-yellow-400 ft-body">
                   Biometric authentication is not available on this device.
                 </p>
               </div>

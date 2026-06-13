@@ -226,7 +226,7 @@ export const OfflineModeStatus = () => {
               <Cloud className="w-5 h-5 text-green-500" />
               <div>
                 <p className="text-green-400 font-medium">Online</p>
-                <p className="text-green-400/60 text-sm">Messages syncing in real-time</p>
+                <p className="text-green-400/60 ft-body">Messages syncing in real-time</p>
               </div>
             </>
           ) : (
@@ -234,7 +234,7 @@ export const OfflineModeStatus = () => {
               <CloudOff className="w-5 h-5 text-red-500" />
               <div>
                 <p className="text-red-400 font-medium">Offline</p>
-                <p className="text-red-400/60 text-sm">Messages will be queued</p>
+                <p className="text-red-400/60 ft-body">Messages will be queued</p>
               </div>
             </>
           )}
@@ -244,7 +244,7 @@ export const OfflineModeStatus = () => {
         {queuedMessages.length > 0 && (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <p className="text-gray-400 text-sm">
+              <p className="text-gray-400 ft-body">
                 {queuedMessages.length} message{queuedMessages.length > 1 ? 's' : ''} queued
               </p>
               {isOnline && (
@@ -272,10 +272,10 @@ export const OfflineModeStatus = () => {
                   className="p-2 bg-gray-700/50 rounded flex items-center justify-between"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="text-white text-sm truncate">
+                    <p className="text-white ft-body truncate">
                       To: {message.recipientName}
                     </p>
-                    <p className="text-gray-400 text-xs truncate">{message.content}</p>
+                    <p className="text-gray-400 ft-meta truncate">{message.content}</p>
                   </div>
                   <div className="flex items-center gap-1 ml-2">
                     {message.status === 'sending' && (
@@ -315,7 +315,7 @@ export const OfflineModeStatus = () => {
         )}
 
         {queuedMessages.length === 0 && (
-          <p className="text-gray-500 text-sm text-center py-2">
+          <p className="text-gray-500 ft-body text-center py-2">
             No queued messages
           </p>
         )}

@@ -134,7 +134,7 @@ const Index = () => {
       <div className="min-h-screen fortress-shell flex items-center justify-center">
         <div className="flex flex-col items-center space-y-4">
           <Loader2 className="w-12 h-12 text-green-500 animate-spin" />
-          <p className="text-green-400 font-mono text-sm">INITIALIZING...</p>
+          <p className="text-green-400 font-mono ft-body">INITIALIZING...</p>
         </div>
       </div>
     );
@@ -145,7 +145,7 @@ const Index = () => {
       return (
         <div className="min-h-screen fortress-shell flex items-center justify-center px-4">
           <div className="max-w-md text-center space-y-4">
-            <p className="text-red-400 font-mono text-sm">{initializationError}</p>
+            <p className="text-red-400 font-mono ft-body">{initializationError}</p>
             <button
               type="button"
               onClick={() => window.location.reload()}

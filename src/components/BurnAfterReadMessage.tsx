@@ -83,7 +83,7 @@ export const BurnAfterReadMessage = ({ message, children }: BurnAfterReadMessage
 
   if (isDeleting) {
     return (
-      <div className="flex items-center gap-2 text-orange-300 font-mono text-xs animate-pulse">
+      <div className="flex items-center gap-2 text-orange-300 font-mono ft-meta animate-pulse">
         <Flame className="w-4 h-4" />
         BURNING MESSAGE...
       </div>
@@ -93,18 +93,18 @@ export const BurnAfterReadMessage = ({ message, children }: BurnAfterReadMessage
   if (shouldCoverMessage) {
     return (
       <div className="rounded-lg border border-orange-500/50 bg-black/80 p-3 shadow-lg shadow-orange-500/10">
-        <div className="flex items-center gap-2 text-orange-300 font-mono text-xs font-semibold">
+        <div className="flex items-center gap-2 text-orange-300 font-mono ft-meta font-semibold">
           <Flame className="w-4 h-4" />
           BURN AFTER READ
         </div>
-        <p className="mt-2 text-xs text-gray-300 font-mono">
+        <p className="mt-2 ft-meta text-gray-300 font-mono">
           This secure message will delete {formatBurnTime(burnSeconds)} after opening.
         </p>
         <button
           type="button"
           onClick={openMessage}
           disabled={isOpening}
-          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-md border border-orange-500/50 bg-orange-500/15 px-3 py-2 text-xs font-semibold text-orange-200 transition hover:bg-orange-500/25 disabled:opacity-60"
+          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-md border border-orange-500/50 bg-orange-500/15 px-3 py-2 ft-meta font-semibold text-orange-200 transition hover:bg-orange-500/25 disabled:opacity-60"
         >
           <Eye className="w-4 h-4" />
           {isOpening ? 'OPENING...' : 'OPEN SECURE MESSAGE'}
@@ -116,7 +116,7 @@ export const BurnAfterReadMessage = ({ message, children }: BurnAfterReadMessage
   return (
     <>
       {children}
-      <div className="mt-2 flex items-center gap-2 text-xs font-mono text-orange-300">
+      <div className="mt-2 flex items-center gap-2 ft-meta font-mono text-orange-300">
         {expiresAt && secondsLeft !== null ? (
           <>
             <Timer className="w-3 h-3" />

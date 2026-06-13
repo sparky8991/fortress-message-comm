@@ -109,7 +109,7 @@ const WelcomeScreen = ({ onNext }: { onNext: () => void }) => (
 
     {/* Title */}
     <div>
-      <h1 className="text-3xl font-bold text-white mb-2">SecureChat</h1>
+      <h1 className="text-[24px] font-bold text-white mb-2 tracking-[0.04em]">SecureChat</h1>
       <p className="text-gray-400">Private messaging built for control.</p>
     </div>
 
@@ -154,8 +154,8 @@ const RiskSelectScreen = ({
 }) => (
   <div className="space-y-6 animate-in fade-in duration-500">
     <div className="text-center">
-      <h2 className="text-2xl font-bold text-white mb-2">How do you plan to use SecureChat?</h2>
-      <p className="text-gray-400 text-sm">This helps us personalize your experience</p>
+      <h2 className="text-[18px] font-bold text-white mb-2">How do you plan to use SecureChat?</h2>
+      <p className="text-gray-400 ft-body">This helps us personalize your experience</p>
     </div>
 
     {/* Options */}
@@ -178,7 +178,7 @@ const RiskSelectScreen = ({
           </div>
           <div>
             <h3 className="text-white font-medium mb-1">Everyday private conversations</h3>
-            <p className="text-gray-400 text-sm">I want strong privacy with a simple experience</p>
+            <p className="text-gray-400 ft-body">I want strong privacy with a simple experience</p>
           </div>
         </div>
       </button>
@@ -201,14 +201,14 @@ const RiskSelectScreen = ({
           </div>
           <div>
             <h3 className="text-white font-medium mb-1">Sensitive or high-risk situations</h3>
-            <p className="text-gray-400 text-sm">I may need advanced protection and fast controls</p>
+            <p className="text-gray-400 ft-body">I may need advanced protection and fast controls</p>
           </div>
         </div>
       </button>
     </div>
 
     {/* Microcopy */}
-    <p className="text-center text-gray-500 text-xs">
+    <p className="text-center text-gray-500 ft-meta">
       You can change this anytime in Settings. This only affects defaults and guidance.
     </p>
 
@@ -237,7 +237,7 @@ const NormalReassuranceScreen = ({
       <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4">
         <Shield className="w-8 h-8 text-green-500" />
       </div>
-      <h2 className="text-2xl font-bold text-white mb-2">You're protected by default</h2>
+      <h2 className="text-[18px] font-bold text-white mb-2">You're protected by default</h2>
     </div>
 
     {/* Protection list */}
@@ -256,7 +256,7 @@ const NormalReassuranceScreen = ({
       </div>
     </div>
 
-    <p className="text-center text-gray-400 text-sm">
+    <p className="text-center text-gray-400 ft-body">
       You can explore more security controls anytime in Settings.
     </p>
 
@@ -294,8 +294,8 @@ const HighRiskSetupScreen = ({
       <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4">
         <Lock className="w-8 h-8 text-green-500" />
       </div>
-      <h2 className="text-2xl font-bold text-white mb-2">Lock down this device</h2>
-      <p className="text-gray-400 text-sm">We recommend enabling these now</p>
+      <h2 className="text-[18px] font-bold text-white mb-2">Lock down this device</h2>
+      <p className="text-gray-400 ft-body">We recommend enabling these now</p>
     </div>
 
     {/* Security options */}
@@ -374,7 +374,7 @@ const HighRiskSetupScreen = ({
 
     <button
       onClick={onNext}
-      className="w-full text-gray-500 hover:text-gray-400 text-sm"
+      className="w-full text-gray-500 hover:text-gray-400 ft-body"
     >
       Skip for now
     </button>
@@ -413,14 +413,14 @@ const PanicEducationScreen = ({
     return (
       <div className="text-center space-y-6 animate-in fade-in duration-300">
         <AlertTriangle className="w-16 h-16 text-red-500 mx-auto animate-pulse" />
-        <h2 className="text-xl font-bold text-white">DEMO: Emergency Wipe</h2>
+        <h2 className="text-[16px] font-bold text-white">DEMO: Emergency Wipe</h2>
         <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
           <div
             className="h-full bg-red-500 transition-all duration-100"
             style={{ width: `${demoProgress}%` }}
           />
         </div>
-        <p className="text-gray-400 text-sm">
+        <p className="text-gray-400 ft-body">
           {demoProgress < 100 ? 'Simulating data wipe...' : 'Demo complete! No real data was affected.'}
         </p>
       </div>
@@ -433,14 +433,14 @@ const PanicEducationScreen = ({
         <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-4">
           <AlertTriangle className="w-8 h-8 text-red-500" />
         </div>
-        <h2 className="text-2xl font-bold text-white mb-2">Emergency wipe (Panic Mode)</h2>
+        <h2 className="text-[18px] font-bold text-white mb-2">Emergency wipe (Panic Mode)</h2>
       </div>
 
       <div className="bg-gray-800/50 rounded-xl p-5 border border-gray-700 space-y-4">
         <p className="text-gray-300">
           If your device is at risk, this instantly erases all data.
         </p>
-        <ul className="space-y-2 text-gray-400 text-sm">
+        <ul className="space-y-2 text-gray-400 ft-body">
           <li className="flex items-center gap-2">
             <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
             Requires press-and-hold (3 seconds)

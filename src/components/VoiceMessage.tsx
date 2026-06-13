@@ -101,13 +101,13 @@ export const VoiceMessageRecorder = ({ onRecordingComplete, onCancel }: VoiceMes
             {isRecording ? (
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                <span className="text-red-400 font-mono text-sm">Recording {formatDuration(duration)}</span>
+                <span className="text-red-400 font-mono ft-body">Recording {formatDuration(duration)}</span>
                 <div className="flex-1 h-1 bg-gray-700 rounded-full overflow-hidden">
                   <div className="h-full bg-red-500 animate-pulse" style={{ width: `${Math.min(100, duration * 2)}%` }} />
                 </div>
               </div>
             ) : (
-              <span className="text-gray-400 text-sm">Tap to record voice message</span>
+              <span className="text-gray-400 ft-body">Tap to record voice message</span>
             )}
           </div>
           <Button variant="ghost" size="sm" onClick={handleCancel}>
@@ -205,7 +205,7 @@ export const VoiceMessagePlayer = ({ audioUrl, duration = 0 }: VoiceMessagePlaye
             style={{ width: `${progress}%` }}
           />
         </div>
-        <span className="text-xs text-gray-400 font-mono w-12">
+        <span className="ft-meta text-gray-400 font-mono w-12">
           {formatTime(isPlaying ? currentTime : totalDuration)}
         </span>
       </div>

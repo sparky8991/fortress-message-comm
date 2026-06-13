@@ -101,7 +101,7 @@ export const MessageTranslation = ({ originalText, onTranslated }: MessageTransl
               variant="ghost"
               size="sm"
               disabled={isTranslating}
-              className="h-6 px-2 text-xs text-gray-400 hover:text-blue-400"
+              className="h-6 px-2 ft-meta text-gray-400 hover:text-blue-400"
             >
               {isTranslating ? (
                 <Loader2 className="w-3 h-3 mr-1 animate-spin" />
@@ -134,7 +134,7 @@ export const MessageTranslation = ({ originalText, onTranslated }: MessageTransl
             variant="ghost"
             size="sm"
             onClick={clearTranslation}
-            className="h-6 px-2 text-xs text-gray-400 hover:text-red-400"
+            className="h-6 px-2 ft-meta text-gray-400 hover:text-red-400"
           >
             Show original
           </Button>
@@ -143,8 +143,8 @@ export const MessageTranslation = ({ originalText, onTranslated }: MessageTransl
 
       {translatedText && (
         <div className="p-2 bg-blue-500/10 rounded-lg border border-blue-500/20">
-          <p className="text-blue-300 text-sm">{translatedText}</p>
-          <p className="text-gray-500 text-xs mt-1">
+          <p className="text-blue-300 ft-body">{translatedText}</p>
+          <p className="text-gray-500 ft-meta mt-1">
             Translated to {SUPPORTED_LANGUAGES.find(l => l.code === selectedLanguage)?.name}
           </p>
         </div>
@@ -196,8 +196,8 @@ export const TranslationSettings = () => {
         <div className="flex items-center gap-3">
           <Languages className="w-5 h-5 text-blue-500" />
           <div>
-            <p className="text-white text-sm font-medium">Auto-Translate</p>
-            <p className="text-gray-400 text-xs">Automatically translate incoming messages</p>
+            <p className="text-white ft-body font-medium">Auto-Translate</p>
+            <p className="text-gray-400 ft-meta">Automatically translate incoming messages</p>
           </div>
         </div>
         <button
@@ -214,13 +214,13 @@ export const TranslationSettings = () => {
 
       {autoTranslateEnabled && (
         <div className="p-3 bg-gray-700/50 rounded-lg">
-          <p className="text-gray-400 text-sm mb-2">Translate to:</p>
+          <p className="text-gray-400 ft-body mb-2">Translate to:</p>
           <div className="grid grid-cols-3 gap-2">
             {supportedLanguages.slice(0, 6).map((lang) => (
               <button
                 key={lang.code}
                 onClick={() => enableAutoTranslate(lang.code)}
-                className={`p-2 rounded text-sm ${
+                className={`p-2 rounded ft-body ${
                   preferredLanguage === lang.code
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-600 text-gray-300 hover:bg-gray-500'

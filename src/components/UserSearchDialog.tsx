@@ -186,7 +186,7 @@ export const UserSearchDialog = ({ isOpen, onClose, onStartConversation }: UserS
               </div>
               {searchResults.map((user) => (
                 <div key={user.id} className="flex items-center gap-3 rounded-sm border border-[#1C2B22] bg-[#101814] p-3">
-                  <div className="grid h-10 w-10 flex-none place-items-center overflow-hidden rounded-sm border border-[#1E5C3C] bg-[#12301F] font-mono text-sm font-extrabold text-[#7BEFA9]">
+                  <div className="grid h-10 w-10 flex-none place-items-center overflow-hidden rounded-sm border border-[#1E5C3C] bg-[#12301F] font-mono ft-body font-extrabold text-[#7BEFA9]">
                     {user.avatar_url ? (
                       <img src={user.avatar_url} alt="" className="h-full w-full object-cover" />
                     ) : (
@@ -195,7 +195,7 @@ export const UserSearchDialog = ({ isOpen, onClose, onStartConversation }: UserS
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex min-w-0 items-center gap-2">
-                      <span className="truncate font-mono text-xs font-bold tracking-wide text-[#ECF7F0]">
+                      <span className="truncate font-mono ft-meta font-bold tracking-wide text-[#ECF7F0]">
                         {user.username}
                       </span>
                       <span

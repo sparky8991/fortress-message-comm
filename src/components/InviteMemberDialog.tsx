@@ -142,7 +142,7 @@ export const InviteMemberDialog = ({ isOpen, onOpenChange, teamId, teamName }: I
                 <Input
                   value={inviteLink}
                   readOnly
-                  className="bg-gray-600 border-gray-500 text-white text-sm"
+                  className="bg-gray-600 border-gray-500 text-white ft-body"
                 />
                 <Button
                   type="button"
@@ -153,7 +153,7 @@ export const InviteMemberDialog = ({ isOpen, onOpenChange, teamId, teamName }: I
                   {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 </Button>
               </div>
-              <p className="text-xs text-gray-400 mt-2">
+              <p className="ft-meta text-gray-400 mt-2">
                 Share this link with {email}. Expires in 7 days.
               </p>
             </div>

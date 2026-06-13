@@ -22,9 +22,6 @@ export const SelfDestructTimer = ({
   const [isDestroying, setIsDestroying] = useState(false);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-    let destructTimeout: NodeJS.Timeout;
-
     const calculateTimeLeft = () => {
       let targetTime: number | null = null;
 
@@ -55,11 +52,10 @@ export const SelfDestructTimer = ({
     };
 
     calculateTimeLeft();
-    interval = setInterval(calculateTimeLeft, 1000);
+    const interval = setInterval(calculateTimeLeft, 1000);
 
     return () => {
       clearInterval(interval);
-      clearTimeout(destructTimeout);
     };
   }, [messageId, selfDestructAt, selfDestructAfterRead, readAt]);
 
@@ -67,7 +63,7 @@ export const SelfDestructTimer = ({
     return (
       <div className="flex items-center gap-1 text-orange-500 animate-pulse">
         <Flame className="w-3 h-3" />
-        <span className="text-xs font-mono">DESTROYING...</span>
+        <span className="ft-meta font-mono">DESTROYING...</span>
       </div>
     );
   }
@@ -87,12 +83,12 @@ export const SelfDestructTimer = ({
       {selfDestructAfterRead && !readAt ? (
         <>
           <Eye className="w-3 h-3" />
-          <span className="text-xs font-mono">{selfDestructAfterRead}s after read</span>
+          <span className="ft-meta font-mono">{selfDestructAfterRead}s after read</span>
         </>
       ) : (
         <>
           <Timer className="w-3 h-3" />
-          <span className="text-xs font-mono">{formatTime(timeLeft)}</span>
+          <span className="ft-meta font-mono">{formatTime(timeLeft)}</span>
         </>
       )}
     </div>

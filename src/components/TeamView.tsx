@@ -115,8 +115,8 @@ export const TeamView = ({ teamId, onBack }: TeamViewProps) => {
 
         <div className="space-y-4">
           <div>
-            <h2 className="text-2xl font-bold text-white">{team.name}</h2>
-            <div className="flex items-center space-x-4 text-sm text-gray-400">
+            <h2 className="ft-head font-bold text-white">{team.name}</h2>
+            <div className="flex items-center space-x-4 ft-body text-gray-400">
               <div className="flex items-center space-x-1">
                 <Crown className="w-4 h-4 text-yellow-500" />
                 <span>Created by {getCreatorName()}</span>

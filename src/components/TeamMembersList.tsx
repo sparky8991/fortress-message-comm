@@ -165,7 +165,7 @@ export const TeamMembersList = ({ teamId, teamName, currentUserRole }: TeamMembe
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-white">Team Members</h3>
+        <h3 className="ft-head font-semibold text-white">Team Members</h3>
         {canManageRoles && (
           <Button
             size="sm"
@@ -187,7 +187,7 @@ export const TeamMembersList = ({ teamId, teamName, currentUserRole }: TeamMembe
                 <p className="text-white font-medium">
                   {getMemberName(member)}
                 </p>
-                <Badge className={`text-xs ${getRoleBadgeColor(member.role)}`}>
+                <Badge className={`ft-meta ${getRoleBadgeColor(member.role)}`}>
                   {formatRoleName(member.role)}
                 </Badge>
               </div>

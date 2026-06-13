@@ -49,7 +49,7 @@ export const TopNavBar = ({ onToggleSidebar, showMenuButton = false, callSign }:
               <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full animate-pulse" />
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-bold text-white leading-tight">SecureChat</span>
+              <span className="ft-body font-bold text-white leading-tight">SecureChat</span>
               <span className="text-[10px] text-gray-500 font-mono leading-tight hidden sm:block">FORTRESS</span>
             </div>
           </div>
@@ -58,7 +58,7 @@ export const TopNavBar = ({ onToggleSidebar, showMenuButton = false, callSign }:
         {/* Center - Security Status (hidden on mobile) */}
         <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/30">
           <Lock className="w-3.5 h-3.5 text-green-400" />
-          <span className="text-xs text-green-400 font-medium tracking-wide">ENCRYPTED</span>
+          <span className="ft-meta text-green-400 font-medium tracking-wide">ENCRYPTED</span>
           <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
         </div>
 
@@ -78,7 +78,7 @@ export const TopNavBar = ({ onToggleSidebar, showMenuButton = false, callSign }:
                   <User className="w-4 h-4 text-black" />
                 </div>
                 {callSign && !isMobile && (
-                  <span className="text-sm text-gray-300 max-w-[100px] truncate">{callSign}</span>
+                  <span className="ft-body text-gray-300 max-w-[100px] truncate">{callSign}</span>
                 )}
               </button>
             </DropdownMenuTrigger>
@@ -86,8 +86,8 @@ export const TopNavBar = ({ onToggleSidebar, showMenuButton = false, callSign }:
               {callSign && (
                 <>
                   <div className="px-3 py-2 border-b border-gray-700">
-                    <p className="text-xs text-gray-400">Signed in as</p>
-                    <p className="text-sm font-medium text-white truncate">{callSign}</p>
+                    <p className="ft-meta text-gray-400">Signed in as</p>
+                    <p className="ft-body font-medium text-white truncate">{callSign}</p>
                   </div>
                 </>
               )}

@@ -131,7 +131,7 @@ export const DecoyAppIcon = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <p className="text-gray-400 text-sm">
+        <p className="text-gray-400 ft-body">
           Disguise the app to look like another application on your home screen.
           {!isPWA && (
             <span className="text-yellow-400 block mt-1">
@@ -156,7 +156,7 @@ export const DecoyAppIcon = () => {
                 <div className={`w-14 h-14 ${icon.bgColor} rounded-xl flex items-center justify-center ${icon.iconColor}`}>
                   {icon.icon}
                 </div>
-                <span className="text-white text-xs font-medium">{icon.name}</span>
+                <span className="text-white ft-meta font-medium">{icon.name}</span>
                 {selectedIcon === icon.id && (
                   <Check className="w-4 h-4 text-green-500" />
                 )}
@@ -168,7 +168,7 @@ export const DecoyAppIcon = () => {
         {/* PWA Install Hint */}
         {!isPWA && (
           <div className="p-3 bg-blue-500/20 rounded-lg">
-            <p className="text-blue-400 text-sm">
+            <p className="text-blue-400 ft-body">
               <strong>Tip:</strong> Add to Home Screen to use decoy icons effectively.
               The app will appear with your chosen icon.
             </p>
@@ -177,7 +177,7 @@ export const DecoyAppIcon = () => {
 
         {/* Warning */}
         <div className="p-3 bg-yellow-500/20 rounded-lg">
-          <p className="text-yellow-400 text-sm">
+          <p className="text-yellow-400 ft-body">
             <strong>Note:</strong> Decoy icons work best when the app is installed as a PWA.
             Browser tabs will still show the real favicon.
           </p>

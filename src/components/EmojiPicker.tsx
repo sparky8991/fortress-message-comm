@@ -47,7 +47,7 @@ export const EmojiPicker = ({ onEmojiSelect, isOpen, onClose }: EmojiPickerProps
                 onEmojiSelect(emoji);
                 onClose();
               }}
-              className="fortress-focus flex min-h-[30px] items-center justify-center rounded-sm border border-transparent p-1.5 text-base transition-all duration-200 hover:scale-105 hover:border-[#1E5C3C] hover:bg-[#36E27B]/10 active:scale-95"
+              className="fortress-focus flex min-h-[30px] items-center justify-center rounded-sm border border-transparent p-1.5 ft-body transition-all duration-200 hover:scale-105 hover:border-[#1E5C3C] hover:bg-[#36E27B]/10 active:scale-95"
               aria-label={`Insert ${emoji} emoji`}
             >
               {emoji}

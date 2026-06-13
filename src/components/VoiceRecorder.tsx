@@ -230,7 +230,7 @@ export const VoiceRecorder = ({ onSend, onCancel }: VoiceRecorderProps) => {
       </div>
 
       {/* Duration */}
-      <div className="text-green-400 font-mono text-sm min-w-[48px] text-center">
+      <div className="text-green-400 font-mono ft-body min-w-[48px] text-center">
         {formatDuration(duration)}
       </div>
 

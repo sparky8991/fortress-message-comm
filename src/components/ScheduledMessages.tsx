@@ -205,15 +205,15 @@ export const ScheduledMessages = () => {
               className="p-3 bg-gray-700/50 rounded-lg space-y-2"
             >
               <div className="flex items-center justify-between">
-                <span className="text-white text-sm font-medium">
+                <span className="text-white ft-body font-medium">
                   {message.conversationName}
                 </span>
-                <div className="flex items-center gap-1 text-blue-400 text-xs">
+                <div className="flex items-center gap-1 text-blue-400 ft-meta">
                   <Clock className="w-3 h-3" />
                   {formatScheduledTime(message.scheduledFor)}
                 </div>
               </div>
-              <p className="text-gray-400 text-sm line-clamp-2">{message.content}</p>
+              <p className="text-gray-400 ft-body line-clamp-2">{message.content}</p>
               <div className="flex justify-end gap-1">
                 <Button
                   size="sm"
@@ -258,7 +258,7 @@ export const ScheduledMessages = () => {
             </DialogHeader>
             <div className="space-y-4">
               <div>
-                <label className="text-sm text-gray-400">Recipient/Channel</label>
+                <label className="ft-body text-gray-400">Recipient/Channel</label>
                 <Input
                   value={formData.conversationName}
                   onChange={(e) => setFormData({ ...formData, conversationName: e.target.value })}
@@ -267,7 +267,7 @@ export const ScheduledMessages = () => {
                 />
               </div>
               <div>
-                <label className="text-sm text-gray-400">Message</label>
+                <label className="ft-body text-gray-400">Message</label>
                 <Textarea
                   value={formData.content}
                   onChange={(e) => setFormData({ ...formData, content: e.target.value })}
@@ -277,7 +277,7 @@ export const ScheduledMessages = () => {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-sm text-gray-400">Date</label>
+                  <label className="ft-body text-gray-400">Date</label>
                   <Input
                     type="date"
                     value={formData.scheduledDate}
@@ -287,7 +287,7 @@ export const ScheduledMessages = () => {
                   />
                 </div>
                 <div>
-                  <label className="text-sm text-gray-400">Time</label>
+                  <label className="ft-body text-gray-400">Time</label>
                   <Input
                     type="time"
                     value={formData.scheduledTime}

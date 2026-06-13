@@ -127,8 +127,8 @@ export const ThemeSettingsDialog = ({ isOpen, onClose }: ThemeSettingsDialogProp
                       backgroundColor: style.value === 'minimal' ? 'transparent' : localSettings.accentColor
                     }}
                   />
-                  <p className="text-xs text-white font-medium">{style.name}</p>
-                  <p className="text-xs text-gray-400">{style.description}</p>
+                  <p className="ft-meta text-white font-medium">{style.name}</p>
+                  <p className="ft-meta text-gray-400">{style.description}</p>
                 </button>
               ))}
             </div>
@@ -178,10 +178,10 @@ export const ThemeSettingsDialog = ({ isOpen, onClose }: ThemeSettingsDialogProp
                       : 'border-gray-600 hover:border-gray-500 bg-gray-700/50'
                   }`}
                 >
-                  <p className={`text-sm text-white font-medium ${font.family}`}>
+                  <p className={`ft-body text-white font-medium ${font.family}`}>
                     {font.name}
                   </p>
-                  <p className={`text-xs text-gray-400 ${font.family}`}>
+                  <p className={`ft-meta text-gray-400 ${font.family}`}>
                     Aa Bb Cc
                   </p>
                 </button>
@@ -210,7 +210,7 @@ export const ThemeSettingsDialog = ({ isOpen, onClose }: ThemeSettingsDialogProp
                       backgroundColor: localSettings.bubbleStyle === 'minimal' ? 'transparent' : '#374151'
                     }}
                   >
-                    <p className="text-sm text-gray-100">Hey, how are you?</p>
+                    <p className="ft-body text-gray-100">Hey, how are you?</p>
                   </div>
                 </div>
                 <div className="flex justify-end">
@@ -226,7 +226,7 @@ export const ThemeSettingsDialog = ({ isOpen, onClose }: ThemeSettingsDialogProp
                       color: localSettings.accentColor
                     }}
                   >
-                    <p className="text-sm">I'm doing great!</p>
+                    <p className="ft-body">I'm doing great!</p>
                   </div>
                 </div>
               </div>

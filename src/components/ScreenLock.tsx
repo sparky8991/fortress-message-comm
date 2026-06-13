@@ -94,8 +94,8 @@ export const ScreenLock = ({ onUnlock, onPanic }: ScreenLockProps) => {
         <div className="inline-flex items-center justify-center w-16 h-16 bg-green-500 rounded-2xl mb-4">
           <Shield className="w-8 h-8 text-slate-900" />
         </div>
-        <h1 className="text-2xl font-bold text-white mb-1">SecureChat</h1>
-        <p className="text-gray-400 text-sm flex items-center justify-center gap-2">
+        <h1 className="ft-head font-bold text-white mb-1">SecureChat</h1>
+        <p className="text-gray-400 ft-body flex items-center justify-center gap-2">
           <Lock className="w-4 h-4" />
           Enter PIN to unlock
         </p>
@@ -123,12 +123,12 @@ export const ScreenLock = ({ onUnlock, onPanic }: ScreenLockProps) => {
 
       {/* Show PIN (hidden by default) */}
       {showPin && pin && (
-        <div className="text-green-400 font-mono text-lg mb-4">{pin}</div>
+        <div className="text-green-400 font-mono ft-head mb-4">{pin}</div>
       )}
 
       {/* Error Message */}
       {error && (
-        <div className="text-red-400 text-sm mb-4 text-center">{error}</div>
+        <div className="text-red-400 ft-body mb-4 text-center">{error}</div>
       )}
 
       {/* Number Pad */}
@@ -143,7 +143,7 @@ export const ScreenLock = ({ onUnlock, onPanic }: ScreenLockProps) => {
                   else if (key) handleNumberPress(key);
                 }}
                 disabled={isLocked || (!key && key !== '0')}
-                className={`w-16 h-16 rounded-full font-semibold text-xl transition-all ${
+                className={`w-16 h-16 rounded-full font-semibold ft-head transition-all ${
                   !key
                     ? 'invisible'
                     : key === 'del'
@@ -253,9 +253,9 @@ export const PinSetup = ({ onComplete, onSkip, mode = 'setup' }: PinSetupProps) 
         <div className={`inline-flex items-center justify-center w-16 h-16 ${mode === 'panic' ? 'bg-red-500' : 'bg-green-500'} rounded-2xl mb-4`}>
           <Lock className="w-8 h-8 text-slate-900" />
         </div>
-        <h1 className="text-2xl font-bold text-white mb-1">{title}</h1>
-        <p className="text-gray-400 text-sm">{description}</p>
-        <p className={`text-sm mt-2 ${mode === 'panic' ? 'text-red-400' : 'text-green-400'}`}>
+        <h1 className="ft-head font-bold text-white mb-1">{title}</h1>
+        <p className="text-gray-400 ft-body">{description}</p>
+        <p className={`ft-body mt-2 ${mode === 'panic' ? 'text-red-400' : 'text-green-400'}`}>
           {step === 'enter' ? 'Enter your PIN' : 'Confirm your PIN'}
         </p>
       </div>
@@ -274,7 +274,7 @@ export const PinSetup = ({ onComplete, onSkip, mode = 'setup' }: PinSetupProps) 
         ))}
       </div>
 
-      {error && <div className="text-red-400 text-sm mb-4">{error}</div>}
+      {error && <div className="text-red-400 ft-body mb-4">{error}</div>}
 
       {/* Number Pad */}
       <div className="grid gap-3 mb-6">
@@ -287,7 +287,7 @@ export const PinSetup = ({ onComplete, onSkip, mode = 'setup' }: PinSetupProps) 
                   if (key === 'del') handleDelete();
                   else if (key) handleNumberPress(key);
                 }}
-                className={`w-16 h-16 rounded-full font-semibold text-xl transition-all ${
+                className={`w-16 h-16 rounded-full font-semibold ft-head transition-all ${
                   !key
                     ? 'invisible'
                     : key === 'del'

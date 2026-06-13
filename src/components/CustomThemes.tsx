@@ -296,7 +296,7 @@ export const CustomThemes = () => {
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <span style={{ color: theme.colors.primary }}>{theme.icon}</span>
-                  <span className="text-white text-sm font-medium">{theme.name}</span>
+                  <span className="text-white ft-body font-medium">{theme.name}</span>
                 </div>
                 {selectedTheme === theme.id && (
                   <Check className="w-4 h-4 text-green-500" />

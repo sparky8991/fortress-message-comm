@@ -226,7 +226,7 @@ export const BurnerIdentities = () => {
               </Avatar>
               <div className="flex-1">
                 <p className="text-white font-medium">{activeIdentity.alias}</p>
-                <p className="text-gray-400 text-xs">
+                <p className="text-gray-400 ft-meta">
                   Expires in {getTimeRemaining(activeIdentity.expiresAt)}
                 </p>
               </div>
@@ -257,7 +257,7 @@ export const BurnerIdentities = () => {
                 </Avatar>
                 <div>
                   <p className="text-white font-medium">{identity.alias}</p>
-                  <p className="text-gray-500 text-xs flex items-center gap-1">
+                  <p className="text-gray-500 ft-meta flex items-center gap-1">
                     <Clock className="w-3 h-3" />
                     Expires in {getTimeRemaining(identity.expiresAt)}
                   </p>
@@ -303,21 +303,21 @@ export const BurnerIdentities = () => {
               {/* Preview */}
               <div className="flex items-center justify-center gap-3 p-4 bg-gray-700/50 rounded-lg">
                 <Avatar className={`w-16 h-16 ${newIdentity.avatarColor}`}>
-                  <AvatarFallback className="text-white text-2xl font-bold">
+                  <AvatarFallback className="text-white text-[18px] font-bold">
                     {(newIdentity.alias || 'A').charAt(0)}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="text-white font-medium text-lg">
+                  <p className="text-white font-medium ft-head">
                     {newIdentity.alias || 'Random Alias'}
                   </p>
-                  <p className="text-gray-400 text-sm">Preview</p>
+                  <p className="text-gray-400 ft-body">Preview</p>
                 </div>
               </div>
 
               {/* Alias Input */}
               <div>
-                <label className="text-sm text-gray-400">Alias</label>
+                <label className="ft-body text-gray-400">Alias</label>
                 <div className="flex gap-2">
                   <Input
                     value={newIdentity.alias}
@@ -337,7 +337,7 @@ export const BurnerIdentities = () => {
 
               {/* Color Selection */}
               <div>
-                <label className="text-sm text-gray-400">Avatar Color</label>
+                <label className="ft-body text-gray-400">Avatar Color</label>
                 <div className="grid grid-cols-8 gap-2 mt-2">
                   {AVATAR_COLORS.map((color) => (
                     <button
@@ -355,7 +355,7 @@ export const BurnerIdentities = () => {
 
               {/* Duration Selection */}
               <div>
-                <label className="text-sm text-gray-400">Identity Lifespan</label>
+                <label className="ft-body text-gray-400">Identity Lifespan</label>
                 <Select
                   value={newIdentity.duration}
                   onValueChange={(value) => setNewIdentity({ ...newIdentity, duration: value })}
@@ -375,7 +375,7 @@ export const BurnerIdentities = () => {
               </div>
 
               {/* Warning */}
-              <div className="p-3 bg-yellow-500/20 rounded-lg text-yellow-400 text-sm">
+              <div className="p-3 bg-yellow-500/20 rounded-lg text-yellow-400 ft-body">
                 <strong>Note:</strong> Messages sent with this identity will show the burner alias.
                 The identity will auto-delete after expiration.
               </div>

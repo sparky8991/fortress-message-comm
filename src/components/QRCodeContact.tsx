@@ -158,7 +158,7 @@ export const QRCodeContact = () => {
 
             <div className="text-center">
               <p className="text-white font-medium">{user?.displayName || user?.email}</p>
-              <p className="text-gray-400 text-sm">Scan to add me as a contact</p>
+              <p className="text-gray-400 ft-body">Scan to add me as a contact</p>
             </div>
 
             {/* Actions */}
@@ -190,12 +190,12 @@ export const QRCodeContact = () => {
                   <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
                     <UserPlus className="w-8 h-8 text-green-500" />
                   </div>
-                  <p className="text-white font-medium text-lg">{scannedContact.userName}</p>
+                  <p className="text-white font-medium ft-head">{scannedContact.userName}</p>
                   {scannedContact.callSign && (
-                    <p className="text-green-400 text-sm">{scannedContact.callSign}</p>
+                    <p className="text-green-400 ft-body">{scannedContact.callSign}</p>
                   )}
                   {scannedContact.userEmail && (
-                    <p className="text-gray-400 text-sm">{scannedContact.userEmail}</p>
+                    <p className="text-gray-400 ft-body">{scannedContact.userEmail}</p>
                   )}
                 </div>
 
@@ -239,7 +239,7 @@ export const QRCodeContact = () => {
                   </div>
                 </div>
 
-                <p className="text-gray-400 text-sm text-center">
+                <p className="text-gray-400 ft-body text-center">
                   Point your camera at a QR code
                 </p>
 

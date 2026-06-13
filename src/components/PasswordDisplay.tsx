@@ -16,7 +16,7 @@ export const PasswordDisplay = ({ password, onRegeneratePassword, onCopyPassword
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <Label className="text-sm font-medium text-green-400">
+        <Label className="ft-body font-medium text-green-400">
           Generated Encryption Key
         </Label>
         <button
@@ -32,7 +32,7 @@ export const PasswordDisplay = ({ password, onRegeneratePassword, onCopyPassword
           type={showPassword ? 'text' : 'password'}
           value={password}
           readOnly
-          className="bg-gray-700 border-green-500/50 text-green-400 font-mono text-xs pr-20"
+          className="bg-gray-700 border-green-500/50 text-green-400 font-mono ft-meta pr-20"
         />
         <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex space-x-1">
           <button
@@ -51,7 +51,7 @@ export const PasswordDisplay = ({ password, onRegeneratePassword, onCopyPassword
           </button>
         </div>
       </div>
-      <p className="text-xs text-green-400/70 mt-1 font-mono">
+      <p className="ft-meta text-green-400/70 mt-1 font-mono">
         › Share this key with authorized personnel for decryption
       </p>
     </div>

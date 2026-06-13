@@ -51,7 +51,7 @@ export const PrivacySecuritySettings = ({ isOpen, onClose }: PrivacySecuritySett
               <Fingerprint className="w-5 h-5 text-purple-400" />
               <div>
                 <Label className="text-white font-medium">Biometric Lock</Label>
-                <p className="text-xs text-gray-400">Coming soon for supported mobile devices</p>
+                <p className="ft-meta text-gray-400">Coming soon for supported mobile devices</p>
               </div>
             </div>
             <Switch
@@ -66,7 +66,7 @@ export const PrivacySecuritySettings = ({ isOpen, onClose }: PrivacySecuritySett
               <Eye className="w-5 h-5 text-blue-400" />
               <div>
                 <Label className="text-white font-medium">Screenshot Protection</Label>
-                <p className="text-xs text-gray-400">Coming soon where the platform allows it</p>
+                <p className="ft-meta text-gray-400">Coming soon where the platform allows it</p>
               </div>
             </div>
             <Switch
@@ -81,7 +81,7 @@ export const PrivacySecuritySettings = ({ isOpen, onClose }: PrivacySecuritySett
               <Timer className="w-5 h-5 text-orange-400" />
               <div>
                 <Label className="text-white font-medium">Auto-Delete Messages</Label>
-                <p className="text-xs text-gray-400">Default cleanup policy for future messages</p>
+                <p className="ft-meta text-gray-400">Default cleanup policy for future messages</p>
               </div>
             </div>
             <Switch
@@ -93,7 +93,7 @@ export const PrivacySecuritySettings = ({ isOpen, onClose }: PrivacySecuritySett
           {/* Auto-Delete Timer */}
           {localSettings.autoDeleteMessages && (
             <div className="pl-8 space-y-2">
-              <Label className="text-sm text-gray-300">Delete messages after:</Label>
+              <Label className="ft-body text-gray-300">Delete messages after:</Label>
               <Select
                 value={localSettings.autoDeleteTimer.toString()}
                 onValueChange={(value) => setLocalSettings({ ...localSettings, autoDeleteTimer: parseInt(value) })}
@@ -117,9 +117,9 @@ export const PrivacySecuritySettings = ({ isOpen, onClose }: PrivacySecuritySett
           <div className="bg-green-900/20 border border-green-700/70 rounded p-3">
             <div className="flex items-center space-x-2 text-green-400 mb-1">
               <Lock className="w-4 h-4" />
-              <span className="text-sm font-medium">Protected Channel</span>
+              <span className="ft-body font-medium">Protected Channel</span>
             </div>
-            <p className="text-xs text-gray-400">
+            <p className="ft-meta text-gray-400">
               Messages, locked payloads, and burn-after-read controls are protected by the app's current security rules and encryption workflow. Keep decryption keys separate from the chat.
             </p>
           </div>

@@ -33,7 +33,7 @@ export const FileSelector = ({ selectedFile, onFileSelect }: FileSelectorProps) 
 
   return (
     <div>
-      <Label htmlFor="image-file" className="text-sm font-medium text-gray-300 mb-2 block">
+      <Label htmlFor="image-file" className="ft-body font-medium text-gray-300 mb-2 block">
         Select Image Payload
       </Label>
       <input
@@ -46,7 +46,7 @@ export const FileSelector = ({ selectedFile, onFileSelect }: FileSelectorProps) 
       <Button
         variant="outline"
         onClick={() => document.getElementById('image-file')?.click()}
-        className="w-full justify-start bg-gray-700 border-gray-600 text-white hover:bg-gray-600 text-sm"
+        className="w-full justify-start bg-gray-700 border-gray-600 text-white hover:bg-gray-600 ft-body"
       >
         <Upload className="w-4 h-4 mr-2" />
         {selectedFile ? selectedFile.name : 'Choose Image File'}

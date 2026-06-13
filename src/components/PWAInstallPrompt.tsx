@@ -83,8 +83,8 @@ export const PWAInstallPrompt = () => {
               <Smartphone className="w-5 h-5 text-green-400" />
             </div>
             <div>
-              <h3 className="text-white font-semibold text-sm">Install SecureChat</h3>
-              <p className="text-gray-400 text-xs">Add to your home screen</p>
+              <h3 className="text-white font-semibold ft-body">Install SecureChat</h3>
+              <p className="text-gray-400 ft-meta">Add to your home screen</p>
             </div>
           </div>
           <button
@@ -97,7 +97,7 @@ export const PWAInstallPrompt = () => {
 
         {isIOS ? (
           <div className="space-y-2">
-            <p className="text-gray-300 text-xs leading-relaxed">
+            <p className="text-gray-300 ft-meta leading-relaxed">
               Tap the <span className="inline-flex items-center px-1 py-0.5 bg-gray-700 rounded text-[10px]">
                 <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M15 8a1 1 0 01-1 1h-3v3a1 1 0 11-2 0V9H6a1 1 0 110-2h3V4a1 1 0 112 0v3h3a1 1 0 011 1z"/>

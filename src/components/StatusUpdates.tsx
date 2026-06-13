@@ -179,7 +179,7 @@ export const StatusUpdates = () => {
           </button>
           <div className="flex-1">
             <p className="text-white font-medium">My Status</p>
-            <p className="text-gray-400 text-sm">
+            <p className="text-gray-400 ft-body">
               {myStatus ? `Expires in ${getTimeRemaining(myStatus.expiresAt)}` : 'Tap to add status'}
             </p>
           </div>
@@ -213,8 +213,8 @@ export const StatusUpdates = () => {
                   </Avatar>
                 </div>
                 <div className="flex-1 text-left">
-                  <p className="text-white text-sm font-medium">{status.userName}</p>
-                  <p className="text-gray-500 text-xs flex items-center gap-1">
+                  <p className="text-white ft-body font-medium">{status.userName}</p>
+                  <p className="text-gray-500 ft-meta flex items-center gap-1">
                     <Clock className="w-3 h-3" />
                     {getTimeRemaining(status.expiresAt)} left
                   </p>
@@ -286,7 +286,7 @@ export const StatusUpdates = () => {
                 {isUploading ? 'Posting...' : 'Post Status'}
               </Button>
 
-              <p className="text-gray-500 text-xs text-center">
+              <p className="text-gray-500 ft-meta text-center">
                 Status will expire after 24 hours
               </p>
             </div>
@@ -309,7 +309,7 @@ export const StatusUpdates = () => {
                     </Avatar>
                     <div>
                       <p className="text-white font-medium">{viewingStatus.userName}</p>
-                      <p className="text-gray-400 text-xs">
+                      <p className="text-gray-400 ft-meta">
                         {viewingStatus.createdAt?.toLocaleString()}
                       </p>
                     </div>
@@ -325,7 +325,7 @@ export const StatusUpdates = () => {
                       className="max-w-full max-h-[400px] object-contain"
                     />
                   ) : (
-                    <p className="text-white text-xl text-center">{viewingStatus.content}</p>
+                    <p className="text-white ft-head text-center">{viewingStatus.content}</p>
                   )}
                 </div>
 
@@ -339,7 +339,7 @@ export const StatusUpdates = () => {
                 {/* Views count */}
                 <div className="p-3 bg-gray-900 border-t border-gray-700 flex items-center gap-2 text-gray-400">
                   <Eye className="w-4 h-4" />
-                  <span className="text-sm">{viewingStatus.views.length} views</span>
+                  <span className="ft-body">{viewingStatus.views.length} views</span>
                 </div>
               </div>
             )}

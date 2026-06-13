@@ -80,7 +80,7 @@ export const GhostModeToggle = () => {
         <Label htmlFor="ghost-mode" className="text-white font-medium">
           Ghost Mode
         </Label>
-        <p className="text-sm text-gray-400 mt-1">
+        <p className="ft-body text-gray-400 mt-1">
           Appear offline while accessing encrypted ghost sessions
         </p>
       </div>

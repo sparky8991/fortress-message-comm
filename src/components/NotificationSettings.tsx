@@ -100,7 +100,7 @@ export const NotificationSettings = ({ isOpen, onClose, settings: propSettings, 
                   )}
                   <span>Unread Message Reminders</span>
                 </Label>
-                <p className="text-sm text-gray-400">
+                <p className="ft-body text-gray-400">
                   Get notified when messages haven't been read
                 </p>
               </div>
@@ -122,7 +122,7 @@ export const NotificationSettings = ({ isOpen, onClose, settings: propSettings, 
                     )}
                     <span>Reminder Timer</span>
                   </Label>
-                  <p className="text-sm text-gray-400">
+                  <p className="ft-body text-gray-400">
                     Enable time-based reminder notifications
                   </p>
                 </div>
@@ -150,7 +150,7 @@ export const NotificationSettings = ({ isOpen, onClose, settings: propSettings, 
                   className="bg-gray-700 border-gray-600 text-white"
                   disabled={loading}
                 />
-                <p className="text-xs text-gray-500">
+                <p className="ft-meta text-gray-500">
                   You'll be notified if a message isn't read within {unreadReminderTime} minute{unreadReminderTime !== 1 ? 's' : ''}
                 </p>
               </div>

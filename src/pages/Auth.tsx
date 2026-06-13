@@ -350,12 +350,12 @@ const AuthPage = () => {
               className="h-11 w-11 rounded-xl border border-emerald-400/30 bg-emerald-500/10 p-1"
             />
             <div>
-              <div className="text-lg font-bold leading-tight">SecureChat</div>
-              <div className="font-mono text-xs uppercase tracking-[0.28em] text-emerald-400">Fortress</div>
+              <div className="ft-head font-bold leading-tight">SecureChat</div>
+              <div className="font-mono ft-meta uppercase tracking-[0.28em] text-emerald-400">Fortress</div>
             </div>
           </a>
 
-          <nav className="hidden items-center gap-6 text-sm text-slate-300 md:flex">
+          <nav className="hidden items-center gap-6 ft-body text-slate-300 md:flex">
             <a href="#features" className="hover:text-emerald-300">Features</a>
             <a href="#privacy" className="hover:text-emerald-300">Privacy</a>
             <a href="#how-it-works" className="hover:text-emerald-300">How it works</a>
@@ -365,14 +365,14 @@ const AuthPage = () => {
             <button
               type="button"
               onClick={() => openAuthDialog('login')}
-              className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-emerald-400/70 hover:text-emerald-300"
+              className="rounded-lg border border-slate-700 px-4 py-2 ft-body font-semibold text-slate-200 transition hover:border-emerald-400/70 hover:text-emerald-300"
             >
               Sign In
             </button>
             <button
               type="button"
               onClick={() => openAuthDialog('signup')}
-              className="hidden rounded-lg bg-emerald-500 px-4 py-2 text-sm font-bold text-slate-950 transition hover:bg-emerald-400 sm:inline-flex"
+              className="hidden rounded-lg bg-emerald-500 px-4 py-2 ft-body font-bold text-slate-950 transition hover:bg-emerald-400 sm:inline-flex"
             >
               Create Account
             </button>
@@ -385,17 +385,17 @@ const AuthPage = () => {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.14),transparent_34%),linear-gradient(135deg,rgba(15,23,42,0.96),rgba(2,6,23,1))]" />
           <div className="relative mx-auto grid min-h-[calc(100vh-76px)] max-w-7xl items-center gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1.08fr_0.92fr] lg:px-8 lg:py-16">
             <div className="max-w-3xl">
-              <p className="mb-5 font-mono text-sm uppercase tracking-[0.35em] text-emerald-400">
+              <p className="mb-5 font-mono ft-body uppercase tracking-[0.35em] text-emerald-400">
                 Encrypted / Private / Controlled
               </p>
               <h1 className="max-w-4xl text-4xl font-black leading-[1.05] tracking-normal text-white sm:text-5xl lg:text-7xl">
                 Secure messaging for teams that need control.
               </h1>
-              <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
+              <p className="mt-6 max-w-2xl ft-head leading-8 text-slate-300">
                 Key-locked messages, burn-after-read, and encrypted media sharing built for fast,
                 private team communication.
               </p>
-              <p className="mt-5 max-w-3xl text-base leading-7 text-slate-400">
+              <p className="mt-5 max-w-3xl ft-body leading-7 text-slate-400">
                 SecureChat is a private communication workspace for teams that need their
                 conversations to stay between the people in them. Send protected messages, lock the
                 sensitive ones behind a key only your recipient holds, share images, GIFs, and files
@@ -407,7 +407,7 @@ const AuthPage = () => {
                 <button
                   type="button"
                   onClick={() => openAuthDialog('signup')}
-                  className="inline-flex items-center justify-center rounded-lg bg-emerald-500 px-6 py-3 text-base font-black text-slate-950 transition hover:bg-emerald-400"
+                  className="inline-flex items-center justify-center rounded-lg bg-emerald-500 px-6 py-3 ft-body font-black text-slate-950 transition hover:bg-emerald-400"
                 >
                   Create Account
                   <ArrowRight className="ml-2 h-5 w-5" />
@@ -415,13 +415,13 @@ const AuthPage = () => {
                 <button
                   type="button"
                   onClick={() => openAuthDialog('login')}
-                  className="inline-flex items-center justify-center rounded-lg border border-slate-700 px-6 py-3 text-base font-bold text-slate-100 transition hover:border-emerald-400/70 hover:text-emerald-300"
+                  className="inline-flex items-center justify-center rounded-lg border border-slate-700 px-6 py-3 ft-body font-bold text-slate-100 transition hover:border-emerald-400/70 hover:text-emerald-300"
                 >
                   Sign In
                 </button>
                 <a
                   href="#how-it-works"
-                  className="inline-flex items-center justify-center rounded-lg px-6 py-3 text-base font-bold text-slate-300 transition hover:text-emerald-300"
+                  className="inline-flex items-center justify-center rounded-lg px-6 py-3 ft-body font-bold text-slate-300 transition hover:text-emerald-300"
                 >
                   See how it works
                 </a>
@@ -437,7 +437,7 @@ const AuthPage = () => {
                     </div>
                     <div>
                       <div className="font-bold">Fortress Channel</div>
-                      <div className="font-mono text-xs uppercase text-emerald-400">Channel active</div>
+                      <div className="font-mono ft-meta uppercase text-emerald-400">Channel active</div>
                     </div>
                   </div>
                   <Lock className="h-5 w-5 text-emerald-400" />
@@ -445,25 +445,25 @@ const AuthPage = () => {
 
                 <div className="space-y-4 p-5">
                   <div className="max-w-[82%] rounded-lg border border-slate-700 bg-slate-800 p-4">
-                    <div className="mb-2 inline-flex rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 font-mono text-xs text-emerald-300">
+                    <div className="mb-2 inline-flex rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 font-mono ft-meta text-emerald-300">
                       Raven
                     </div>
-                    <p className="text-sm text-slate-200">Status check complete. Moving to private channel.</p>
-                    <div className="mt-3 flex items-center gap-2 font-mono text-xs uppercase text-emerald-400">
+                    <p className="ft-body text-slate-200">Status check complete. Moving to private channel.</p>
+                    <div className="mt-3 flex items-center gap-2 font-mono ft-meta uppercase text-emerald-400">
                       <Shield className="h-3.5 w-3.5" />
                       Encrypted
                     </div>
                   </div>
 
                   <div className="ml-auto max-w-[82%] rounded-lg border border-emerald-500/70 bg-black p-4 shadow-lg shadow-emerald-950/50">
-                    <div className="mb-3 flex items-center gap-2 font-mono text-xs uppercase text-emerald-300">
+                    <div className="mb-3 flex items-center gap-2 font-mono ft-meta uppercase text-emerald-300">
                       <FileKey2 className="h-4 w-4" />
                       Key-locked payload
                     </div>
-                    <div className="rounded-md border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-100">
+                    <div className="rounded-md border border-emerald-500/30 bg-emerald-500/10 p-3 ft-body text-emerald-100">
                       File sealed. Recipient needs the one-time key to unlock it.
                     </div>
-                    <div className="mt-3 flex items-center justify-between border-t border-emerald-900/70 pt-3 font-mono text-xs uppercase text-emerald-400">
+                    <div className="mt-3 flex items-center justify-between border-t border-emerald-900/70 pt-3 font-mono ft-meta uppercase text-emerald-400">
                       <span>Burn optional</span>
                       <Flame className="h-4 w-4" />
                     </div>
@@ -472,13 +472,13 @@ const AuthPage = () => {
                   <div className="grid grid-cols-2 gap-3 pt-2">
                     <div className="rounded-lg border border-slate-800 bg-slate-900 p-3">
                       <MessageSquare className="mb-3 h-5 w-5 text-cyan-300" />
-                      <div className="text-sm font-bold">Direct chat</div>
-                      <div className="text-xs text-slate-500">Private messages</div>
+                      <div className="ft-body font-bold">Direct chat</div>
+                      <div className="ft-meta text-slate-500">Private messages</div>
                     </div>
                     <div className="rounded-lg border border-slate-800 bg-slate-900 p-3">
                       <TimerReset className="mb-3 h-5 w-5 text-orange-300" />
-                      <div className="text-sm font-bold">Burn mode</div>
-                      <div className="text-xs text-slate-500">Two minute timer</div>
+                      <div className="ft-body font-bold">Burn mode</div>
+                      <div className="ft-meta text-slate-500">Two minute timer</div>
                     </div>
                   </div>
                 </div>
@@ -490,7 +490,7 @@ const AuthPage = () => {
         <section id="features" className="border-b border-slate-800 bg-slate-950 px-4 py-16 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl">
             <div className="max-w-3xl">
-              <p className="font-mono text-sm uppercase tracking-[0.3em] text-emerald-400">What you can do</p>
+              <p className="font-mono ft-body uppercase tracking-[0.3em] text-emerald-400">What you can do</p>
               <h2 className="mt-3 text-3xl font-black text-white sm:text-4xl">
                 A private workspace for sensitive team conversations.
               </h2>
@@ -506,8 +506,8 @@ const AuthPage = () => {
                 return (
                   <article key={feature.title} className="rounded-lg border border-slate-800 bg-slate-900/70 p-5">
                     <Icon className="mb-4 h-6 w-6 text-emerald-400" />
-                    <h3 className="text-lg font-bold text-white">{feature.title}</h3>
-                    <p className="mt-3 text-sm leading-6 text-slate-400">{feature.text}</p>
+                    <h3 className="ft-head font-bold text-white">{feature.title}</h3>
+                    <p className="mt-3 ft-body leading-6 text-slate-400">{feature.text}</p>
                   </article>
                 );
               })}
@@ -518,7 +518,7 @@ const AuthPage = () => {
         <section id="privacy" className="border-b border-slate-800 bg-slate-900 px-4 py-16 sm:px-6 lg:px-8">
           <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.85fr_1.15fr]">
             <div>
-              <p className="font-mono text-sm uppercase tracking-[0.3em] text-emerald-400">Privacy tools</p>
+              <p className="font-mono ft-body uppercase tracking-[0.3em] text-emerald-400">Privacy tools</p>
               <h2 className="mt-3 text-3xl font-black text-white sm:text-4xl">
                 Simple controls that make private messaging feel private.
               </h2>
@@ -530,7 +530,7 @@ const AuthPage = () => {
 
             <div className="grid gap-4 xl:grid-cols-2">
               <div className="rounded-lg border border-emerald-500/30 bg-slate-950 p-5">
-                <div className="mb-5 inline-flex rounded-full bg-emerald-500 px-3 py-1 text-xs font-black uppercase text-slate-950">
+                <div className="mb-5 inline-flex rounded-full bg-emerald-500 px-3 py-1 ft-meta font-black uppercase text-slate-950">
                   Available now
                 </div>
                 <div className="space-y-4">
@@ -541,7 +541,7 @@ const AuthPage = () => {
                         <Icon className="mt-1 h-5 w-5 shrink-0 text-emerald-400" />
                         <div>
                           <h3 className="font-bold text-white">{item.title}</h3>
-                          <p className="text-sm text-slate-400">{item.text}</p>
+                          <p className="ft-body text-slate-400">{item.text}</p>
                         </div>
                       </div>
                     );
@@ -550,7 +550,7 @@ const AuthPage = () => {
               </div>
 
               <div className="rounded-lg border border-slate-700 bg-slate-950 p-5">
-                <div className="mb-5 inline-flex rounded-full border border-slate-600 px-3 py-1 text-xs font-black uppercase text-slate-300">
+                <div className="mb-5 inline-flex rounded-full border border-slate-600 px-3 py-1 ft-meta font-black uppercase text-slate-300">
                   Coming soon
                 </div>
                 <div className="space-y-4">
@@ -561,7 +561,7 @@ const AuthPage = () => {
                         <Icon className="mt-1 h-5 w-5 shrink-0 text-cyan-300" />
                         <div>
                           <h3 className="font-bold text-white">{item.title}</h3>
-                          <p className="text-sm text-slate-400">{item.text}</p>
+                          <p className="ft-body text-slate-400">{item.text}</p>
                         </div>
                       </div>
                     );
@@ -575,7 +575,7 @@ const AuthPage = () => {
         <section id="how-it-works" className="border-b border-slate-800 bg-slate-950 px-4 py-16 sm:px-6 lg:px-8">
           <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-2">
             <div>
-              <p className="font-mono text-sm uppercase tracking-[0.3em] text-emerald-400">How it works</p>
+              <p className="font-mono ft-body uppercase tracking-[0.3em] text-emerald-400">How it works</p>
               <h2 className="mt-3 text-3xl font-black text-white sm:text-4xl">
                 Get in, pick a call sign, and keep the conversation contained.
               </h2>
@@ -601,7 +601,7 @@ const AuthPage = () => {
                 decryption key. Pass that key to your recipient through a separate channel.
                 Without it, the payload stays locked. No key, no message.
               </p>
-              <div className="mt-6 rounded-lg border border-amber-400/30 bg-amber-400/10 p-4 text-sm text-amber-100">
+              <div className="mt-6 rounded-lg border border-amber-400/30 bg-amber-400/10 p-4 ft-body text-amber-100">
                 Built-in privacy tools reduce what you expose, but no tool replaces good judgment.
                 Only share sensitive information with people you trust.
               </div>
@@ -612,7 +612,7 @@ const AuthPage = () => {
         <section className="bg-slate-900 px-4 py-16 sm:px-6 lg:px-8">
           <div className="mx-auto grid max-w-7xl gap-6 rounded-xl border border-slate-700 bg-slate-950 p-8 md:grid-cols-[1fr_auto] md:items-center">
             <div className="max-w-3xl">
-              <p className="font-mono text-sm uppercase tracking-[0.3em] text-emerald-400">Ready to go dark?</p>
+              <p className="font-mono ft-body uppercase tracking-[0.3em] text-emerald-400">Ready to go dark?</p>
               <h2 className="mt-3 text-3xl font-black text-white">
                 Create an account and start sending messages that stay yours.
               </h2>
@@ -624,7 +624,7 @@ const AuthPage = () => {
             <button
               type="button"
               onClick={() => openAuthDialog('signup')}
-              className="inline-flex w-full items-center justify-center rounded-lg bg-emerald-500 px-6 py-3 text-base font-black text-slate-950 transition hover:bg-emerald-400 md:w-auto"
+              className="inline-flex w-full items-center justify-center rounded-lg bg-emerald-500 px-6 py-3 ft-body font-black text-slate-950 transition hover:bg-emerald-400 md:w-auto"
             >
               Create Account
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -634,7 +634,7 @@ const AuthPage = () => {
       </main>
 
       <footer className="border-t border-slate-800 bg-slate-950 px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 ft-body text-slate-500 sm:flex-row sm:items-center sm:justify-between">
           <span>SecureChat by Johnathan Carlson.</span>
           <span className="inline-flex items-center gap-2">
             <CheckCircle2 className="h-4 w-4 text-emerald-400" />
@@ -660,7 +660,7 @@ const AuthPage = () => {
           <button
             onClick={handleGoogleSignIn}
             disabled={loading}
-            className="mt-2 flex w-full items-center justify-center rounded-xl bg-white px-6 py-4 text-lg font-bold text-slate-900 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-2 flex w-full items-center justify-center rounded-xl bg-white px-6 py-4 ft-head font-bold text-slate-900 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <svg className="mr-3 h-6 w-6" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -673,7 +673,7 @@ const AuthPage = () => {
 
           <div className="flex items-center gap-4">
             <div className="h-px flex-1 bg-slate-700" />
-            <span className="text-sm text-slate-500">or</span>
+            <span className="ft-body text-slate-500">or</span>
             <div className="h-px flex-1 bg-slate-700" />
           </div>
 
@@ -774,7 +774,7 @@ const AuthPage = () => {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-center rounded-xl bg-emerald-500 px-6 py-4 text-lg font-black text-slate-950 transition-colors hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex w-full items-center justify-center rounded-xl bg-emerald-500 px-6 py-4 ft-head font-black text-slate-950 transition-colors hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <ArrowRight className="mr-3 h-6 w-6" />
               {loading ? 'PROCESSING...' : (isLogin ? 'SIGN IN' : 'CREATE ACCOUNT')}
@@ -783,13 +783,13 @@ const AuthPage = () => {
 
           {success && (
             <div className="rounded-xl border border-emerald-700 bg-emerald-900/50 p-4">
-              <p className="font-mono text-sm text-emerald-400">{success}</p>
+              <p className="font-mono ft-body text-emerald-400">{success}</p>
             </div>
           )}
 
           {error && (
             <div className="rounded-xl border border-red-700 bg-red-900/50 p-4">
-              <pre className="whitespace-pre-wrap font-mono text-xs text-red-400">{error}</pre>
+              <pre className="whitespace-pre-wrap font-mono ft-meta text-red-400">{error}</pre>
             </div>
           )}
 

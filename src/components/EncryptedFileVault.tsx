@@ -299,7 +299,7 @@ export const EncryptedFileVault = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-gray-400 text-sm">
+          <p className="text-gray-400 ft-body">
             Create a password to encrypt your secure file vault. This password cannot be recovered.
           </p>
           <Input
@@ -380,7 +380,7 @@ export const EncryptedFileVault = () => {
         >
           <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
           <p className="text-gray-400">Click to upload encrypted files</p>
-          <p className="text-gray-500 text-xs mt-1">Files are encrypted before upload</p>
+          <p className="text-gray-500 ft-meta mt-1">Files are encrypted before upload</p>
         </div>
         <input
           ref={fileInputRef}
@@ -393,7 +393,7 @@ export const EncryptedFileVault = () => {
         {isUploading && (
           <div className="space-y-2">
             <Progress value={uploadProgress} className="h-2" />
-            <p className="text-gray-400 text-sm text-center">Encrypting and uploading...</p>
+            <p className="text-gray-400 ft-body text-center">Encrypting and uploading...</p>
           </div>
         )}
 
@@ -407,8 +407,8 @@ export const EncryptedFileVault = () => {
               <div className="flex items-center gap-3 min-w-0">
                 {getFileIcon(file.type)}
                 <div className="min-w-0">
-                  <p className="text-white text-sm truncate">{file.name}</p>
-                  <p className="text-gray-500 text-xs">{formatFileSize(file.size)}</p>
+                  <p className="text-white ft-body truncate">{file.name}</p>
+                  <p className="text-gray-500 ft-meta">{formatFileSize(file.size)}</p>
                 </div>
               </div>
               <div className="flex gap-1">

@@ -188,7 +188,7 @@ export const LocationSharing = ({ conversationId, userName = 'User' }: LocationS
 
           <div className="space-y-4 py-4">
             <div>
-              <label className="block text-sm text-gray-300 mb-2">
+              <label className="block ft-body text-gray-300 mb-2">
                 <Clock className="w-4 h-4 inline mr-1" />
                 Share for
               </label>
@@ -207,13 +207,13 @@ export const LocationSharing = ({ conversationId, userName = 'User' }: LocationS
             </div>
 
             {error && (
-              <div className="flex items-center gap-2 text-red-400 text-sm p-3 bg-red-900/30 rounded-lg">
+              <div className="flex items-center gap-2 text-red-400 ft-body p-3 bg-red-900/30 rounded-lg">
                 <AlertTriangle className="w-4 h-4" />
                 {error}
               </div>
             )}
 
-            <div className="text-xs text-gray-500 space-y-1">
+            <div className="ft-meta text-gray-500 space-y-1">
               <p>Your location will be updated in real-time while sharing is active.</p>
               <p>You can stop sharing at any time.</p>
             </div>
@@ -260,18 +260,18 @@ export const SharedLocationView = ({ conversationId, excludeUserId }: SharedLoca
 
   return (
     <div className="p-3 bg-green-900/20 border border-green-700/50 rounded-lg">
-      <div className="flex items-center gap-2 text-green-400 text-sm mb-2">
+      <div className="flex items-center gap-2 text-green-400 ft-body mb-2">
         <MapPin className="w-4 h-4" />
         <span>Live Locations</span>
       </div>
       {Array.from(locations.entries()).map(([id, loc]) => (
-        <div key={id} className="flex items-center justify-between text-sm py-1">
+        <div key={id} className="flex items-center justify-between ft-body py-1">
           <span className="text-gray-300">{loc.userName}</span>
           <a
             href={`https://www.google.com/maps?q=${loc.latitude},${loc.longitude}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-green-400 hover:text-green-300 text-xs"
+            className="text-green-400 hover:text-green-300 ft-meta"
           >
             View on Map
           </a>

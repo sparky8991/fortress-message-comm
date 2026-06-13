@@ -71,7 +71,7 @@ export const EncryptedImageUpload = ({ onEncryptedImageReady, onCancel }: Encryp
         <div className="flex items-center justify-between mb-6 md:mb-12">
           <div className="flex items-center space-x-2 md:space-x-4">
             <Lock className="w-8 h-8 md:w-12 md:h-12 text-green-400" />
-            <h3 className="text-2xl md:text-4xl font-bold text-white">ENCRYPT PAYLOAD</h3>
+            <h3 className="ft-head font-bold text-white">ENCRYPT PAYLOAD</h3>
           </div>
           <button
             onClick={onCancel}
@@ -96,7 +96,7 @@ export const EncryptedImageUpload = ({ onEncryptedImageReady, onCancel }: Encryp
           <Button
             onClick={handleEncryptAndUpload}
             disabled={!selectedFile || isEncrypting}
-            className="flex-1 bg-green-600 hover:bg-green-700 text-white text-lg md:text-xl py-4 md:py-8"
+            className="flex-1 bg-green-600 hover:bg-green-700 text-white ft-head py-4 md:py-8"
           >
             {isEncrypting ? (
               <>
@@ -113,7 +113,7 @@ export const EncryptedImageUpload = ({ onEncryptedImageReady, onCancel }: Encryp
           <Button
             variant="outline"
             onClick={onCancel}
-            className="bg-gray-700 border-gray-600 text-white hover:bg-gray-600 text-lg md:text-xl py-4 md:py-8 px-8 md:px-12"
+            className="bg-gray-700 border-gray-600 text-white hover:bg-gray-600 ft-head py-4 md:py-8 px-8 md:px-12"
           >
             ABORT
           </Button>

@@ -185,8 +185,8 @@ export const TacticalSounds = () => {
         {settings.enabled && (
           <div className="p-3 bg-gray-700/50 rounded-lg space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-gray-400 text-sm">Volume</span>
-              <span className="text-white text-sm">{Math.round(settings.volume * 100)}%</span>
+              <span className="text-gray-400 ft-body">Volume</span>
+              <span className="text-white ft-body">{Math.round(settings.volume * 100)}%</span>
             </div>
             <Slider
               value={[settings.volume * 100]}
@@ -201,7 +201,7 @@ export const TacticalSounds = () => {
         {/* Sound Packs */}
         {settings.enabled && (
           <div className="space-y-2">
-            <p className="text-gray-400 text-sm">Sound Pack</p>
+            <p className="text-gray-400 ft-body">Sound Pack</p>
             {SOUND_PACKS.map((pack) => (
               <button
                 key={pack.id}
@@ -214,7 +214,7 @@ export const TacticalSounds = () => {
               >
                 <div className="text-left">
                   <p className="text-white font-medium">{pack.name}</p>
-                  <p className="text-gray-400 text-xs">{pack.description}</p>
+                  <p className="text-gray-400 ft-meta">{pack.description}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   {pack.id !== 'silent' && (

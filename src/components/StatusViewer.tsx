@@ -148,7 +148,7 @@ export const StatusViewer = ({ statusUser, onClose, onDeleted }: StatusViewerPro
           </div>
           <div>
             <p className="text-white font-medium">{statusUser.username}</p>
-            <p className="text-gray-400 text-xs">
+            <p className="text-gray-400 ft-meta">
               {formatDistanceToNow(currentStatus.created_at, { addSuffix: true })}
             </p>
           </div>
@@ -157,7 +157,7 @@ export const StatusViewer = ({ statusUser, onClose, onDeleted }: StatusViewerPro
         <div className="flex items-center space-x-2">
           {isOwnStatus && (
             <>
-              <div className="flex items-center space-x-1 text-gray-400 text-sm mr-2">
+              <div className="flex items-center space-x-1 text-gray-400 ft-body mr-2">
                 <Eye className="w-4 h-4" />
                 <span>{currentStatus.views.length}</span>
               </div>
@@ -225,7 +225,7 @@ export const StatusViewer = ({ statusUser, onClose, onDeleted }: StatusViewerPro
       {isPaused && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="bg-black/50 rounded-full p-4">
-            <span className="text-white text-lg">Paused</span>
+            <span className="text-white ft-head">Paused</span>
           </div>
         </div>
       )}

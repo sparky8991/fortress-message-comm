@@ -157,7 +157,7 @@ export const HoldPanicButton = ({ variant = 'full', onWipeComplete }: HoldPanicB
       <div className="fixed inset-0 bg-red-900/95 z-50 flex flex-col items-center justify-center p-4">
         <div className="text-center">
           <AlertTriangle className="w-16 h-16 text-red-400 mx-auto mb-4 animate-pulse" />
-          <h2 className="text-2xl font-bold text-white mb-2">EMERGENCY WIPE IN PROGRESS</h2>
+          <h2 className="ft-head font-bold text-white mb-2">EMERGENCY WIPE IN PROGRESS</h2>
           <p className="text-red-300 mb-6">{wipeStatus}</p>
 
           <div className="w-64 h-2 bg-red-800 rounded-full overflow-hidden mb-4">
@@ -167,11 +167,11 @@ export const HoldPanicButton = ({ variant = 'full', onWipeComplete }: HoldPanicB
             />
           </div>
 
-          <p className="text-red-400 text-sm">{wipeProgress}% Complete</p>
+          <p className="text-red-400 ft-body">{wipeProgress}% Complete</p>
 
           <div className="mt-4 flex items-center justify-center gap-2">
             <Loader2 className="w-4 h-4 animate-spin text-red-400" />
-            <span className="text-red-300 text-sm">Do not close this window</span>
+            <span className="text-red-300 ft-body">Do not close this window</span>
           </div>
         </div>
       </div>
@@ -255,7 +255,7 @@ export const HoldPanicButton = ({ variant = 'full', onWipeComplete }: HoldPanicB
         </div>
       </button>
 
-      <p className="text-xs text-gray-500 text-center">
+      <p className="ft-meta text-gray-500 text-center">
         Hold the button for 3 seconds to wipe all data
       </p>
     </div>

@@ -62,7 +62,7 @@ export const StatusBar = ({ onViewStatus, onCreateStatus, variant = 'top' }: Sta
                 myStatus.avatar_url ? (
                   <img src={myStatus.avatar_url} alt="My status" className="w-full h-full rounded-sm object-cover" />
                 ) : (
-                  <span className={`text-white font-bold font-mono ${isSidebar ? 'text-xs' : 'text-lg'}`}>
+                  <span className={`text-white font-bold font-mono ${isSidebar ? 'ft-meta' : 'ft-head'}`}>
                     {myStatus.username.charAt(0).toUpperCase()}
                   </span>
                 )
@@ -76,7 +76,7 @@ export const StatusBar = ({ onViewStatus, onCreateStatus, variant = 'top' }: Sta
               </div>
             )}
           </button>
-          <span className={`${isSidebar ? 'text-[8px] max-w-[58px]' : 'text-xs max-w-[60px]'} text-green-500/60 mt-1 truncate font-mono`}>
+          <span className={`${isSidebar ? 'text-[8px] max-w-[58px]' : 'ft-meta max-w-[60px]'} text-green-500/60 mt-1 truncate font-mono`}>
             {myStatus ? 'Status' : 'Add Status'}
           </span>
         </div>
@@ -100,7 +100,7 @@ export const StatusBar = ({ onViewStatus, onCreateStatus, variant = 'top' }: Sta
                     className="w-full h-full rounded-sm object-cover"
                   />
                 ) : (
-                  <span className={`text-white font-bold font-mono ${isSidebar ? 'text-xs' : 'text-lg'}`}>
+                  <span className={`text-white font-bold font-mono ${isSidebar ? 'ft-meta' : 'ft-head'}`}>
                     {statusUser.username.charAt(0).toUpperCase()}
                   </span>
                 )}
@@ -109,14 +109,14 @@ export const StatusBar = ({ onViewStatus, onCreateStatus, variant = 'top' }: Sta
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse" />
               )}
             </button>
-            <span className={`${isSidebar ? 'text-[8px] max-w-[58px]' : 'text-xs max-w-[60px]'} text-green-500/60 mt-1 truncate font-mono`}>
+            <span className={`${isSidebar ? 'text-[8px] max-w-[58px]' : 'ft-meta max-w-[60px]'} text-green-500/60 mt-1 truncate font-mono`}>
               {statusUser.username}
             </span>
           </div>
         ))}
 
         {statusUsers.length === 0 && !myStatus && (
-          <div className={`${isSidebar ? 'text-[9px]' : 'text-sm'} text-green-500/45 pl-0.5 font-mono uppercase tracking-[0.16em]`}>
+          <div className={`${isSidebar ? 'text-[9px]' : 'ft-body'} text-green-500/45 pl-0.5 font-mono uppercase tracking-[0.16em]`}>
             No status traffic
           </div>
         )}

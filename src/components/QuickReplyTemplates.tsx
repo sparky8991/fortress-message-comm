@@ -178,8 +178,8 @@ export const QuickReplyTemplates = ({ onSelect }: QuickReplyTemplatesProps) => {
                       className="flex items-center justify-between p-2 bg-gray-700/50 rounded"
                     >
                       <div className="min-w-0">
-                        <p className="text-yellow-400 text-sm font-mono">{template.shortcut}</p>
-                        <p className="text-gray-400 text-xs truncate">{template.content}</p>
+                        <p className="text-yellow-400 ft-body font-mono">{template.shortcut}</p>
+                        <p className="text-gray-400 ft-meta truncate">{template.content}</p>
                       </div>
                       <div className="flex gap-1">
                         <Button
@@ -211,7 +211,7 @@ export const QuickReplyTemplates = ({ onSelect }: QuickReplyTemplatesProps) => {
         <div className="max-h-64 overflow-y-auto">
           {categories.map((category) => (
             <div key={category}>
-              <div className="px-3 py-1.5 bg-gray-750 text-gray-500 text-xs uppercase">
+              <div className="px-3 py-1.5 bg-gray-750 text-gray-500 ft-meta uppercase">
                 {category}
               </div>
               {templates
@@ -226,8 +226,8 @@ export const QuickReplyTemplates = ({ onSelect }: QuickReplyTemplatesProps) => {
                     className="w-full px-3 py-2 text-left hover:bg-gray-700 flex items-center justify-between group"
                   >
                     <div className="min-w-0">
-                      <span className="text-yellow-400 text-sm font-mono">{template.shortcut}</span>
-                      <p className="text-gray-400 text-xs truncate">{template.content}</p>
+                      <span className="text-yellow-400 ft-body font-mono">{template.shortcut}</span>
+                      <p className="text-gray-400 ft-meta truncate">{template.content}</p>
                     </div>
                     <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-white opacity-0 group-hover:opacity-100" />
                   </button>

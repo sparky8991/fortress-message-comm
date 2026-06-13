@@ -81,7 +81,7 @@ export const MessageRecall = ({
       size="sm"
       onClick={recallMessage}
       disabled={isRecalling}
-      className="h-6 px-2 text-xs text-gray-400 hover:text-orange-400 hover:bg-orange-500/20"
+      className="h-6 px-2 ft-meta text-gray-400 hover:text-orange-400 hover:bg-orange-500/20"
     >
       <Undo2 className="w-3 h-3 mr-1" />
       {isRecalling ? 'Recalling...' : `Recall ${timeRemaining ? `(${timeRemaining})` : ''}`}
@@ -117,7 +117,7 @@ export const useMessageRecall = (recallWindowMinutes: number = 5) => {
 
 // Recalled message indicator component
 export const RecalledMessageIndicator = () => (
-  <div className="flex items-center gap-2 text-gray-500 italic text-sm">
+  <div className="flex items-center gap-2 text-gray-500 italic ft-body">
     <Undo2 className="w-4 h-4" />
     <span>This message was recalled</span>
   </div>

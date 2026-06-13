@@ -29,7 +29,7 @@ export const ChatHeader = ({ contact, onStartCall, onToggleSidebar }: ChatHeader
             {/* Avatar as sidebar toggle on mobile */}
             <button
               onClick={isMobile ? onToggleSidebar : undefined}
-              className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-sm border border-[#F2B43C]/55 bg-[#F2B43C]/10 font-mono text-sm font-black text-[#FFE0A8] transition-colors fortress-focus ${
+              className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-sm border border-[#F2B43C]/55 bg-[#F2B43C]/10 font-mono ft-body font-black text-[#FFE0A8] transition-colors fortress-focus ${
                 isMobile
                   ? 'hover:bg-[#F2B43C]/15 active:scale-95 cursor-pointer'
                   : 'cursor-default'

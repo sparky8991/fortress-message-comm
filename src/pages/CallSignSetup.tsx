@@ -102,7 +102,7 @@ const CallSignSetup = () => {
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="flex flex-col items-center space-y-4">
           <Loader2 className="w-12 h-12 text-green-500 animate-spin" />
-          <p className="text-green-400 font-mono text-sm">LOADING...</p>
+          <p className="text-green-400 font-mono ft-body">LOADING...</p>
         </div>
       </div>
     );
@@ -117,13 +117,13 @@ const CallSignSetup = () => {
             <Shield className="w-10 h-10 text-slate-900" />
           </div>
           <h1 className="text-4xl font-bold text-white mb-2">SecureChat</h1>
-          <p className="text-green-500 text-sm font-mono tracking-wider">MILITARY-GRADE ENCRYPTION</p>
+          <p className="text-green-500 ft-body font-mono tracking-wider">MILITARY-GRADE ENCRYPTION</p>
         </div>
 
         {/* Setup Form */}
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-white">Choose Your Call Sign</h2>
-          <p className="text-slate-400 text-sm mt-2">
+          <p className="text-slate-400 ft-body mt-2">
             This is how you'll be known in the system
           </p>
         </div>
@@ -144,7 +144,7 @@ const CallSignSetup = () => {
             />
           </div>
 
-          <div className="text-xs text-slate-500 space-y-1">
+          <div className="ft-meta text-slate-500 space-y-1">
             <p>• 2-20 characters</p>
             <p>• Letters, numbers, underscores, and hyphens only</p>
             <p>• This will be your identifier in all communications</p>
@@ -153,7 +153,7 @@ const CallSignSetup = () => {
           <button
             type="submit"
             disabled={saving}
-            className="w-full flex items-center justify-center py-4 px-6 bg-green-500 hover:bg-green-600 rounded-xl text-slate-900 font-bold text-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center py-4 px-6 bg-green-500 hover:bg-green-600 rounded-xl text-slate-900 font-bold ft-head transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {saving ? (
               <Loader2 className="w-6 h-6 animate-spin" />
@@ -168,7 +168,7 @@ const CallSignSetup = () => {
 
         {error && (
           <div className="mt-6 p-4 bg-red-900/50 border border-red-700 rounded-xl">
-            <pre className="text-red-400 text-xs font-mono whitespace-pre-wrap">{error}</pre>
+            <pre className="text-red-400 ft-meta font-mono whitespace-pre-wrap">{error}</pre>
           </div>
         )}
       </div>

@@ -52,7 +52,7 @@ export const CallSettingsDialog = ({ isOpen, onClose }: CallSettingsDialogProps)
               <Volume2 className="w-5 h-5 text-blue-400" />
               <div>
                 <Label className="text-white font-medium">Ringtone</Label>
-                <p className="text-xs text-gray-400">Play sound for incoming calls</p>
+                <p className="ft-meta text-gray-400">Play sound for incoming calls</p>
               </div>
             </div>
             <Switch
@@ -67,7 +67,7 @@ export const CallSettingsDialog = ({ isOpen, onClose }: CallSettingsDialogProps)
               <Vibrate className="w-5 h-5 text-purple-400" />
               <div>
                 <Label className="text-white font-medium">Vibration</Label>
-                <p className="text-xs text-gray-400">Vibrate for incoming calls</p>
+                <p className="ft-meta text-gray-400">Vibrate for incoming calls</p>
               </div>
             </div>
             <Switch
@@ -82,7 +82,7 @@ export const CallSettingsDialog = ({ isOpen, onClose }: CallSettingsDialogProps)
               <Mic className="w-5 h-5 text-green-400" />
               <div>
                 <Label className="text-white font-medium">Noise Cancellation</Label>
-                <p className="text-xs text-gray-400">Reduce background noise during calls</p>
+                <p className="ft-meta text-gray-400">Reduce background noise during calls</p>
               </div>
             </div>
             <Switch
@@ -97,7 +97,7 @@ export const CallSettingsDialog = ({ isOpen, onClose }: CallSettingsDialogProps)
               <Phone className="w-5 h-5 text-cyan-400" />
               <div>
                 <Label className="text-white font-medium">Auto Answer</Label>
-                <p className="text-xs text-gray-400">Automatically answer incoming calls</p>
+                <p className="ft-meta text-gray-400">Automatically answer incoming calls</p>
               </div>
             </div>
             <Switch

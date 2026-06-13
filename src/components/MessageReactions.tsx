@@ -88,7 +88,7 @@ export const MessageReactions = ({ messageId, reactions = [], onReactionChange }
         <button
           key={reaction.emoji}
           onClick={() => handleReaction(reaction.emoji)}
-          className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs transition-all ${
+          className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full ft-meta transition-all ${
             hasUserReacted(reaction.emoji)
               ? 'bg-green-500/30 border border-green-500/50'
               : 'bg-gray-700/50 border border-gray-600/50 hover:bg-gray-600/50'
@@ -112,7 +112,7 @@ export const MessageReactions = ({ messageId, reactions = [], onReactionChange }
               <button
                 key={emoji}
                 onClick={() => handleReaction(emoji)}
-                className={`p-1.5 rounded hover:bg-gray-700 transition-colors text-lg ${
+                className={`p-1.5 rounded hover:bg-gray-700 transition-colors ft-head ${
                   hasUserReacted(emoji) ? 'bg-green-500/20' : ''
                 }`}
               >

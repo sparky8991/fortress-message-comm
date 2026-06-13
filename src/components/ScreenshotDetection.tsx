@@ -128,7 +128,7 @@ export const useScreenshotDetection = (conversationId: string, enabled: boolean 
 
 // Visual indicator component
 export const ScreenshotProtectionBadge = ({ enabled }: { enabled: boolean }) => (
-  <div className={`flex items-center gap-1 px-2 py-1 rounded text-xs ${
+  <div className={`flex items-center gap-1 px-2 py-1 rounded ft-meta ${
     enabled ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'
   }`}>
     <Shield className="w-3 h-3" />
@@ -138,7 +138,7 @@ export const ScreenshotProtectionBadge = ({ enabled }: { enabled: boolean }) => 
 
 // Screenshot alert notification component
 export const ScreenshotAlertBanner = ({ alert }: { alert: ScreenshotAlert }) => (
-  <div className="flex items-center gap-2 p-2 bg-red-500/20 rounded-lg text-red-400 text-sm">
+  <div className="flex items-center gap-2 p-2 bg-red-500/20 rounded-lg text-red-400 ft-body">
     <Camera className="w-4 h-4" />
     <span>
       <strong>{alert.userName}</strong> took a screenshot
@@ -169,8 +169,8 @@ export const ScreenshotDetectionSettings = () => {
       <div className="flex items-center gap-3">
         <Camera className="w-5 h-5 text-orange-500" />
         <div>
-          <p className="text-white text-sm font-medium">Screenshot Detection</p>
-          <p className="text-gray-400 text-xs">Alert when screenshots are taken</p>
+          <p className="text-white ft-body font-medium">Screenshot Detection</p>
+          <p className="text-gray-400 ft-meta">Alert when screenshots are taken</p>
         </div>
       </div>
       <button

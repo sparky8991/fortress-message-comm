@@ -136,7 +136,7 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <h1 className="text-lg font-semibold text-white">SecureChat</h1>
+            <h1 className="ft-head font-semibold text-white">SecureChat</h1>
             <div className="w-6" /> {/* Spacer */}
           </div>
         </div>
@@ -150,15 +150,15 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
                 <Search className="absolute -right-1 -top-1 h-6 w-6 text-[#36E27B]" />
               </div>
             </div>
-            <h2 className="mb-4 font-mono text-xl font-black uppercase tracking-[0.16em] text-[#ECF7F0]">
+            <h2 className="mb-4 font-mono ft-head font-black uppercase tracking-[0.16em] text-[#ECF7F0]">
               SecureChat Fortress
             </h2>
-            <p className="mb-6 font-mono text-sm leading-relaxed text-[#76897D]">
+            <p className="mb-6 font-mono ft-body leading-relaxed text-[#76897D]">
               Open a protected channel by searching for users in the sidebar.
               Lock sensitive payloads and use burn-after-read when the traffic should not linger.
             </p>
             <div className="fortress-panel-muted rounded p-4">
-              <p className="flex items-center font-mono text-sm text-[#7BEFA9]">
+              <p className="flex items-center font-mono ft-body text-[#7BEFA9]">
                 <Search className="mr-2 h-4 w-4 text-[#36E27B]" />
                 Use the sidebar search button to find and connect with operators.
               </p>

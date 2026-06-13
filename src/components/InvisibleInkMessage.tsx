@@ -106,7 +106,7 @@ export const InvisibleInkMessage = ({
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="flex items-center gap-2 text-white/80">
               <Eye className="w-4 h-4" />
-              <span className="text-sm">Hold to reveal</span>
+              <span className="ft-body">Hold to reveal</span>
             </div>
           </div>
         )}
@@ -123,7 +123,7 @@ export const InvisibleInkMessage = ({
       </div>
 
       {/* Invisible Ink Label */}
-      <div className="flex items-center gap-1 mt-1 text-xs text-gray-500">
+      <div className="flex items-center gap-1 mt-1 ft-meta text-gray-500">
         <Sparkles className="w-3 h-3" />
         <span>Invisible Ink</span>
       </div>
@@ -261,7 +261,7 @@ export const ScratchRevealMessage = ({ content }: { content: string }) => {
 
       {!isRevealed && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <span className="text-gray-400 text-sm">Scratch to reveal</span>
+          <span className="text-gray-400 ft-body">Scratch to reveal</span>
         </div>
       )}
     </div>

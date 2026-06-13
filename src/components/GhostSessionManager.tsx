@@ -217,7 +217,7 @@ export const GhostSessionManager = ({ teamId }: GhostSessionManagerProps) => {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <Ghost className="w-5 h-5 text-purple-400" />
-          <h3 className="text-lg font-semibold text-white">Ghost Sessions</h3>
+          <h3 className="ft-head font-semibold text-white">Ghost Sessions</h3>
         </div>
         <Button
           onClick={() => setIsCreateDialogOpen(true)}
@@ -239,7 +239,7 @@ export const GhostSessionManager = ({ teamId }: GhostSessionManagerProps) => {
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <h4 className="font-medium text-white">{session.session_name}</h4>
-                  <div className="flex items-center space-x-4 text-sm text-gray-400 mt-1">
+                  <div className="flex items-center space-x-4 ft-body text-gray-400 mt-1">
                     <div className="flex items-center space-x-1">
                       <Users className="w-3 h-3" />
                       <span>{getActiveMemberCount(session)}/{session.max_members}</span>
@@ -268,7 +268,7 @@ export const GhostSessionManager = ({ teamId }: GhostSessionManagerProps) => {
           <div className="text-center py-8 text-gray-400">
             <Ghost className="w-12 h-12 mx-auto mb-4 text-gray-600" />
             <p>No ghost sessions available.</p>
-            <p className="text-sm mt-1">Create one to start encrypted communication.</p>
+            <p className="ft-body mt-1">Create one to start encrypted communication.</p>
           </div>
         )}
       </div>
@@ -293,7 +293,7 @@ export const GhostSessionManager = ({ teamId }: GhostSessionManagerProps) => {
                 className="bg-gray-700 border-gray-600 text-white mt-2"
               />
             </div>
-            <div className="text-sm text-gray-400 bg-gray-900 p-3 rounded border border-gray-700">
+            <div className="ft-body text-gray-400 bg-gray-900 p-3 rounded border border-gray-700">
               <Lock className="w-4 h-4 inline mr-2" />
               This session will use enhanced encryption and be limited to 5 members maximum.
             </div>

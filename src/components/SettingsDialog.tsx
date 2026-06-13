@@ -472,7 +472,7 @@ export const SettingsDialog = ({
                             border: `1px solid ${active ? accent : FORTRESS.border}`,
                           }}
                         >
-                          <div className="text-xs" style={{ fontFamily, color: FORTRESS.text }}>
+                          <div className="ft-meta" style={{ fontFamily, color: FORTRESS.text }}>
                             Aa Bb 01
                           </div>
                           <div className="mt-1.5 font-mono text-[7px] font-extrabold uppercase tracking-wide" style={{ color: active ? accent : FORTRESS.textDim }}>
