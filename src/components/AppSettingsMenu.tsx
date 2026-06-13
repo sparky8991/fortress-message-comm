@@ -14,7 +14,6 @@ import {
 import { signOut } from 'firebase/auth';
 import { auth } from '@/integrations/firebase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useUserSettings } from '@/hooks/useUserSettings';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,38 +22,47 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { AboutDialog } from './AboutDialog';
-import { CallSettingsDialog } from './CallSettingsDialog';
-import { ChatSettingsDialog } from './ChatSettingsDialog';
-import { NotificationSettings } from './NotificationSettings';
-import { PrivacySecuritySettings } from './PrivacySecuritySettings';
-import { ThemeSettingsDialog } from './ThemeSettingsDialog';
+import {
+  SettingsDialog,
+  SettingsProfileSummary,
+  SettingsSectionId,
+} from './SettingsDialog';
 
 interface AppSettingsMenuProps {
   triggerClassName?: string;
+  profile?: SettingsProfileSummary;
+  onEditCallSign?: () => void;
 }
 
 const getErrorMessage = (error: unknown) =>
   error instanceof Error ? error.message : 'Failed to log out. Please try again.';
 
-export const AppSettingsMenu = ({ triggerClassName }: AppSettingsMenuProps) => {
+export const AppSettingsMenu = ({ triggerClassName, profile, onEditCallSign }: AppSettingsMenuProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { settings: userSettings } = useUserSettings();
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [showPrivacySecurity, setShowPrivacySecurity] = useState(false);
-  const [showCallSettings, setShowCallSettings] = useState(false);
-  const [showChatSettings, setShowChatSettings] = useState(false);
-  const [showThemeSettings, setShowThemeSettings] = useState(false);
-  const [showAbout, setShowAbout] = useState(false);
-  const [fallbackNotificationSettings, setFallbackNotificationSettings] = useState({
-    unreadReminderEnabled: true,
-    reminderTimerEnabled: true,
-    unreadReminderTime: 5,
-  });
+  const [showSettings, setShowSettings] = useState(false);
+  const [initialSection, setInitialSection] = useState<SettingsSectionId>('profile');
 
-  const currentNotificationSettings =
-    userSettings?.notification_settings || fallbackNotificationSettings;
+  const currentProfile: SettingsProfileSummary = profile || {
+    callSign: 'Operator',
+    email: auth.currentUser?.email || '',
+    avatarInitials: 'SC',
+  };
+
+  const openSettings = (section: SettingsSectionId) => {
+    setInitialSection(section);
+    setShowSettings(true);
+  };
+
+  const handleEditProfile = () => {
+    setShowSettings(false);
+    navigate('/profile-settings');
+  };
+
+  const handleEditCallSign = () => {
+    setShowSettings(false);
+    onEditCallSign?.();
+  };
 
   const handleLogout = async () => {
     try {
@@ -98,14 +106,14 @@ export const AppSettingsMenu = ({ triggerClassName }: AppSettingsMenuProps) => {
           <DropdownMenuSeparator className="bg-green-500/15" />
 
           <DropdownMenuItem
-            onClick={() => navigate('/profile-settings')}
+            onClick={() => openSettings('profile')}
             className="hover:bg-green-500/10 focus:bg-green-500/10 cursor-pointer"
           >
             <User className="mr-2 h-4 w-4 text-green-500" />
             <span>Operator Profile</span>
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => setShowNotifications(true)}
+            onClick={() => openSettings('notifications')}
             className="hover:bg-green-500/10 focus:bg-green-500/10 cursor-pointer"
           >
             <Bell className="mr-2 h-4 w-4 text-blue-500" />
@@ -115,28 +123,28 @@ export const AppSettingsMenu = ({ triggerClassName }: AppSettingsMenuProps) => {
           <DropdownMenuSeparator className="bg-green-500/15" />
 
           <DropdownMenuItem
-            onClick={() => setShowPrivacySecurity(true)}
+            onClick={() => openSettings('security')}
             className="hover:bg-green-500/10 focus:bg-green-500/10 cursor-pointer"
           >
             <Shield className="mr-2 h-4 w-4 text-purple-500" />
             <span>Privacy & Security</span>
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => setShowCallSettings(true)}
+            onClick={() => openSettings('calls')}
             className="hover:bg-green-500/10 focus:bg-green-500/10 cursor-pointer"
           >
             <Phone className="mr-2 h-4 w-4 text-orange-500" />
             <span>Call Settings</span>
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => setShowChatSettings(true)}
+            onClick={() => openSettings('chat')}
             className="hover:bg-green-500/10 focus:bg-green-500/10 cursor-pointer"
           >
             <MessageSquare className="mr-2 h-4 w-4 text-cyan-500" />
             <span>Chat Behavior</span>
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => setShowThemeSettings(true)}
+            onClick={() => openSettings('theme')}
             className="hover:bg-green-500/10 focus:bg-green-500/10 cursor-pointer"
           >
             <Palette className="mr-2 h-4 w-4 text-pink-500" />
@@ -146,7 +154,7 @@ export const AppSettingsMenu = ({ triggerClassName }: AppSettingsMenuProps) => {
           <DropdownMenuSeparator className="bg-green-500/15" />
 
           <DropdownMenuItem
-            onClick={() => setShowAbout(true)}
+            onClick={() => openSettings('about')}
             className="hover:bg-green-500/10 focus:bg-green-500/10 cursor-pointer"
           >
             <Info className="mr-2 h-4 w-4 text-gray-400" />
@@ -165,29 +173,14 @@ export const AppSettingsMenu = ({ triggerClassName }: AppSettingsMenuProps) => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <NotificationSettings
-        isOpen={showNotifications}
-        onClose={() => setShowNotifications(false)}
-        settings={currentNotificationSettings}
-        onSave={setFallbackNotificationSettings}
+      <SettingsDialog
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+        profile={currentProfile}
+        initialSection={initialSection}
+        onEditProfile={handleEditProfile}
+        onEditCallSign={handleEditCallSign}
       />
-      <PrivacySecuritySettings
-        isOpen={showPrivacySecurity}
-        onClose={() => setShowPrivacySecurity(false)}
-      />
-      <CallSettingsDialog
-        isOpen={showCallSettings}
-        onClose={() => setShowCallSettings(false)}
-      />
-      <ChatSettingsDialog
-        isOpen={showChatSettings}
-        onClose={() => setShowChatSettings(false)}
-      />
-      <ThemeSettingsDialog
-        isOpen={showThemeSettings}
-        onClose={() => setShowThemeSettings(false)}
-      />
-      <AboutDialog isOpen={showAbout} onClose={() => setShowAbout(false)} />
     </>
   );
 };

@@ -6,7 +6,9 @@ import { GifPicker } from './GifPicker';
 import { EncryptedImageUpload } from './EncryptedImageUpload';
 import { ReplyPreview } from './ReplyPreview';
 import { VoiceRecorder } from './VoiceRecorder';
+import { ComposerModeBar } from './tactical';
 import { toast } from '@/hooks/use-toast';
+import type { TrafficMark } from '@/lib/fortress';
 import { buildEncryptedPayloadMessage, stripEncryptedPayloadSecrets } from '@/utils/encryptedPayloadMessage';
 import { BURN_AFTER_READ_SECONDS } from '@/utils/burnAfterRead.js';
 
@@ -27,7 +29,7 @@ type MessageMetadata = Record<string, unknown> & {
   burnOpenedAt?: null;
   burnExpiresAt?: null;
   burnOpenedBy?: null;
-  trafficMark?: 'normal' | 'sensitive' | 'locked';
+  trafficMark?: TrafficMark;
 };
 
 interface MessageInputProps {
@@ -45,7 +47,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
   const [showEncryptedUpload, setShowEncryptedUpload] = useState(false);
   const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
   const [burnAfterReadEnabled, setBurnAfterReadEnabled] = useState(false);
-  const [messageMark, setMessageMark] = useState<'normal' | 'sensitive' | 'locked'>('normal');
+  const [messageMark, setMessageMark] = useState<TrafficMark>('normal');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -214,55 +216,16 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
         />
 
         <div className="p-2.5 md:p-3 space-y-2.5 mx-2 md:mx-0">
-          <div className="flex flex-wrap items-center gap-2 px-1">
-            <span className="fortress-command">Mode</span>
-            {[
-              { key: 'normal', label: 'Normal' },
-              { key: 'sensitive', label: 'Sensitive' },
-              { key: 'locked', label: 'Locked' },
-            ].map((mark) => (
-              <button
-                key={mark.key}
-                type="button"
-                onClick={() => {
-                  if (mark.key === 'locked') {
-                    setMessageMark('locked');
-                    setShowEncryptedUpload(true);
-                    return;
-                  }
-                  setMessageMark(mark.key as 'normal' | 'sensitive');
-                }}
-                className={`rounded border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] transition-colors fortress-focus ${
-                  messageMark === mark.key
-                    ? mark.key === 'sensitive'
-                      ? 'border-amber-400/70 bg-amber-400/15 text-amber-300'
-                      : mark.key === 'locked'
-                        ? 'border-red-400/70 bg-red-500/15 text-red-300'
-                        : 'border-green-400/70 bg-green-500/15 text-green-300'
-                    : 'border-green-500/20 text-green-500/45 hover:border-green-500/40 hover:text-green-300'
-                }`}
-                aria-pressed={messageMark === mark.key}
-              >
-                {mark.label}
-              </button>
-            ))}
-            <button
-              type="button"
-              onClick={() => setBurnAfterReadEnabled((enabled) => !enabled)}
-              className={`rounded border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] transition-colors fortress-focus ${
-                burnAfterReadEnabled
-                  ? 'border-orange-400/70 bg-orange-500/15 text-orange-300'
-                  : 'border-green-500/20 text-green-500/45 hover:border-orange-500/50 hover:text-orange-300'
-              }`}
-              aria-pressed={burnAfterReadEnabled}
-              title="Burn after read: 2 minutes"
-            >
-              <span className="inline-flex items-center gap-1">
-                <Flame className="w-3 h-3" />
-                Burn: {burnAfterReadEnabled ? '2 min' : 'off'}
-              </span>
-            </button>
-          </div>
+          <ComposerModeBar
+            messageMark={messageMark}
+            onSelectMark={setMessageMark}
+            onLockedSelect={() => {
+              setMessageMark('locked');
+              setShowEncryptedUpload(true);
+            }}
+            burnEnabled={burnAfterReadEnabled}
+            onToggleBurn={() => setBurnAfterReadEnabled((enabled) => !enabled)}
+          />
 
           {attachment && (
             <div className="px-3 py-2 bg-black/90 border border-green-500/40 rounded flex items-center justify-between animate-in fade-in-50 duration-200 min-w-0 shadow-lg shadow-green-500/10">

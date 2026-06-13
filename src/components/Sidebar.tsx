@@ -39,6 +39,7 @@ export const Sidebar = ({
   const [showUserSearch, setShowUserSearch] = useState(false);
   const [showEditCallSign, setShowEditCallSign] = useState(false);
   const [callSign, setCallSign] = useState<string>('');
+  const [callSignChangesThisYear, setCallSignChangesThisYear] = useState(0);
   const isMobile = useIsMobile();
   const navigate = useNavigate();
   const { switchToConversation } = useDirectMessages();
@@ -52,7 +53,9 @@ export const Sidebar = ({
         const profileRef = doc(db, 'profiles', user.uid);
         const unsubscribeProfile = onSnapshot(profileRef, (snap) => {
           if (snap.exists()) {
-            setCallSign(snap.data().callSign || '');
+            const data = snap.data();
+            setCallSign(data.callSign || '');
+            setCallSignChangesThisYear(data.callSignChangesThisYear || 0);
           }
         });
         return () => unsubscribeProfile();
@@ -97,36 +100,43 @@ export const Sidebar = ({
 
         {/* User Profile Card */}
         {callSign && (
-          <div className="flex items-center justify-between p-3 fortress-panel rounded mb-3">
+          <div className="flex items-center justify-between gap-2 p-2.5 fortress-panel rounded-sm mb-3">
             <button
               onClick={() => navigate('/profile-settings')}
-              className="flex items-center gap-3 min-w-0 hover:opacity-85 transition-opacity fortress-focus rounded"
+              className="flex min-w-0 items-center gap-2.5 rounded-sm hover:opacity-85 transition-opacity fortress-focus"
             >
-              <div className="w-10 h-10 rounded border border-green-400/40 bg-green-500/15 flex items-center justify-center flex-shrink-0">
-                <span className="font-mono text-sm font-black text-green-300">{initials}</span>
+              <div className="w-9 h-9 rounded-sm border border-green-400/40 bg-green-500/15 flex items-center justify-center flex-shrink-0">
+                <span className="font-mono text-xs font-black text-green-300">{initials}</span>
               </div>
               <div className="min-w-0 text-left">
-                <span className="fortress-command block">Call Sign</span>
-                <span className="text-sm text-white font-bold truncate block font-mono">
+                <span className="fortress-command block leading-none">Call Sign</span>
+                <span className="text-sm text-white font-black truncate block font-mono tracking-wide">
                   {callSign}
                   <span className="ml-1 text-green-400">✓</span>
                 </span>
               </div>
             </button>
-            <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="flex items-center gap-1.5 flex-shrink-0">
               <div className="hidden min-[370px]:flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
                 <span className="fortress-command">Online</span>
               </div>
               <button
                 onClick={() => setShowEditCallSign(true)}
-                className="p-2 rounded text-gray-400 hover:text-green-300 hover:bg-green-500/10 transition-colors fortress-focus"
+                className="p-1.5 rounded-sm text-green-500/55 hover:text-green-300 hover:bg-green-500/10 transition-colors fortress-focus"
                 title="Edit call sign"
               >
-                <Edit2 className="w-4 h-4" />
+                <Edit2 className="w-3.5 h-3.5" />
               </button>
               <AppSettingsMenu
-                triggerClassName="p-2 rounded text-gray-400 hover:text-green-300 hover:bg-green-500/10 transition-colors fortress-focus"
+                triggerClassName="p-1.5 rounded-sm border border-green-500/15 text-green-500/55 hover:text-green-300 hover:bg-green-500/10 transition-colors fortress-focus"
+                profile={{
+                  callSign,
+                  email: auth.currentUser?.email || '',
+                  avatarInitials: initials,
+                  callSignChangesThisYear,
+                }}
+                onEditCallSign={() => setShowEditCallSign(true)}
               />
             </div>
           </div>

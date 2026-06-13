@@ -54,6 +54,45 @@ export interface UserSettings {
   theme_settings?: ThemeSettings;
 }
 
+export const DEFAULT_USER_SETTINGS: UserSettings = {
+  notification_settings: {
+    unreadReminderEnabled: true,
+    reminderTimerEnabled: true,
+    unreadReminderTime: 5
+  },
+  security_settings: {
+    autoDeleteMessages: true,
+    screenshotProtection: false,
+    biometricLock: false,
+    autoDeleteTimer: 24
+  },
+  appearance_settings: {
+    theme: 'dark',
+    fontSize: 'medium',
+    language: 'en'
+  },
+  call_settings: {
+    ringtoneEnabled: true,
+    vibrationEnabled: true,
+    autoAnswerEnabled: false,
+    videoQuality: 'high',
+    noiseCancellation: true
+  },
+  chat_settings: {
+    enterToSend: true,
+    showTypingIndicator: true,
+    showReadReceipts: true,
+    messagePreview: true,
+    mediaAutoDownload: true
+  },
+  theme_settings: {
+    accentColor: '#22c55e',
+    bubbleStyle: 'rounded',
+    chatBackground: 'default',
+    fontStyle: 'mono'
+  }
+};
+
 export const userSettingsService = {
   async getUserSettings(): Promise<UserSettings | null> {
     try {
@@ -69,9 +108,12 @@ export const userSettingsService = {
 
       const data = settingsSnap.data();
       return {
-        notification_settings: data.notification_settings as NotificationSettings,
-        security_settings: data.security_settings as SecuritySettings,
-        appearance_settings: data.appearance_settings as AppearanceSettings,
+        notification_settings: (data.notification_settings as NotificationSettings) || DEFAULT_USER_SETTINGS.notification_settings,
+        security_settings: (data.security_settings as SecuritySettings) || DEFAULT_USER_SETTINGS.security_settings,
+        appearance_settings: (data.appearance_settings as AppearanceSettings) || DEFAULT_USER_SETTINGS.appearance_settings,
+        call_settings: (data.call_settings as CallSettings) || DEFAULT_USER_SETTINGS.call_settings,
+        chat_settings: (data.chat_settings as ChatSettings) || DEFAULT_USER_SETTINGS.chat_settings,
+        theme_settings: (data.theme_settings as ThemeSettings) || DEFAULT_USER_SETTINGS.theme_settings,
       };
     } catch (error) {
       console.error('Error fetching user settings:', error);
@@ -85,42 +127,13 @@ export const userSettingsService = {
       if (!user) throw new Error('User not authenticated');
 
       const defaultSettings: UserSettings = {
-        notification_settings: {
-          unreadReminderEnabled: true,
-          reminderTimerEnabled: true,
-          unreadReminderTime: 5
-        },
-        security_settings: {
-          autoDeleteMessages: true,
-          screenshotProtection: true,
-          biometricLock: true,
-          autoDeleteTimer: 24
-        },
-        appearance_settings: {
-          theme: 'dark',
-          fontSize: 'medium',
-          language: 'en'
-        },
-        call_settings: {
-          ringtoneEnabled: true,
-          vibrationEnabled: true,
-          autoAnswerEnabled: false,
-          videoQuality: 'high',
-          noiseCancellation: true
-        },
-        chat_settings: {
-          enterToSend: true,
-          showTypingIndicator: true,
-          showReadReceipts: true,
-          messagePreview: true,
-          mediaAutoDownload: true
-        },
-        theme_settings: {
-          accentColor: '#22c55e', // green-500
-          bubbleStyle: 'rounded',
-          chatBackground: 'default',
-          fontStyle: 'mono'
-        }
+        ...DEFAULT_USER_SETTINGS,
+        notification_settings: { ...DEFAULT_USER_SETTINGS.notification_settings },
+        security_settings: { ...DEFAULT_USER_SETTINGS.security_settings },
+        appearance_settings: { ...DEFAULT_USER_SETTINGS.appearance_settings },
+        call_settings: { ...DEFAULT_USER_SETTINGS.call_settings },
+        chat_settings: { ...DEFAULT_USER_SETTINGS.chat_settings },
+        theme_settings: { ...DEFAULT_USER_SETTINGS.theme_settings }
       };
 
       const settingsRef = doc(db, 'user_settings', user.uid);

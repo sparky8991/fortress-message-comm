@@ -1,12 +1,10 @@
-
 import React, { useState } from 'react';
-import { Search, User, MessageSquare, X } from 'lucide-react';
+import { Loader2, MessageSquare, Search, UserX } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { db } from '@/integrations/firebase/client';
-import { collection, query, getDocs, limit } from 'firebase/firestore';
+import { collection, getDocs, limit, query } from 'firebase/firestore';
 import { conversationService } from '@/services/conversationService';
 import { toast } from '@/hooks/use-toast';
 
@@ -14,7 +12,8 @@ interface UserSearchResult {
   id: string;
   username: string;
   full_name: string;
-  user_number: number;
+  email: string;
+  verified: boolean;
   avatar_url: string;
 }
 
@@ -24,32 +23,37 @@ interface UserSearchDialogProps {
   onStartConversation: (conversationId: string) => void;
 }
 
+type SearchStage = 'idle' | 'searching' | 'empty' | 'results';
+
 export const UserSearchDialog = ({ isOpen, onClose, onStartConversation }: UserSearchDialogProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<UserSearchResult[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [isCreatingConversation, setIsCreatingConversation] = useState(false);
+  const [searchStage, setSearchStage] = useState<SearchStage>('idle');
+  const [creatingId, setCreatingId] = useState<string | null>(null);
+
+  const resetSearch = () => {
+    setSearchTerm('');
+    setSearchResults([]);
+    setSearchStage('idle');
+  };
 
   const handleSearch = async () => {
-    if (!searchTerm.trim()) {
+    const searchLower = searchTerm.toLowerCase().trim();
+    if (!searchLower) {
       setSearchResults([]);
+      setSearchStage('idle');
       return;
     }
 
-    setIsSearching(true);
+    setSearchStage('searching');
     try {
       const profilesRef = collection(db, 'profiles');
-      const searchLower = searchTerm.toLowerCase().trim();
-      const results: UserSearchResult[] = [];
-
-      // Get all profiles and filter client-side (most reliable approach)
       const allProfilesQuery = query(profilesRef, limit(100));
       const snapshot = await getDocs(allProfilesQuery);
+      const results: UserSearchResult[] = [];
 
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-
-        // Build searchable text from all relevant fields
+      snapshot.forEach((profileDoc) => {
+        const data = profileDoc.data();
         const searchableText = [
           data.callSign,
           data.callSignLower,
@@ -58,36 +62,39 @@ export const UserSearchDialog = ({ isOpen, onClose, onStartConversation }: UserS
           data.displayName,
           data.displayNameLower,
           data.firstName,
-          data.lastName
-        ].filter(Boolean).join(' ').toLowerCase();
+          data.lastName,
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase();
 
-        // Check if search term matches any field
         if (searchableText.includes(searchLower)) {
           results.push({
-            id: doc.id,
+            id: profileDoc.id,
             username: data.callSign || data.displayName || data.email?.split('@')[0] || 'Unknown',
             full_name: data.displayName || `${data.firstName || ''} ${data.lastName || ''}`.trim() || data.email || '',
-            user_number: 0,
-            avatar_url: data.avatarUrl || data.photoURL || ''
+            email: data.email || '',
+            verified: !!data.verified,
+            avatar_url: data.avatarUrl || data.photoURL || '',
           });
         }
       });
 
       setSearchResults(results);
+      setSearchStage(results.length ? 'results' : 'empty');
     } catch (error) {
       console.error('Error searching users:', error);
       toast({
         title: 'Search Failed',
         description: 'Failed to search for users. Please try again.',
-        variant: 'destructive'
+        variant: 'destructive',
       });
-    } finally {
-      setIsSearching(false);
+      setSearchStage('idle');
     }
   };
 
   const handleStartConversation = async (userId: string) => {
-    setIsCreatingConversation(true);
+    setCreatingId(userId);
     try {
       const conversationId = await conversationService.findOrCreateDirectConversation(userId);
 
@@ -98,108 +105,128 @@ export const UserSearchDialog = ({ isOpen, onClose, onStartConversation }: UserS
 
       onStartConversation(conversationId);
       onClose();
-      setSearchTerm('');
-      setSearchResults([]);
+      resetSearch();
     } catch (error) {
       console.error('Error creating conversation:', error);
       toast({
         title: 'Connection Failed',
         description: 'Failed to establish secure channel. Please try again.',
-        variant: 'destructive'
+        variant: 'destructive',
       });
     } finally {
-      setIsCreatingConversation(false);
+      setCreatingId(null);
     }
   };
 
-  const getUserDisplayName = (user: UserSearchResult) => {
-    if (user.username) return user.username;
-    if (user.full_name) return user.full_name;
-    return `User #${user.user_number}`;
-  };
-
-  const getUserInitials = (user: UserSearchResult) => {
-    if (user.username) return user.username.substring(0, 2).toUpperCase();
-    if (user.full_name) return user.full_name.split(' ').map(n => n[0]).join('').toUpperCase();
-    return `#${user.user_number}`;
-  };
+  const getUserInitials = (user: UserSearchResult) =>
+    (user.username || user.full_name || '?').slice(0, 2).toUpperCase();
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-gray-800 border-gray-700 text-white max-w-md">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-md border-[#1E5C3C] bg-[#0C120F] text-[#DCEAE1]">
         <DialogHeader>
-          <DialogTitle className="text-green-400 font-mono flex items-center space-x-2">
-            <Search className="w-5 h-5" />
-            <span>USER SEARCH</span>
+          <DialogTitle className="flex items-center gap-2 font-mono text-[11px] font-extrabold uppercase tracking-[0.2em] text-green-400">
+            <Search className="h-4 w-4" />
+            User Search
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
-          <div className="flex space-x-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
-                type="text"
-                placeholder="Search by call sign or email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                className="pl-10 bg-gray-900 border-gray-600 text-white placeholder-gray-400 focus:ring-green-500 focus:border-green-500"
-              />
-            </div>
-            <Button
-              onClick={handleSearch}
-              disabled={isSearching || !searchTerm.trim()}
-              className="bg-green-600 hover:bg-green-700 text-black"
-            >
-              {isSearching ? 'Searching...' : 'Search'}
-            </Button>
+        <div className="flex gap-2">
+          <div className="flex flex-1 items-center gap-2 rounded-sm border border-[#1C2B22] bg-[#0F1612] px-2.5">
+            <Search className="h-3.5 w-3.5 text-[#5C6E63]" />
+            <Input
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              onKeyDown={(event) => event.key === 'Enter' && handleSearch()}
+              placeholder="Search call sign or email..."
+              className="border-0 bg-transparent px-0 font-mono text-[11px] text-[#DCEAE1] placeholder-[#5C6E63] focus-visible:ring-0"
+            />
           </div>
+          <Button
+            onClick={handleSearch}
+            disabled={searchStage === 'searching' || !searchTerm.trim()}
+            className="rounded-sm bg-green-500 px-4 font-mono text-[9px] font-extrabold uppercase tracking-[0.2em] text-black hover:bg-green-400"
+          >
+            Search
+          </Button>
+        </div>
 
-          <div className="max-h-80 overflow-y-auto space-y-2">
-            {searchResults.length > 0 ? (
-              searchResults.map((user) => (
-                <div
-                  key={user.id}
-                  className="flex items-center justify-between p-3 bg-gray-900 rounded-lg hover:bg-gray-700 transition-colors"
-                >
-                  <div className="flex items-center space-x-3">
-                    <Avatar className="w-10 h-10">
-                      <AvatarImage src={user.avatar_url} />
-                      <AvatarFallback className="bg-gray-600 text-white text-sm">
-                        {getUserInitials(user)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium text-white">{getUserDisplayName(user)}</p>
-                      {user.full_name && user.username && (
-                        <p className="text-xs text-gray-500">{user.full_name}</p>
-                      )}
+        <div className="mt-1 min-h-[230px]">
+          {searchStage === 'idle' && (
+            <div className="flex h-[230px] flex-col items-center justify-center gap-3.5">
+              <Search className="h-10 w-10 text-[#243B30]" strokeWidth={1.4} />
+              <div className="font-mono text-[10px] tracking-wide text-[#5C6E63]">
+                Enter a search term to find operators
+              </div>
+            </div>
+          )}
+
+          {searchStage === 'searching' && (
+            <div className="flex h-[230px] flex-col items-center justify-center gap-3">
+              <Loader2 className="h-8 w-8 animate-spin text-green-400" />
+              <div className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#5C6E63]">
+                Querying directory...
+              </div>
+            </div>
+          )}
+
+          {searchStage === 'empty' && (
+            <div className="flex h-[230px] flex-col items-center justify-center gap-3">
+              <UserX className="h-9 w-9 text-[#5C2420]" strokeWidth={1.4} />
+              <div className="font-mono text-[10px] tracking-wide text-[#76897D]">
+                No users found matching your search
+              </div>
+            </div>
+          )}
+
+          {searchStage === 'results' && (
+            <div className="flex max-h-80 flex-col gap-2 overflow-y-auto pr-1">
+              <div className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#4A5A50]">
+                {searchResults.length} result(s)
+              </div>
+              {searchResults.map((user) => (
+                <div key={user.id} className="flex items-center gap-3 rounded-sm border border-[#1C2B22] bg-[#101814] p-3">
+                  <div className="grid h-10 w-10 flex-none place-items-center overflow-hidden rounded-sm border border-[#1E5C3C] bg-[#12301F] font-mono text-sm font-extrabold text-[#7BEFA9]">
+                    {user.avatar_url ? (
+                      <img src={user.avatar_url} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      getUserInitials(user)
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex min-w-0 items-center gap-2">
+                      <span className="truncate font-mono text-xs font-bold tracking-wide text-[#ECF7F0]">
+                        {user.username}
+                      </span>
+                      <span
+                        className="flex-none font-mono text-[7px] font-extrabold uppercase tracking-wide"
+                        style={{ color: user.verified ? '#36E27B' : '#F2B43C' }}
+                      >
+                        {user.verified ? 'Verified' : 'Unverified'}
+                      </span>
+                    </div>
+                    <div className="truncate font-mono text-[9px] tracking-wide text-[#76897D]">
+                      {user.email || user.full_name}
                     </div>
                   </div>
                   <Button
                     onClick={() => handleStartConversation(user.id)}
-                    disabled={isCreatingConversation}
+                    disabled={creatingId === user.id}
                     size="sm"
-                    className="bg-green-600 hover:bg-green-700 text-black"
+                    className="flex-none gap-1 rounded-sm bg-transparent font-mono text-[8px] font-extrabold uppercase tracking-wide text-green-400 hover:bg-green-500/10"
+                    style={{ border: '1px solid #1E5C3C' }}
                   >
-                    <MessageSquare className="w-4 h-4 mr-1" />
+                    {creatingId === user.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <MessageSquare className="h-3.5 w-3.5" />}
                     Chat
                   </Button>
                 </div>
-              ))
-            ) : searchTerm.trim() && !isSearching ? (
-              <div className="text-center py-8 text-gray-400">
-                <User className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                <p>No users found matching your search</p>
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-400">
-                <Search className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                <p>Enter a search term to find users</p>
-              </div>
-            )}
-          </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="border-t border-[#141E18] pt-2.5 text-center font-mono text-[7px] uppercase tracking-[0.15em] text-[#4A5A50]">
+          Directory search uses your signed-in account and returns matching operators
         </div>
       </DialogContent>
     </Dialog>
