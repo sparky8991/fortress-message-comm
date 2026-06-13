@@ -18,15 +18,15 @@ export const Toggle = ({
     aria-checked={on}
     aria-label={ariaLabel}
     onClick={onClick}
-    className="relative h-5 w-10 flex-none rounded-full border transition-colors fortress-focus"
+    className="relative h-[18px] w-9 flex-none rounded-full border transition-colors fortress-focus"
     style={{
       borderColor: on ? accent : FORTRESS.border,
       background: on ? alpha(accent, 0.15) : FORTRESS.surfaceSunken,
     }}
   >
     <span
-      className="absolute top-0.5 h-3.5 w-3.5 rounded-full transition-all"
-      style={{ left: on ? 22 : 2, background: on ? accent : '#3A4A41' }}
+      className="absolute top-[2px] h-3 w-3 rounded-full transition-all"
+      style={{ left: on ? 20 : 2, background: on ? accent : '#3A4A41' }}
     />
   </button>
 );
@@ -41,14 +41,14 @@ export const SettingRow = ({
   children: ReactNode;
 }) => (
   <div
-    className="flex items-center gap-3 rounded border p-3"
+    className="flex items-center gap-3 rounded-sm border px-3 py-2.5"
     style={{ borderColor: FORTRESS.border, background: FORTRESS.surfaceRaised }}
   >
     <div className="min-w-0 flex-1">
-      <div className="font-mono text-[10px] font-bold uppercase tracking-wide" style={{ color: FORTRESS.text }}>
+      <div className="font-mono text-[9px] font-bold uppercase tracking-wide" style={{ color: FORTRESS.text }}>
         {title}
       </div>
-      <div className="mt-0.5 font-mono text-[8px] leading-relaxed tracking-wide" style={{ color: FORTRESS.textDim }}>
+      <div className="mt-0.5 font-mono text-[7px] leading-relaxed tracking-wide" style={{ color: FORTRESS.textDim }}>
         {desc}
       </div>
     </div>
@@ -70,7 +70,7 @@ export const Chip = ({
   <button
     type="button"
     onClick={onClick}
-    className="rounded-sm px-3 py-1.5 font-mono text-[9px] font-extrabold uppercase tracking-wide transition-colors fortress-focus"
+    className="rounded-sm px-2.5 py-1.5 font-mono text-[8px] font-extrabold uppercase tracking-wide transition-colors fortress-focus"
     style={{
       background: active ? alpha(accent, 0.12) : 'transparent',
       border: `1px solid ${active ? accent : FORTRESS.border}`,
