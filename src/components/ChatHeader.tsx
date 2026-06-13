@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Phone, Video, Lock, Settings, ShieldCheck } from 'lucide-react';
+import { Phone, Video, Lock, Settings } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ChatSettingsDialog } from './ChatSettingsDialog';
 
@@ -19,21 +19,22 @@ interface ChatHeaderProps {
 export const ChatHeader = ({ contact, onStartCall, onToggleSidebar }: ChatHeaderProps) => {
   const isMobile = useIsMobile();
   const [showChatSettings, setShowChatSettings] = useState(false);
+  const contactInitial = contact?.avatar || contact?.name?.charAt(0).toUpperCase() || '?';
 
   return (
     <>
-      <div className="border-b border-green-500/15 bg-[#06100b]/98 backdrop-blur-sm shadow-lg">
-        <div className="hidden md:flex h-6 items-center justify-center bg-green-700/70 border-b border-green-400/20">
-          <span className="font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-green-50">
+      <div className="border-b border-green-500/15 bg-[#06100b]/98 backdrop-blur-sm">
+        <div className="hidden h-5 items-center justify-center border-b border-green-400/20 bg-green-700/75 md:flex">
+          <span className="font-mono text-[8px] font-black uppercase tracking-[0.34em] text-green-50">
             Protected Workspace // Secure Team Traffic
           </span>
         </div>
-        <div className="flex items-center justify-between p-3">
-          <div className="flex items-center space-x-3 min-w-0 flex-1">
+        <div className="flex items-center justify-between px-3 py-2.5 md:px-4">
+          <div className="flex min-w-0 flex-1 items-center space-x-3">
             {/* Avatar as sidebar toggle on mobile */}
             <button
               onClick={isMobile ? onToggleSidebar : undefined}
-              className={`w-11 h-11 bg-amber-500/10 border border-amber-400/45 rounded flex items-center justify-center text-amber-200 font-mono font-black text-lg flex-shrink-0 transition-all duration-200 fortress-focus ${
+              className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-sm border border-amber-400/55 bg-amber-500/10 font-mono text-sm font-black text-amber-200 transition-all duration-200 fortress-focus ${
                 isMobile
                   ? 'hover:bg-amber-500/15 active:scale-95 cursor-pointer'
                   : 'cursor-default'
@@ -41,13 +42,13 @@ export const ChatHeader = ({ contact, onStartCall, onToggleSidebar }: ChatHeader
               title={isMobile ? "Open sidebar" : undefined}
               aria-label={isMobile ? "Open sidebar" : "Contact avatar"}
             >
-              {contact?.avatar}
+              {contactInitial}
             </button>
 
             <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2 min-w-0">
-                <h2 className="font-mono font-bold text-white text-base truncate">{contact?.name}</h2>
-                <span className="hidden sm:inline-flex rounded border border-amber-400/40 bg-amber-400/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-amber-300">
+              <div className="flex min-w-0 items-center gap-2">
+                <h2 className="truncate font-mono text-[15px] font-black leading-tight text-white">{contact?.name}</h2>
+                <span className="hidden rounded-sm border border-amber-400/45 bg-amber-400/10 px-1.5 py-0.5 font-mono text-[8px] font-black uppercase tracking-[0.16em] text-amber-300 sm:inline-flex">
                   Unverified
                 </span>
               </div>
@@ -55,21 +56,18 @@ export const ChatHeader = ({ contact, onStartCall, onToggleSidebar }: ChatHeader
                 // Compact mobile layout - just encryption status
                 <div className="flex items-center space-x-1">
                   <Lock className="w-2.5 h-2.5 text-green-500" />
-                  <span className="text-xs text-green-500 font-mono">Protected</span>
+                  <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-green-500">Protected</span>
                 </div>
               ) : (
                 // Full desktop layout
-                <div className="flex flex-col space-y-0.5">
-                  <p className="text-[10px] text-green-500/50 truncate font-mono uppercase tracking-[0.16em]">
+                <div className="mt-0.5 flex flex-col space-y-0.5">
+                  <p className="truncate font-mono text-[8px] uppercase tracking-[0.22em] text-green-500/45">
                     Channel ready
                   </p>
-                  <div className="flex items-center space-x-1.5">
-                    <div className="relative">
-                      <ShieldCheck className="w-3 h-3 text-green-500 flex-shrink-0 animate-pulse" />
-                      <div className="absolute inset-0 bg-green-500/20 rounded-full animate-ping opacity-75"></div>
-                    </div>
-                    <span className="text-xs text-green-500 font-mono font-semibold tracking-wide">
-                      Protected channel active
+                  <div className="flex items-center space-x-1.5 font-mono text-[9px] font-bold uppercase tracking-[0.12em] text-green-400">
+                    <Lock className="h-2.5 w-2.5 flex-shrink-0" />
+                    <span className="truncate">
+                      E2E encrypted - AES-256-GCM
                     </span>
                   </div>
                 </div>
@@ -77,38 +75,38 @@ export const ChatHeader = ({ contact, onStartCall, onToggleSidebar }: ChatHeader
             </div>
           </div>
 
-          <div className="flex items-center space-x-1 flex-shrink-0">
+          <div className="flex flex-shrink-0 items-center space-x-2">
             <button
               onClick={() => onStartCall('voice')}
-              className="p-2 text-green-500/65 hover:text-green-300 hover:bg-green-500/10 rounded border border-transparent hover:border-green-500/25 transition-all duration-200 min-h-[40px] min-w-[40px] flex items-center justify-center active:scale-95 fortress-focus"
+              className="flex h-8 w-8 items-center justify-center rounded-sm border border-green-500/20 bg-[#07110c] text-green-500/70 transition-all duration-200 hover:border-green-500/45 hover:bg-green-500/10 hover:text-green-300 active:scale-95 fortress-focus md:h-9 md:w-9"
               title="Voice Call"
               aria-label="Start voice call"
             >
-              <Phone className="w-4 h-4" />
+              <Phone className="h-3.5 w-3.5" />
             </button>
             <button
               onClick={() => onStartCall('video')}
-              className="p-2 text-green-500/65 hover:text-green-300 hover:bg-green-500/10 rounded border border-transparent hover:border-green-500/25 transition-all duration-200 min-h-[40px] min-w-[40px] flex items-center justify-center active:scale-95 fortress-focus"
+              className="flex h-8 w-8 items-center justify-center rounded-sm border border-green-500/20 bg-[#07110c] text-green-500/70 transition-all duration-200 hover:border-green-500/45 hover:bg-green-500/10 hover:text-green-300 active:scale-95 fortress-focus md:h-9 md:w-9"
               title="Video Call"
               aria-label="Start video call"
             >
-              <Video className="w-4 h-4" />
+              <Video className="h-3.5 w-3.5" />
             </button>
             <button
               onClick={() => setShowChatSettings(true)}
-              className="p-2 text-green-500/65 hover:text-green-300 hover:bg-green-500/10 rounded border border-transparent hover:border-green-500/25 transition-all duration-200 min-h-[40px] min-w-[40px] flex items-center justify-center active:scale-95 fortress-focus"
+              className="flex h-8 w-8 items-center justify-center rounded-sm border border-green-500/20 bg-[#07110c] text-green-500/70 transition-all duration-200 hover:border-green-500/45 hover:bg-green-500/10 hover:text-green-300 active:scale-95 fortress-focus md:h-9 md:w-9"
               title="Chat Settings"
               aria-label="Open chat settings"
             >
-              <Settings className="w-4 h-4" />
+              <Settings className="h-3.5 w-3.5" />
             </button>
           </div>
         </div>
-        <div className="hidden md:flex items-center justify-between border-t border-green-500/10 bg-amber-950/10 px-4 py-1">
-          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-amber-400/80">
+        <div className="hidden items-center justify-between border-t border-amber-400/15 bg-amber-950/10 px-4 py-1 md:flex">
+          <span className="font-mono text-[8px] font-bold uppercase tracking-[0.2em] text-amber-400/80">
             [ ! ] Verify identity before passing sensitive traffic
           </span>
-          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-green-500/45">
+          <span className="font-mono text-[8px] font-bold uppercase tracking-[0.2em] text-green-500/45">
             Session established
           </span>
         </div>
