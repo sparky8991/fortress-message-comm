@@ -18,7 +18,7 @@ a `VERIFIED` badge over plaintext is dangerous false confidence. This design mak
 | Fork | Decision | Why / cost |
 |---|---|---|
 | Crypto depth | **Pragmatic real E2E** — X25519 ECDH per conversation + AEAD | Real & correct & achievable. **No forward secrecy**: theft of an identity key exposes that user's past messages. Forward secrecy (Double Ratchet) deferred. |
-| Private-key storage | **Passphrase-wrapped, synced** | Recoverable + multi-device. **Cost:** security ≤ passphrase strength (see Key Management). |
+| Private-key storage | **Passphrase + one-time recovery code, wrapped & synced** | Recoverable + multi-device. **Cost:** security ≤ passphrase/recovery-code strength (see Key Management). |
 | Crypto implementation | **`libsodium-wrappers` only** | No hand-rolled crypto (refuse-list). X25519 + XChaCha20-Poly1305 + Argon2id, all from libsodium. |
 
 ## Architecture
@@ -129,14 +129,15 @@ Trust state for a peer = compare peer's **current** `identityKeyFingerprint` to 
 7. `KeyChangeBanner` + change detection + composer gating.
 8. Later: QR scan, forward secrecy, multi-device hardening, group verification.
 
-## Open decisions for you
+## Resolved decisions (2026-06-14)
 
-1. **Passphrase policy** — minimum length/strength for the key-wrap passphrase (recommend ≥ 10 chars
-   or a passphrase, *not* a numeric PIN). Drives how secure the synced blob really is.
-2. **Existing-user backfill** — prompt for a passphrase + generate keys on next login; legacy
-   messages remain readable as plaintext. OK?
-3. **Library** — confirm `libsodium-wrappers` (adds ~150KB gz). Alternative is `tweetnacl` (smaller,
-   no Argon2id — we'd need a separate KDF). Recommend libsodium for the bundled Argon2id.
+1. **Wrap secret — passphrase + one-time recovery code.** Key-wrap uses a real passphrase
+   (≥10 chars, distinct from the screen-lock PIN) **plus** a high-entropy recovery code shown once
+   at setup, via Argon2id. The recovery code is the fallback if the passphrase is forgotten; UX must
+   force the user to save it at setup (lose both = lose history, by design). Strongest recoverable option.
+2. **Existing-user backfill — prompt on next login.** Existing users set the passphrase + generate
+   keys on next login; legacy plaintext messages remain readable. Everyone converges to E2E.
+3. **Library — `libsodium-wrappers`.** Bundled Argon2id + X25519 + XChaCha20-Poly1305 (~150KB gz).
 
 ## Success criteria
 
