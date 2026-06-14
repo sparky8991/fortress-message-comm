@@ -21,7 +21,7 @@ This is the source of truth so nothing gets lost between sessions.
 - [x] Version → v2.9; Rafter local secrets scan (clean)
 
 ## E2E encryption (in progress)
-- [ ] **Phase 2c — key bootstrap wiring** (auth-touching): keygen+publish at signup, passphrase setup + one-time recovery code, unlock-on-login, in-memory key session. → `rafter-code-review`
+- [x] **Phase 2c — key bootstrap**: service (`identityKeyService` + `keySession`) + setup/unlock dialogs + opt-in Settings → Privacy & Security entry. Auto-prompt-on-login deferred to Phase 3 (when encryption activates). `rafter-code-review` on the identity flow still pending.
 - [ ] **Phase 2 — Firestore rules** for identity-key fields (owner-write only). → `rafter-code-review`
 - [ ] **Phase 3 — message encryption**: per-conversation ECDH key; encrypt-before-store / decrypt-on-read; mixed-state (legacy plaintext); stop storing plaintext `last_message_preview`. → `rafter-code-review`
 - [ ] **Phase 4 — attachment encryption** (also closes the public Supabase bucket leak).
@@ -43,7 +43,8 @@ This is the source of truth so nothing gets lost between sessions.
 - **TanStack Query deeper adoption** (the "gentle introduction" article): the app is real-time Firestore (`onSnapshot`). TanStack Query's REST/polling patterns (`staleTime`, refetch, backoff) don't fit push-based data. It's already installed; no rewrite warranted. Revisit only if we add REST-style fetching.
 
 ## Security
-- [ ] **Full Rafter SAST** (`rafter run`) — scans the GitHub remote, so it needs `tactical-crispness-pass` pushed first. Run after pushing.
+- [x] **Full Rafter SAST** (`rafter run`) — branch pushed + scanned 2026-06-14. **Our code is clean** (no SAST findings); 1 low-sev SCA warning (below).
+- [ ] **Update i18next** (transitive, 3.4.2 → ≥3.4.3) — low-sev SCA finding R-6D5E2; fix via npm `overrides`, then verify build + tests.
 - [ ] Firestore rules: tighten the broad collaboration-collection reads flagged in the app guide.
 - [ ] Firebase Storage rules (`storage.rules`) are not tracked in the repo — add + version them.
 - [x] Rafter local secrets scan — clean (only gitignored `.env` + `dist/`; keys there are public-by-design client keys).

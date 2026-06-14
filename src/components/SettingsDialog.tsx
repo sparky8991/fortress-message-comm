@@ -35,6 +35,9 @@ import {
   alpha,
 } from '@/lib/fortress';
 import { Chip, SettingRow, Toggle } from '@/components/tactical';
+import { IdentityKeySetup } from './IdentityKeySetup';
+import { IdentityKeyUnlock } from './IdentityKeyUnlock';
+import { getKeyState, type KeyState } from '@/services/identityKeyService';
 
 export interface SettingsProfileSummary {
   callSign: string;
@@ -140,10 +143,17 @@ export const SettingsDialog = ({
     updateThemeSettings,
   } = useUserSettings();
   const [section, setSection] = useState<SettingsSectionId>(initialSection);
+  const [keyState, setKeyState] = useState<KeyState>('none');
+  const [showKeySetup, setShowKeySetup] = useState(false);
+  const [showKeyUnlock, setShowKeyUnlock] = useState(false);
 
   useEffect(() => {
     if (isOpen) setSection(initialSection);
   }, [initialSection, isOpen]);
+
+  useEffect(() => {
+    if (isOpen) getKeyState().then(setKeyState).catch(() => setKeyState('none'));
+  }, [isOpen]);
 
   const security = settings?.security_settings ?? DEFAULT_SECURITY;
   const chat = settings?.chat_settings ?? DEFAULT_CHAT;
@@ -175,6 +185,7 @@ export const SettingsDialog = ({
     'SC';
 
   return (
+    <>
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
         className="flex h-[100dvh] max-h-[100dvh] w-screen max-w-[100vw] flex-col overflow-hidden rounded-none p-0 font-mono md:h-[560px] md:max-h-[92vh] md:w-[740px] md:max-w-[94vw] md:rounded-sm"
@@ -278,6 +289,22 @@ export const SettingsDialog = ({
 
             {section === 'security' && (
               <div className="flex flex-col gap-2">
+                <SettingRow title="Message Encryption" desc="End-to-end encryption keys for your messages, protected by your passphrase + recovery code.">
+                  {keyState === 'unlocked' ? (
+                    <span className="rounded-sm border px-2 py-1 font-mono text-[10px] font-extrabold uppercase tracking-[1.5px]" style={{ borderColor: FORTRESS.borderGreen, color: FORTRESS.green, background: alpha(FORTRESS.green, 0.08) }}>
+                      Active
+                    </span>
+                  ) : (
+                    <Button
+                      type="button"
+                      onClick={() => (keyState === 'none' ? setShowKeySetup(true) : setShowKeyUnlock(true))}
+                      className="h-auto bg-transparent px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[1.5px] text-green-400 hover:bg-green-500/10"
+                      style={{ border: `1px solid ${FORTRESS.borderGreen}` }}
+                    >
+                      {keyState === 'none' ? 'Set up' : 'Unlock'}
+                    </Button>
+                  )}
+                </SettingRow>
                 <SettingRow title="Biometric Lock" desc="Planned for supported mobile builds.">
                   <StatusPill>Coming soon</StatusPill>
                 </SettingRow>
@@ -543,6 +570,17 @@ export const SettingsDialog = ({
         </div>
       </DialogContent>
     </Dialog>
+    <IdentityKeySetup
+      isOpen={showKeySetup}
+      onClose={() => setShowKeySetup(false)}
+      onComplete={() => getKeyState().then(setKeyState).catch(() => setKeyState('none'))}
+    />
+    <IdentityKeyUnlock
+      isOpen={showKeyUnlock}
+      onClose={() => setShowKeyUnlock(false)}
+      onUnlocked={() => getKeyState().then(setKeyState).catch(() => setKeyState('none'))}
+    />
+    </>
   );
 };
 
