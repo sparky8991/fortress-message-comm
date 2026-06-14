@@ -20,8 +20,8 @@ export const FORTRESS = {
   redBorder: '#5C2420',
 } as const;
 
-export const FORTRESS_VERSION = 'v2.7';
-export const FORTRESS_BUILD = '0613Z';
+export const FORTRESS_VERSION = 'v2.8';
+export const FORTRESS_BUILD = '0614Z';
 
 export const alpha = (hex: string, opacity: number): string => {
   const value = parseInt(hex.replace(/#/g, ''), 16);

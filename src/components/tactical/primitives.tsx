@@ -45,10 +45,10 @@ export const SettingRow = ({
     style={{ borderColor: FORTRESS.border, background: FORTRESS.surfaceRaised }}
   >
     <div className="min-w-0 flex-1">
-      <div className="font-mono text-[10px] font-bold uppercase tracking-[1px]" style={{ color: FORTRESS.text }}>
+      <div className="font-mono text-[12px] font-bold uppercase tracking-[1px]" style={{ color: FORTRESS.text }}>
         {title}
       </div>
-      <div className="mt-1 font-mono text-[8px] leading-[1.6] tracking-[0.5px]" style={{ color: FORTRESS.textDim }}>
+      <div className="mt-1 font-mono text-[11px] leading-[1.6] tracking-[0.3px]" style={{ color: FORTRESS.textDim }}>
         {desc}
       </div>
     </div>
@@ -70,7 +70,7 @@ export const Chip = ({
   <button
     type="button"
     onClick={onClick}
-    className="rounded-sm px-3.5 py-1.5 font-mono text-[9px] font-extrabold uppercase tracking-[1.5px] transition-colors fortress-focus"
+    className="rounded-sm px-3.5 py-1.5 font-mono text-[10px] font-extrabold uppercase tracking-[1.5px] transition-colors fortress-focus"
     style={{
       background: active ? alpha(accent, 0.12) : 'transparent',
       border: `1px solid ${active ? accent : FORTRESS.border}`,
@@ -84,7 +84,7 @@ export const Chip = ({
 export const SectionDivider = ({ children }: { children: ReactNode }) => (
   <div className="mb-2 flex items-center gap-2.5">
     <span
-      className="font-mono text-[8px] font-extrabold uppercase tracking-[0.2em]"
+      className="font-mono text-[9px] font-extrabold uppercase tracking-[0.2em]"
       style={{ color: FORTRESS.textDim }}
     >
       {children}
