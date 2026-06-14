@@ -357,7 +357,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
-                className="h-[38px] min-h-[38px] max-h-28 w-full resize-none rounded border border-[#1C2B22] bg-[#0F1612] px-3 py-[11px] font-mono text-[13px] text-[#DCEAE1] shadow-[inset_0_1px_8px_rgba(54,226,123,0.06)] caret-[#36E27B] transition-colors placeholder:text-[#76897D]/60 focus:border-[#1E5C3C] focus:outline-none focus:ring-1 focus:ring-[#36E27B]/25"
+                className="h-[38px] min-h-[38px] max-h-28 w-full resize-none scrollbar-hide rounded border border-[#1C2B22] bg-[#0F1612] px-3 py-[10px] font-mono text-[13px] text-[#DCEAE1] shadow-[inset_0_1px_8px_rgba(54,226,123,0.06)] caret-[#36E27B] transition-colors placeholder:text-[#76897D]/60 focus:border-[#1E5C3C] focus:outline-none focus:ring-1 focus:ring-[#36E27B]/25"
                 rows={message.split('\n').length > 1 ? Math.min(message.split('\n').length, 3) : 1}
                 style={{
                   letterSpacing: '0.5px',

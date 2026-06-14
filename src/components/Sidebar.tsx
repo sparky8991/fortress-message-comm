@@ -92,10 +92,10 @@ export const Sidebar = ({
             <Shield className="h-4 w-4 text-[#36E27B]" />
           </div>
           <div className="min-w-0 flex-1">
-            <h1 className="font-mono text-[15px] font-extrabold uppercase leading-none tracking-[2px] text-[#ECF7F0]">
+            <h1 className="font-mono text-[14px] font-extrabold uppercase leading-none tracking-[2px] text-[#ECF7F0]">
               SECURECHAT
             </h1>
-            <div className="mt-1 whitespace-nowrap font-mono text-[10px] uppercase tracking-[2px] text-[#76897D]">
+            <div className="mt-1 truncate font-mono text-[9px] uppercase tracking-[1.5px] text-[#76897D]">
               FORTRESS TERMINAL {FORTRESS_VERSION}
             </div>
           </div>
@@ -104,7 +104,7 @@ export const Sidebar = ({
             <span className="font-mono text-[10px] font-black uppercase tracking-[0.16em] text-[#36E27B]">SECURE</span>
           </div>
         </div>
-        <div className="mt-2 flex items-center justify-between font-mono text-[10px] uppercase tracking-[1px] text-[#4A5A50]">
+        <div className="mt-2 flex items-center justify-between gap-2 font-mono text-[9px] uppercase tracking-[1px] text-[#4A5A50]">
           <span className="text-[#76897D]">{utcTime}</span>
           <span>X25519 · AES-256-GCM</span>
         </div>
