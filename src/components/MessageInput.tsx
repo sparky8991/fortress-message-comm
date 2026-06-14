@@ -229,7 +229,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
               burnEnabled={burnAfterReadEnabled}
               onToggleBurn={() => setBurnAfterReadEnabled((enabled) => !enabled)}
             />
-            <span className="hidden flex-none font-mono text-[7px] uppercase tracking-[1px] text-[#4A5A50] lg:inline">
+            <span className="hidden flex-none font-mono text-[9px] uppercase tracking-[1px] text-[#4A5A50] lg:inline">
               OUTBOUND MARKED {MARK_META[outboundMark].label}
             </span>
           </div>
@@ -337,7 +337,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                     setShowGifPicker(!showGifPicker);
                     setShowEmojiPicker(false);
                   }}
-                  className={`${actionButtonClass} font-mono text-[8px] font-extrabold uppercase tracking-[1px]`}
+                  className={`${actionButtonClass} font-mono text-[9px] font-extrabold uppercase tracking-[1px]`}
                   aria-label="Add GIF"
                   title="Send GIF"
                 >
@@ -379,7 +379,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
           </div>
           
           <div className="mt-[7px] flex items-center justify-center">
-            <div className={`flex items-center gap-1.5 font-mono text-[7px] uppercase tracking-[2px] ${
+            <div className={`flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[2px] ${
               burnAfterReadEnabled
                 ? 'text-[#F2B43C]'
                 : 'text-[#4A5A50]'

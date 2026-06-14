@@ -95,7 +95,7 @@ export const Sidebar = ({
             <h1 className="font-mono text-[14px] font-extrabold uppercase leading-none tracking-[2px] text-[#ECF7F0]">
               SECURECHAT
             </h1>
-            <div className="mt-1 whitespace-nowrap font-mono text-[8px] uppercase tracking-[2px] text-[#76897D]">
+            <div className="mt-1 whitespace-nowrap font-mono text-[9px] uppercase tracking-[2px] text-[#76897D]">
               FORTRESS TERMINAL {FORTRESS_VERSION}
             </div>
           </div>
@@ -117,7 +117,7 @@ export const Sidebar = ({
               <span className="font-mono text-[13px] font-black text-[#7BEFA9]">{initials}</span>
             </div>
             <div className="min-w-0">
-              <div className="font-mono text-[8px] uppercase leading-none tracking-[0.22em] text-[#76897D]">CALL SIGN</div>
+              <div className="font-mono text-[9px] uppercase leading-none tracking-[0.22em] text-[#76897D]">CALL SIGN</div>
               <div className="mt-1 truncate font-mono text-[13px] font-black leading-none tracking-[0.08em] text-[#ECF7F0]">
                 {callSign}
                 <span className="ml-1 text-[10px] text-[#36E27B]">✓</span>
@@ -126,7 +126,7 @@ export const Sidebar = ({
           </div>
           <div className="flex flex-none items-center gap-1.5">
             <span className="h-1.5 w-1.5 rounded-full bg-[#36E27B]" />
-            <span className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#76897D]">ONLINE</span>
+            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#76897D]">ONLINE</span>
           </div>
           <AppSettingsMenu
             triggerClassName="grid h-7 w-7 flex-none place-items-center rounded-sm border border-[#1C2B22] bg-transparent text-[#76897D] transition-colors hover:border-[#1E5C3C] hover:text-[#36E27B] fortress-focus"

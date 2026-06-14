@@ -43,7 +43,7 @@ export const ChatHeader = ({ contact, onStartCall, onToggleSidebar }: ChatHeader
             <div className="min-w-0 flex-1">
               <div className="flex min-w-0 items-center gap-2">
                 <h2 className="truncate font-mono text-[14px] font-bold leading-none text-[#ECF7F0]">{contact?.name}</h2>
-                <span className="hidden rounded-sm border border-[#F2B43C]/45 bg-[#F2B43C]/10 px-1.5 py-0.5 font-mono text-[7px] font-black uppercase tracking-[0.18em] text-[#F2B43C] sm:inline-flex">
+                <span className="hidden rounded-sm border border-[#F2B43C]/45 bg-[#F2B43C]/10 px-1.5 py-0.5 font-mono text-[9px] font-black uppercase tracking-[0.18em] text-[#F2B43C] sm:inline-flex">
                   UNVERIFIED
                 </span>
               </div>
@@ -56,7 +56,7 @@ export const ChatHeader = ({ contact, onStartCall, onToggleSidebar }: ChatHeader
               ) : (
                 // Full desktop layout
                 <div className="mt-0.5 flex flex-col space-y-0.5">
-                  <p className="truncate font-mono text-[8px] uppercase tracking-[0.22em] text-[#76897D]">
+                  <p className="truncate font-mono text-[9px] uppercase tracking-[0.22em] text-[#76897D]">
                     CHANNEL READY
                   </p>
                   <div className="flex items-center space-x-1.5 font-mono text-[9px] font-bold uppercase tracking-[0.12em] text-[#36E27B]">
@@ -98,10 +98,10 @@ export const ChatHeader = ({ contact, onStartCall, onToggleSidebar }: ChatHeader
           </div>
         </div>
         <div className="hidden items-center justify-between border-t border-[#6B4B18] bg-[#1A1507] px-4 py-1 md:flex">
-          <span className="font-mono text-[8px] font-bold uppercase tracking-[0.22em] text-[#F2B43C]">
+          <span className="font-mono text-[9px] font-bold uppercase tracking-[0.22em] text-[#F2B43C]">
             [ ! ] VERIFY IDENTITY BEFORE PASSING SENSITIVE TRAFFIC
           </span>
-          <span className="font-mono text-[8px] font-bold uppercase tracking-[0.22em] text-[#4A5A50]">
+          <span className="font-mono text-[9px] font-bold uppercase tracking-[0.22em] text-[#4A5A50]">
             SESSION ESTABLISHED
           </span>
         </div>
