@@ -25,7 +25,8 @@ This is the source of truth so nothing gets lost between sessions.
 - [ ] **Phase 2 — Firestore rules** for identity-key fields (owner-write only). → `rafter-code-review`
 - **Phase 3 — message encryption** (in progress):
   - [x] **3a** — `messageCrypto.ts`: ECDH conversation key (X25519 → BLAKE2b/conv-id) + XChaCha20-Poly1305 encrypt/decrypt + pack/unpack + 6 tests.
-  - [ ] **3b (high-risk wiring)** — surface peer `identityKeyPublic` in participants; encrypt-before-store in `sendMessage`; decrypt-on-read in `useDirectMessages`; mixed-state (legacy plaintext renders); graceful fallback when locked / peer has no key; stop storing plaintext `last_message_preview`. → `rafter-code-review` (changes the live messaging path).
+  - [x] **3b** — `messageEncryption` (conv-key cache + encryptOutgoing/decryptIncoming); encrypt-on-send + decrypt-on-read wired into `conversationService` + `useDirectMessages`; honest `encrypted` flag; no plaintext preview; **plaintext fallback** when locked / no peer key; conv-key cache cleared on lock. **⚠ NEEDS end-to-end two-account testing before trust/deploy** — build + unit tests do not prove live messaging works.
+  - [ ] **3 follow-ups**: re-decrypt displayed messages right after unlock (currently shows "unlock to read" until you switch conversations / a new message arrives); optional per-conversation "require encryption" mode (block the silent plaintext fallback); formal `rafter-code-review` of the encryption wiring.
 - [ ] **Phase 4 — attachment encryption** (also closes the public Supabase bucket leak).
 - [ ] **Phase 5 — verificationService** + `verifications/{me}/peers/{peer}` subcollection + rules; drop global self-grantable `profiles.verified`.
 - [ ] **Phase 6 — VerifyIdentityDialog** + ChatHeader real `VERIFIED` / `UNVERIFIED` / `KEY CHANGED` badge.

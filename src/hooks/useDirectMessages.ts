@@ -7,6 +7,7 @@ import { conversationService, DirectMessage, Conversation } from '@/services/con
 import { toast } from '@/hooks/use-toast';
 import { uploadChatAttachment } from '@/integrations/supabase/storage';
 import { stripEncryptedPayloadSecrets } from '@/utils/encryptedPayloadMessage';
+import { decryptIncoming } from '@/services/messageEncryption';
 
 type MessageMetadata = Record<string, unknown> & {
   isVoiceMessage?: boolean;
@@ -177,8 +178,9 @@ export const useDirectMessages = () => {
       where('conversation_id', '==', activeConversation)
     );
 
-    const unsubscribe = onSnapshot(messagesQuery, (snapshot) => {
-      const newMessages: DirectMessage[] = snapshot.docs.map(doc => {
+    let cancelled = false;
+    const unsubscribe = onSnapshot(messagesQuery, async (snapshot) => {
+      const mapped: DirectMessage[] = snapshot.docs.map(doc => {
         const data = doc.data();
         return {
           id: doc.id,
@@ -197,10 +199,17 @@ export const useDirectMessages = () => {
         };
       });
       // Sort client-side by sent_at ascending
-      newMessages.sort((a, b) =>
+      mapped.sort((a, b) =>
         new Date(a.sent_at).getTime() - new Date(b.sent_at).getTime()
       );
-      setMessages(newMessages);
+      // Decrypt encrypted content (passes through legacy plaintext; placeholder when locked)
+      const decrypted = await Promise.all(
+        mapped.map(async (m) => ({
+          ...m,
+          content: await decryptIncoming(m.conversation_id, m.content, m.encrypted),
+        }))
+      );
+      if (!cancelled) setMessages(decrypted);
     }, (error) => {
       console.error('Error in messages subscription:', error);
     });
@@ -208,6 +217,7 @@ export const useDirectMessages = () => {
     unsubscribeRef.current = unsubscribe;
 
     return () => {
+      cancelled = true;
       if (unsubscribeRef.current) {
         unsubscribeRef.current();
         unsubscribeRef.current = null;

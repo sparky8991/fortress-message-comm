@@ -24,6 +24,7 @@ import {
 } from '@/lib/identityKeys';
 import { fingerprint } from '@/lib/safetyNumber';
 import { clearSessionPrivateKey, isUnlocked, setSessionPrivateKey } from '@/lib/keySession';
+import { clearConversationKeyCache } from './messageEncryption';
 
 export type KeyState = 'none' | 'locked' | 'unlocked';
 
@@ -99,5 +100,8 @@ export const unlock = async (
   return true;
 };
 
-/** Clear the in-memory private key (call on logout / lock). */
-export const lockIdentityKeys = (): void => clearSessionPrivateKey();
+/** Clear the in-memory private key + cached conversation keys (call on logout / lock). */
+export const lockIdentityKeys = (): void => {
+  clearSessionPrivateKey();
+  clearConversationKeyCache();
+};
