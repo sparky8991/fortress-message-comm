@@ -46,7 +46,10 @@ export const generateIdentityKeyPair = async (): Promise<IdentityKeyPair> => {
 export const wrapPrivateKey = async (
   privateKeyB64: string,
   secret: string,
-  strength: Strength = 'moderate',
+  // 'interactive' (64MB Argon2id) — libsodium's recommendation for online/interactive
+  // use. 'moderate' (256MB) stalls the browser. Each wrapped blob stores its own
+  // params, so unwrap works regardless of which was used.
+  strength: Strength = 'interactive',
 ): Promise<WrappedKey> => {
   const s = await getSodium();
   const V = s.base64_variants.ORIGINAL;
