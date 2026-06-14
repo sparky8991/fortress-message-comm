@@ -193,7 +193,7 @@ export const SettingsDialog = ({
         </DialogHeader>
 
         <div className="flex min-h-0 flex-1 flex-col md:flex-row">
-          <nav className="flex w-full flex-none gap-1.5 overflow-x-auto border-b px-2.5 py-2 md:w-[190px] md:flex-col md:overflow-visible md:border-b-0 md:border-r md:py-3" style={{ borderColor: FORTRESS.borderFaint }}>
+          <nav className="flex w-full flex-none gap-1.5 overflow-x-auto scrollbar-hide border-b px-2.5 py-2 md:w-[190px] md:flex-col md:overflow-visible md:border-b-0 md:border-r md:py-3" style={{ borderColor: FORTRESS.borderFaint }}>
             {SECTIONS.map(({ id, label, icon: Icon }) => {
               const active = section === id;
               return (
@@ -215,7 +215,7 @@ export const SettingsDialog = ({
             })}
           </nav>
 
-          <div className="min-w-0 flex-1 overflow-y-auto px-[18px] py-4">
+          <div className="min-w-0 flex-1 overflow-y-auto scrollbar-hide px-[18px] py-4">
             {section === 'profile' && (
               <div className="flex flex-col gap-3">
                 <div className="flex flex-col gap-3 rounded-sm border p-3 sm:flex-row sm:items-center" style={{ borderColor: FORTRESS.border, background: FORTRESS.surfaceRaised }}>
