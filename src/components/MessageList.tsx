@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { Shield, Check, CheckCheck, Clock } from 'lucide-react';
+import { Check, CheckCheck, Clock } from 'lucide-react';
 import { AttachmentPreview } from './AttachmentPreview';
 import { MessageContextMenu } from './MessageContextMenu';
 import { VoiceMessagePlayer } from './VoiceMessagePlayer';
@@ -97,28 +97,15 @@ export const MessageList = ({
             trafficMark === 'locked' ? 'SECRET' :
             trafficMark === 'sensitive' ? 'CONF' :
             'UNCLASS';
-          const markClass =
+          const markColor =
             trafficMark === 'locked'
-              ? 'border-[#FF6B61]/50 bg-[#8C1D18]/20 text-[#FF6B61]'
+              ? '#FF6B61'
               : trafficMark === 'sensitive'
-                ? 'border-[#F2B43C]/50 bg-[#1A1507] text-[#F2B43C]'
-                : 'border-[#1E5C3C] bg-[#36E27B]/10 text-[#36E27B]';
+                ? '#F2B43C'
+                : '#36E27B';
           
           return (
             <div key={message.id} className={`space-y-1 ${isConsecutive ? 'mt-1.5' : 'mt-4 md:mt-5'}`}>
-              {showUsername && (
-                <div className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'}`}>
-                  <div className="flex items-center gap-2">
-                    <span className="rounded-sm border border-[#1E5C3C] bg-[#36E27B]/10 px-2.5 py-1 font-mono text-[11px] font-bold text-[#36E27B]">
-                      {message.sender === 'me' ? 'You' : contactName}
-                    </span>
-                    <span className="font-mono text-[9px] uppercase tracking-[0.08em] text-[#76897D]">
-                      {message.timestamp}
-                    </span>
-                  </div>
-                </div>
-              )}
-              
               <div className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'} group`}>
                 <MessageContextMenu
                   onReply={onReply}
@@ -131,12 +118,17 @@ export const MessageList = ({
                   <div
                     className={`max-w-[90%] cursor-pointer select-none rounded-sm border px-3 py-2 transition-colors md:max-w-[85%] md:px-4 md:py-3 lg:max-w-xl ${
                       message.sender === 'me'
-                        ? 'border-[#1E5C3C] bg-black/95 text-[#36E27B] shadow-[0_0_18px_rgba(54,226,123,0.12)] hover:border-[#36E27B]'
+                        ? 'border-[#36E27B]/45 bg-[#36E27B]/12 text-[#DCEAE1] shadow-[0_0_18px_rgba(54,226,123,0.12)] hover:border-[#36E27B]'
                         : 'border-[#1C2B22] bg-[#101814] text-[#ECF7F0] shadow-lg hover:border-[#36513F]'
                     }`}
                     style={{ letterSpacing: '0.3px' }}
                   >
                     <BurnAfterReadMessage message={message}>
+                      <div className="mb-2 flex items-center gap-2">
+                        <span className="font-mono text-[9px] font-extrabold uppercase tracking-[0.14em]" style={{ color: markColor }}>
+                          ▮ {markLabel}
+                        </span>
+                      </div>
                       {/* Reply indicator */}
                       {message.replyTo && (
                           <div className="mb-2 border-l-2 border-[#36E27B] bg-black/60 p-2 shadow-inner">
@@ -182,31 +174,14 @@ export const MessageList = ({
                         )
                       )}
 
-                      <div className="mt-2 flex items-center justify-between border-t border-[#1C2B22]/70 pt-1.5">
-                        <div className="flex items-center space-x-2 md:space-x-3">
-                          <span className={`rounded-sm border px-1.5 py-0.5 font-mono text-[8px] font-black uppercase tracking-[0.14em] ${markClass}`}>
-                            {markLabel}
-                          </span>
-                          {message.encrypted && (
-                            <div className="flex items-center space-x-1 md:space-x-1.5">
-                              <Shield className="h-2.5 w-2.5 animate-pulse text-[#36E27B]/80 md:h-3 md:w-3" />
-                              <span className="font-mono text-[9px] font-bold uppercase tracking-[0.12em] text-[#36E27B]/70">
-                                {isMobile ? 'ENC' : 'PROTECTED'}
-                              </span>
-                            </div>
-                          )}
-                          {!showUsername && (
-                            <span className={`font-mono text-[9px] ${
-                              message.sender === 'me' ? 'text-[#36E27B]/60' : 'text-[#76897D]'
-                            }`}>
-                              {message.timestamp}
-                            </span>
-                          )}
-                        </div>
+                      <div className="mt-1.5 flex items-center justify-end gap-1.5">
+                        <span className="font-mono text-[9px] tracking-[0.08em] text-[#5C6E63]">
+                          {message.timestamp}
+                        </span>
                         {message.sender === 'me' && (
-                          <div className="flex-shrink-0 opacity-70 group-hover:opacity-100 transition-opacity">
+                          <span className="opacity-80 transition-opacity group-hover:opacity-100">
                             {getStatusIcon(message.status)}
-                          </div>
+                          </span>
                         )}
                       </div>
                     </BurnAfterReadMessage>
