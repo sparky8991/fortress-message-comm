@@ -5,7 +5,7 @@ This is the source of truth so nothing gets lost between sessions.
 
 ## Conventions
 - **Version:** bump `FORTRESS_VERSION` in `src/lib/fortress.ts` on **every user-visible update**.
-  Sequence: `v2.9 → v3.0 → v3.1 → v3.2 …` (after `x.9`, roll to `(x+1).0`). Currently **v2.9**.
+  Sequence: `v2.9 → v3.0 → v3.1 → v3.2 …` (after `x.9`, roll to `(x+1).0`). Currently **v3.1**.
 - **Branch:** redesign + E2E work lives on `tactical-crispness-pass` (not merged; `main` + live Netlify untouched).
 - **Per change:** `npm run build` green + `npm test` green; small commits; security-sensitive diffs get `rafter-code-review`.
 
@@ -54,4 +54,4 @@ This is the source of truth so nothing gets lost between sessions.
 
 ## Docs / Deploy
 - [ ] Refresh `docs/SECURECHAT_APP_GUIDE.md` (version, redesign branch, the plaintext-not-E2E finding, the E2E plan).
-- [ ] When ready: merge `tactical-crispness-pass` → `main` + Netlify deploy. The **visual work is shippable independently** of E2E (E2E Phase 1–2 are unused tested libs).
+- [ ] When ready: merge `tactical-crispness-pass` → `main` + Netlify deploy. **Note:** Phase 3 changed the live messaging path (encrypt/decrypt wired in, with plaintext fallback), so deploying now ships that **untested** wiring — **end-to-end test Phase 3 first.** Everything else (visual redesign, Tactical ID, mobile) is independently safe to ship.
