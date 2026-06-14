@@ -77,7 +77,7 @@ export const CreateTeamDialog = ({ isOpen, onOpenChange }: CreateTeamDialogProps
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[440px] rounded-sm border-[#1E5C3C] bg-[#0C120F] p-0 font-mono text-[#DCEAE1] shadow-[0_0_50px_rgba(0,0,0,0.55)]">
+      <DialogContent className="w-screen max-w-[100vw] rounded-none border-[#1E5C3C] bg-[#0C120F] p-0 font-mono text-[#DCEAE1] shadow-[0_0_50px_rgba(0,0,0,0.55)] md:w-auto md:max-w-[440px] md:rounded-sm">
         <DialogHeader>
           <div className="border-b border-[#1C2B22] px-4 py-3">
             <DialogTitle className="flex items-center gap-2 font-mono text-[12px] font-black uppercase tracking-[0.18em] text-[#36E27B]">

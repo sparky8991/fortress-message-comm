@@ -177,7 +177,7 @@ export const SettingsDialog = ({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
-        className="h-[560px] max-h-[92vh] w-[740px] max-w-[94vw] overflow-hidden rounded-sm p-0 font-mono"
+        className="flex h-[100dvh] max-h-[100dvh] w-screen max-w-[100vw] flex-col overflow-hidden rounded-none p-0 font-mono md:h-[560px] md:max-h-[92vh] md:w-[740px] md:max-w-[94vw] md:rounded-sm"
         style={{ background: FORTRESS.surface, borderColor: FORTRESS.borderGreen, color: FORTRESS.text }}
       >
         <DialogHeader
@@ -192,8 +192,8 @@ export const SettingsDialog = ({
           </span>
         </DialogHeader>
 
-        <div className="flex min-h-0 flex-1">
-          <nav className="flex w-[190px] flex-none flex-col gap-1.5 border-r px-2.5 py-3" style={{ borderColor: FORTRESS.borderFaint }}>
+        <div className="flex min-h-0 flex-1 flex-col md:flex-row">
+          <nav className="flex w-full flex-none gap-1.5 overflow-x-auto border-b px-2.5 py-2 md:w-[190px] md:flex-col md:overflow-visible md:border-b-0 md:border-r md:py-3" style={{ borderColor: FORTRESS.borderFaint }}>
             {SECTIONS.map(({ id, label, icon: Icon }) => {
               const active = section === id;
               return (
@@ -201,7 +201,7 @@ export const SettingsDialog = ({
                   key={id}
                   type="button"
                   onClick={() => setSection(id)}
-                  className="flex items-center gap-2 rounded-sm border px-2.5 py-2 text-left font-mono text-[11px] font-bold uppercase tracking-[1.5px] transition-colors fortress-focus"
+                  className="flex flex-none items-center gap-2 whitespace-nowrap rounded-sm border px-3 py-2.5 text-left font-mono text-[11px] font-bold uppercase tracking-[1.5px] transition-colors fortress-focus md:px-2.5 md:py-2"
                   style={{
                     background: active ? alpha(accent, 0.1) : 'transparent',
                     borderColor: active ? alpha(accent, 0.5) : 'transparent',
@@ -528,14 +528,14 @@ export const SettingsDialog = ({
           </div>
         </div>
 
-        <div className="flex items-center justify-between border-t px-4 py-3" style={{ borderColor: FORTRESS.borderFaint }}>
+        <div className="flex flex-col-reverse gap-2 border-t px-4 py-3 sm:flex-row sm:items-center sm:justify-between" style={{ borderColor: FORTRESS.borderFaint }}>
           <span className="font-mono text-[10px] uppercase tracking-[1.5px]" style={{ color: FORTRESS.textFaint }}>
             Changes sync to your account settings
           </span>
           <Button
             type="button"
             onClick={onClose}
-            className="h-auto rounded-sm px-5 py-2 font-mono text-[12px] font-extrabold uppercase tracking-[2px] text-[#06130B]"
+            className="h-auto w-full rounded-sm px-5 py-3 font-mono text-[12px] font-extrabold uppercase tracking-[2px] text-[#06130B] sm:w-auto sm:py-2"
             style={{ background: accent }}
           >
             Done
