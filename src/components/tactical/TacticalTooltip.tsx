@@ -23,10 +23,10 @@ export const TacticalTooltip = ({
       className="pointer-events-none invisible absolute bottom-[calc(100%+9px)] left-1/2 z-50 -translate-x-1/2 rounded-sm border px-3 py-2 opacity-0 shadow-xl transition-opacity duration-150 group-hover:visible group-hover:opacity-100"
       style={{ width, borderColor: accent, background: '#0F1A14' }}
     >
-      <span className="block font-mono text-[8px] font-extrabold uppercase tracking-[0.15em]" style={{ color: accent }}>
+      <span className="block font-mono text-[10px] font-extrabold uppercase tracking-[0.15em]" style={{ color: accent }}>
         {title}
       </span>
-      <span className="mt-1 block font-mono text-[8px] leading-relaxed tracking-wide" style={{ color: '#9FB2A6' }}>
+      <span className="mt-1 block font-mono text-[10px] leading-relaxed tracking-wide" style={{ color: '#9FB2A6' }}>
         {body}
       </span>
       <span

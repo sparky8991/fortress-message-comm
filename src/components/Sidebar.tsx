@@ -92,19 +92,19 @@ export const Sidebar = ({
             <Shield className="h-4 w-4 text-[#36E27B]" />
           </div>
           <div className="min-w-0 flex-1">
-            <h1 className="font-mono text-[14px] font-extrabold uppercase leading-none tracking-[2px] text-[#ECF7F0]">
+            <h1 className="font-mono text-[15px] font-extrabold uppercase leading-none tracking-[2px] text-[#ECF7F0]">
               SECURECHAT
             </h1>
-            <div className="mt-1 whitespace-nowrap font-mono text-[9px] uppercase tracking-[2px] text-[#76897D]">
+            <div className="mt-1 whitespace-nowrap font-mono text-[10px] uppercase tracking-[2px] text-[#76897D]">
               FORTRESS TERMINAL {FORTRESS_VERSION}
             </div>
           </div>
           <div className="flex flex-none items-center gap-1.5 rounded-sm border border-[#1E5C3C] bg-[#36E27B]/10 px-2 py-1">
             <span className="h-1.5 w-1.5 rounded-full bg-[#36E27B] shadow-[0_0_10px_rgba(54,226,123,0.65)]" />
-            <span className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-[#36E27B]">SECURE</span>
+            <span className="font-mono text-[10px] font-black uppercase tracking-[0.16em] text-[#36E27B]">SECURE</span>
           </div>
         </div>
-        <div className="mt-2 flex items-center justify-between font-mono text-[9px] uppercase tracking-[1px] text-[#4A5A50]">
+        <div className="mt-2 flex items-center justify-between font-mono text-[10px] uppercase tracking-[1px] text-[#4A5A50]">
           <span className="text-[#76897D]">{utcTime}</span>
           <span>X25519 · AES-256-GCM</span>
         </div>
@@ -114,19 +114,19 @@ export const Sidebar = ({
         <div className="mx-3 mt-3 flex items-center gap-2.5 rounded-sm border border-[#1C2B22] bg-[#101814] px-3 py-2.5">
           <div className="flex min-w-0 flex-1 items-center gap-2.5 text-left">
             <div className="grid h-9 w-9 flex-none place-items-center rounded-sm border border-[#1E5C3C] bg-[#12301F]">
-              <span className="font-mono text-[13px] font-black text-[#7BEFA9]">{initials}</span>
+              <span className="font-mono text-[14px] font-black text-[#7BEFA9]">{initials}</span>
             </div>
             <div className="min-w-0">
-              <div className="font-mono text-[9px] uppercase leading-none tracking-[0.22em] text-[#76897D]">CALL SIGN</div>
-              <div className="mt-1 truncate font-mono text-[13px] font-black leading-none tracking-[0.08em] text-[#ECF7F0]">
+              <div className="font-mono text-[10px] uppercase leading-none tracking-[0.22em] text-[#76897D]">CALL SIGN</div>
+              <div className="mt-1 truncate font-mono text-[14px] font-black leading-none tracking-[0.08em] text-[#ECF7F0]">
                 {callSign}
-                <span className="ml-1 text-[10px] text-[#36E27B]">✓</span>
+                <span className="ml-1 text-[11px] text-[#36E27B]">✓</span>
               </div>
             </div>
           </div>
           <div className="flex flex-none items-center gap-1.5">
             <span className="h-1.5 w-1.5 rounded-full bg-[#36E27B]" />
-            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#76897D]">ONLINE</span>
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#76897D]">ONLINE</span>
           </div>
           <AppSettingsMenu
             triggerClassName="grid h-7 w-7 flex-none place-items-center rounded-sm border border-[#1C2B22] bg-transparent text-[#76897D] transition-colors hover:border-[#1E5C3C] hover:text-[#36E27B] fortress-focus"
@@ -150,7 +150,7 @@ export const Sidebar = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             autoComplete="off"
-            className="h-[34px] w-full rounded-sm border border-[#1C2B22] bg-[#0F1612] pl-9 pr-3 font-mono text-[11px] uppercase tracking-[0.1em] text-[#DCEAE1] placeholder:text-[#76897D]/60 transition-colors focus:border-[#1E5C3C] focus:outline-none focus:ring-1 focus:ring-[#36E27B]/25"
+            className="h-[34px] w-full rounded-sm border border-[#1C2B22] bg-[#0F1612] pl-9 pr-3 font-mono text-[12px] uppercase tracking-[0.1em] text-[#DCEAE1] placeholder:text-[#76897D]/60 transition-colors focus:border-[#1E5C3C] focus:outline-none focus:ring-1 focus:ring-[#36E27B]/25"
           />
         </div>
         <Button
@@ -166,7 +166,7 @@ export const Sidebar = ({
       <div className="mx-3 mt-3 grid grid-cols-3 gap-1.5">
         <button
           onClick={() => setActiveTab('chats')}
-          className={`flex h-7 items-center justify-center gap-1.5 rounded-sm border px-2 font-mono text-[9px] font-black uppercase tracking-[0.15em] transition-colors ${
+          className={`flex h-7 items-center justify-center gap-1.5 rounded-sm border px-2 font-mono text-[10px] font-black uppercase tracking-[0.15em] transition-colors ${
             activeTab === 'chats'
               ? 'border-[#1E5C3C] bg-[#36E27B]/10 text-[#36E27B]'
               : 'border-[#1C2B22] text-[#76897D] hover:border-[#1E5C3C] hover:text-[#DCEAE1]'
@@ -177,7 +177,7 @@ export const Sidebar = ({
         </button>
         <button
           onClick={() => setActiveTab('teams')}
-          className={`flex h-7 items-center justify-center gap-1.5 rounded-sm border px-2 font-mono text-[9px] font-black uppercase tracking-[0.15em] transition-colors ${
+          className={`flex h-7 items-center justify-center gap-1.5 rounded-sm border px-2 font-mono text-[10px] font-black uppercase tracking-[0.15em] transition-colors ${
             activeTab === 'teams'
               ? 'border-[#1E5C3C] bg-[#36E27B]/10 text-[#36E27B]'
               : 'border-[#1C2B22] text-[#76897D] hover:border-[#1E5C3C] hover:text-[#DCEAE1]'
@@ -188,7 +188,7 @@ export const Sidebar = ({
         </button>
         <button
           onClick={() => setActiveTab('security')}
-          className={`flex h-7 items-center justify-center gap-1.5 rounded-sm border px-2 font-mono text-[9px] font-black uppercase tracking-[0.15em] transition-colors ${
+          className={`flex h-7 items-center justify-center gap-1.5 rounded-sm border px-2 font-mono text-[10px] font-black uppercase tracking-[0.15em] transition-colors ${
             activeTab === 'security'
               ? 'border-[#1E5C3C] bg-[#36E27B]/10 text-[#36E27B]'
               : 'border-[#1C2B22] text-[#76897D] hover:border-[#1E5C3C] hover:text-[#DCEAE1]'
@@ -224,7 +224,7 @@ export const Sidebar = ({
           <div className="rounded-sm border border-[#5C2420] bg-[#8C1D18]/15 p-2.5">
             <div className="flex items-center gap-2 mb-2">
               <AlertTriangle className="h-3.5 w-3.5 text-[#FF6B61]" />
-              <span className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-[#FF6B61]">Emergency</span>
+              <span className="font-mono text-[10px] font-black uppercase tracking-[0.16em] text-[#FF6B61]">Emergency</span>
             </div>
             <HoldPanicButton variant="full" />
           </div>
@@ -233,7 +233,7 @@ export const Sidebar = ({
         {/* Logout Button */}
         <button
           onClick={handleLogout}
-          className="flex h-9 w-full items-center justify-center gap-2 rounded-sm border border-[#1C2B22] bg-transparent px-3 font-mono text-[9px] font-black uppercase tracking-[0.22em] text-[#76897D] transition-colors hover:border-[#36513F] hover:text-[#DCEAE1]"
+          className="flex h-9 w-full items-center justify-center gap-2 rounded-sm border border-[#1C2B22] bg-transparent px-3 font-mono text-[10px] font-black uppercase tracking-[0.22em] text-[#76897D] transition-colors hover:border-[#36513F] hover:text-[#DCEAE1]"
         >
           <Power className="h-3 w-3" />
           <span>SEAL SESSION / SIGN OUT</span>

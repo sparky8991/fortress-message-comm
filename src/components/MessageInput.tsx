@@ -229,7 +229,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
               burnEnabled={burnAfterReadEnabled}
               onToggleBurn={() => setBurnAfterReadEnabled((enabled) => !enabled)}
             />
-            <span className="hidden flex-none font-mono text-[9px] uppercase tracking-[1px] text-[#4A5A50] lg:inline">
+            <span className="hidden flex-none font-mono text-[10px] uppercase tracking-[1px] text-[#4A5A50] lg:inline">
               OUTBOUND MARKED {MARK_META[outboundMark].label}
             </span>
           </div>
@@ -247,18 +247,18 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                   </div>
                 )}
                 <div className="min-w-0 flex-1">
-                  <span className="block truncate font-mono text-[11px] font-black text-[#ECF7F0]">
+                  <span className="block truncate font-mono text-[12px] font-black text-[#ECF7F0]">
                     {isEncryptedFile ? `[ENCRYPTED]: ${encryptionMetadata?.originalName || 'PAYLOAD'}` : `${attachment.name}`}
                   </span>
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                    <span className="font-mono text-[9px] text-[#76897D]">
+                    <span className="font-mono text-[10px] text-[#76897D]">
                       {(attachment.size / 1024 / 1024).toFixed(2)} MB
                     </span>
                     {isEncryptedFile && typeof encryptionMetadata?.shareCode === 'string' && (
                       <button
                         type="button"
                         onClick={copyEncryptedKey}
-                        className="inline-flex items-center gap-1 rounded-sm border border-[#1E5C3C] bg-[#36E27B]/10 px-1.5 py-0.5 font-mono text-[9px] text-[#7BEFA9] hover:text-[#ECF7F0]"
+                        className="inline-flex items-center gap-1 rounded-sm border border-[#1E5C3C] bg-[#36E27B]/10 px-1.5 py-0.5 font-mono text-[10px] text-[#7BEFA9] hover:text-[#ECF7F0]"
                       >
                         <Copy className="w-3 h-3" />
                         Copy decryption key
@@ -337,7 +337,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                     setShowGifPicker(!showGifPicker);
                     setShowEmojiPicker(false);
                   }}
-                  className={`${actionButtonClass} font-mono text-[9px] font-extrabold uppercase tracking-[1px]`}
+                  className={`${actionButtonClass} font-mono text-[10px] font-extrabold uppercase tracking-[1px]`}
                   aria-label="Add GIF"
                   title="Send GIF"
                 >
@@ -357,7 +357,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
-                className="h-[38px] min-h-[38px] max-h-28 w-full resize-none rounded border border-[#1C2B22] bg-[#0F1612] px-3 py-[11px] font-mono text-[12px] text-[#DCEAE1] shadow-[inset_0_1px_8px_rgba(54,226,123,0.06)] caret-[#36E27B] transition-colors placeholder:text-[#76897D]/60 focus:border-[#1E5C3C] focus:outline-none focus:ring-1 focus:ring-[#36E27B]/25"
+                className="h-[38px] min-h-[38px] max-h-28 w-full resize-none rounded border border-[#1C2B22] bg-[#0F1612] px-3 py-[11px] font-mono text-[13px] text-[#DCEAE1] shadow-[inset_0_1px_8px_rgba(54,226,123,0.06)] caret-[#36E27B] transition-colors placeholder:text-[#76897D]/60 focus:border-[#1E5C3C] focus:outline-none focus:ring-1 focus:ring-[#36E27B]/25"
                 rows={message.split('\n').length > 1 ? Math.min(message.split('\n').length, 3) : 1}
                 style={{
                   letterSpacing: '0.5px',
@@ -379,7 +379,7 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
           </div>
           
           <div className="mt-[7px] flex items-center justify-center">
-            <div className={`flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[2px] ${
+            <div className={`flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[2px] ${
               burnAfterReadEnabled
                 ? 'text-[#F2B43C]'
                 : 'text-[#4A5A50]'

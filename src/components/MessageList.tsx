@@ -83,7 +83,7 @@ export const MessageList = ({
     <div className="mx-auto w-full max-w-6xl px-3 py-2 md:px-6 md:py-4">
       <div className="space-y-3 md:space-y-4">
         <div className="flex items-center justify-center py-2 md:py-3">
-          <div className="font-mono text-[8px] uppercase tracking-[0.28em] text-[#36513F]">
+          <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#36513F]">
             {isMobile ? '-- SESSION ACTIVE --' : `-- SESSION ESTABLISHED ${sessionTime} - PROTECTED CHANNEL READY --`}
           </div>
         </div>
@@ -125,18 +125,18 @@ export const MessageList = ({
                   >
                     <BurnAfterReadMessage message={message}>
                       <div className="mb-2 flex items-center gap-2">
-                        <span className="font-mono text-[9px] font-extrabold uppercase tracking-[0.14em]" style={{ color: markColor }}>
+                        <span className="font-mono text-[10px] font-extrabold uppercase tracking-[0.14em]" style={{ color: markColor }}>
                           ▮ {markLabel}
                         </span>
                       </div>
                       {/* Reply indicator */}
                       {message.replyTo && (
                           <div className="mb-2 border-l-2 border-[#36E27B] bg-black/60 p-2 shadow-inner">
-                            <p className="mb-1 flex items-center space-x-1 font-mono text-[10px] font-bold text-[#7BEFA9]">
+                            <p className="mb-1 flex items-center space-x-1 font-mono text-[11px] font-bold text-[#7BEFA9]">
                               <span className="text-[#36E27B]">{'>'}</span>
                               <span>{message.replyTo.sender}</span>
                             </p>
-                            <p className="truncate font-mono text-[10px] leading-relaxed opacity-90">
+                            <p className="truncate font-mono text-[11px] leading-relaxed opacity-90">
                               {message.replyTo.messageText}
                             </p>
                           </div>
@@ -168,14 +168,14 @@ export const MessageList = ({
                             />
                           </div>
                         ) : (
-                          <p className="break-words font-mono text-[12px] leading-relaxed tracking-[0.03em] whitespace-pre-wrap md:text-[13px]">
+                          <p className="break-words font-mono text-[13px] leading-relaxed tracking-[0.03em] whitespace-pre-wrap md:text-[14px]">
                             {message.text}
                           </p>
                         )
                       )}
 
                       <div className="mt-1.5 flex items-center justify-end gap-1.5">
-                        <span className="font-mono text-[9px] tracking-[0.08em] text-[#5C6E63]">
+                        <span className="font-mono text-[10px] tracking-[0.08em] text-[#5C6E63]">
                           {message.timestamp}
                         </span>
                         {message.sender === 'me' && (

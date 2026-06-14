@@ -47,7 +47,7 @@ export const ChatSettingsDialog = ({ isOpen, onClose }: ChatSettingsDialogProps)
           className="flex-row items-center justify-between border-b px-4 py-3 pr-12"
           style={{ borderColor: FORTRESS.borderFaint }}
         >
-          <DialogTitle className="flex items-center gap-2 font-mono text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#36E27B]">
+          <DialogTitle className="flex items-center gap-2 font-mono text-[11px] font-extrabold uppercase tracking-[0.2em] text-[#36E27B]">
             <MessageSquare className="h-3.5 w-3.5" />
             Chat Behavior
           </DialogTitle>
@@ -95,7 +95,7 @@ export const ChatSettingsDialog = ({ isOpen, onClose }: ChatSettingsDialogProps)
           </SettingRow>
 
           <div
-            className="rounded-sm border px-3 py-2.5 font-mono text-[8px] uppercase leading-relaxed tracking-[0.12em]"
+            className="rounded-sm border px-3 py-2.5 font-mono text-[10px] uppercase leading-relaxed tracking-[0.12em]"
             style={{ borderColor: FORTRESS.borderGreen, background: 'rgba(54,226,123,0.05)', color: FORTRESS.textDim }}
           >
             Content stays sealed unless message preview is enabled.
@@ -103,7 +103,7 @@ export const ChatSettingsDialog = ({ isOpen, onClose }: ChatSettingsDialogProps)
         </div>
 
         <div className="flex items-center justify-between border-t px-4 py-3" style={{ borderColor: FORTRESS.borderFaint }}>
-          <span className="font-mono text-[7px] uppercase tracking-[0.18em]" style={{ color: FORTRESS.textFaint }}>
+          <span className="font-mono text-[10px] uppercase tracking-[0.18em]" style={{ color: FORTRESS.textFaint }}>
             Changes sync to account settings
           </span>
           <div className="flex gap-2">
@@ -111,14 +111,14 @@ export const ChatSettingsDialog = ({ isOpen, onClose }: ChatSettingsDialogProps)
               type="button"
               variant="ghost"
               onClick={onClose}
-              className="h-auto rounded-sm px-3 py-2 font-mono text-[8px] font-bold uppercase tracking-[0.16em] text-[#76897D] hover:bg-[#36E27B]/10 hover:text-[#DCEAE1]"
+              className="h-auto rounded-sm px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-[#76897D] hover:bg-[#36E27B]/10 hover:text-[#DCEAE1]"
             >
               Cancel
             </Button>
             <Button
               type="button"
               onClick={handleSave}
-              className="h-auto rounded-sm px-4 py-2 font-mono text-[8px] font-extrabold uppercase tracking-[0.16em] text-[#06130B]"
+              className="h-auto rounded-sm px-4 py-2 font-mono text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#06130B]"
               style={{ background: FORTRESS.green }}
             >
               Save

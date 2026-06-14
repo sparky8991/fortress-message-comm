@@ -28,7 +28,7 @@ export const AboutDialog = ({ isOpen, onClose }: AboutDialogProps) => {
               <Shield className="w-10 h-10 text-green-300" />
             </div>
             <h2 className="ft-head font-bold text-white font-mono tracking-[0.14em]">SECURECHAT FORTRESS</h2>
-            <p className="mt-1 font-mono text-[8px] uppercase tracking-[2px] text-green-500/55">
+            <p className="mt-1 font-mono text-[10px] uppercase tracking-[2px] text-green-500/55">
               Terminal {FORTRESS_VERSION} · Build {FORTRESS_BUILD}
             </p>
           </div>
@@ -46,17 +46,17 @@ export const AboutDialog = ({ isOpen, onClose }: AboutDialogProps) => {
             <div className="flex items-center space-x-3 text-gray-300">
               <Lock className="w-4 h-4 text-green-400" />
               <span className="ft-body">Protected message channels</span>
-              <span className="ml-auto text-[10px] font-mono uppercase text-green-400">Available</span>
+              <span className="ml-auto text-[11px] font-mono uppercase text-green-400">Available</span>
             </div>
             <div className="flex items-center space-x-3 text-gray-300">
               <Shield className="w-4 h-4 text-purple-400" />
               <span className="ft-body">Key-locked encrypted payloads</span>
-              <span className="ml-auto text-[10px] font-mono uppercase text-green-400">Available</span>
+              <span className="ml-auto text-[11px] font-mono uppercase text-green-400">Available</span>
             </div>
             <div className="flex items-center space-x-3 text-gray-300">
               <Sparkles className="w-4 h-4 text-amber-400" />
               <span className="ft-body">Biometric unlock and identity verification</span>
-              <span className="ml-auto text-[10px] font-mono uppercase text-amber-400">Coming soon</span>
+              <span className="ml-auto text-[11px] font-mono uppercase text-amber-400">Coming soon</span>
             </div>
           </div>
 
