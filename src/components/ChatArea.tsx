@@ -74,7 +74,8 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
         return {
           name: name,
           status: 'End-to-end encrypted',
-          avatar: name.charAt(0).toUpperCase()
+          avatar: name.charAt(0).toUpperCase(),
+          tacticalId: otherParticipant.profiles.tacticalId || ''
         };
       }
     }

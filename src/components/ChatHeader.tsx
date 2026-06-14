@@ -8,6 +8,7 @@ interface ContactInfo {
   name: string;
   status: string;
   avatar: string;
+  tacticalId?: string;
 }
 
 interface ChatHeaderProps {
@@ -43,6 +44,11 @@ export const ChatHeader = ({ contact, onStartCall, onToggleSidebar }: ChatHeader
             <div className="min-w-0 flex-1">
               <div className="flex min-w-0 items-center gap-2">
                 <h2 className="truncate font-mono text-[15px] font-bold leading-none text-[#ECF7F0]">{contact?.name}</h2>
+                {contact?.tacticalId && (
+                  <span className="flex-none truncate font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-[#76897D]">
+                    {contact.tacticalId}
+                  </span>
+                )}
                 <span className="hidden rounded-sm border border-[#F2B43C]/45 bg-[#F2B43C]/10 px-1.5 py-0.5 font-mono text-[10px] font-black uppercase tracking-[0.18em] text-[#F2B43C] sm:inline-flex">
                   UNVERIFIED
                 </span>

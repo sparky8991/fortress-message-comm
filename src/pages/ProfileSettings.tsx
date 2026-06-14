@@ -38,6 +38,7 @@ const ProfileSettingsPage = () => {
     firstName: string | null;
     lastName: string | null;
     callSign: string | null;
+    tacticalId?: string | null;
     bio: string | null;
     avatarUrl: string | null;
     showAvatar: boolean;
@@ -46,6 +47,7 @@ const ProfileSettingsPage = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [callSign, setCallSign] = useState('');
+  const [tacticalId, setTacticalId] = useState('');
   const [bio, setBio] = useState('');
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [showAvatar, setShowAvatar] = useState(true);
@@ -144,6 +146,7 @@ const ProfileSettingsPage = () => {
           firstName: data.firstName || null,
           lastName: data.lastName || null,
           callSign: data.callSign || null,
+          tacticalId: data.tacticalId || null,
           bio: data.bio || null,
           avatarUrl: data.avatarUrl || null,
           showAvatar: data.showAvatar !== false
@@ -429,6 +432,7 @@ const ProfileSettingsPage = () => {
         lastName: lastName.trim() || null,
         callSign: callSign.trim() || null,
         callSignLower: callSign.trim().toLowerCase() || null,
+        tacticalId: tacticalId.trim().toUpperCase() || null,
         bio: bio.trim() || null,
         updatedAt: serverTimestamp()
       });
@@ -467,6 +471,7 @@ const ProfileSettingsPage = () => {
       setFirstName(profile.firstName || '');
       setLastName(profile.lastName || '');
       setCallSign(profile.callSign || '');
+      setTacticalId(profile.tacticalId || '');
       setBio(profile.bio || '');
       setAvatarUrl(profile.avatarUrl || null);
       setShowAvatar(profile.showAvatar !== false);
@@ -638,6 +643,12 @@ const ProfileSettingsPage = () => {
                         {callSignError || callsignLimitCopy}
                       </p>
                     </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="tacticalId" className="font-mono text-[10px] font-black uppercase tracking-[0.18em] text-[#76897D]">Tactical ID</Label>
+                    <Input id="tacticalId" value={tacticalId} onChange={e => setTacticalId(e.target.value)} maxLength={16} className="mt-2 rounded-sm border-[#1C2B22] bg-[#070B09] font-mono text-[13px] uppercase tracking-[0.12em] text-[#ECF7F0] placeholder:text-[#4A5A50] focus-visible:ring-[#36E27B]" placeholder="E.g., REAPER-6" />
+                    <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[#76897D]">Short tactical code shown beside your call sign to other operators.</p>
                   </div>
 
                   <div>

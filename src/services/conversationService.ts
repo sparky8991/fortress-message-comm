@@ -62,6 +62,7 @@ export interface Conversation {
       avatar_url: string | null;
       show_avatar?: boolean;
       verified?: boolean;
+      tacticalId?: string;
     };
   }[];
 }
@@ -303,7 +304,8 @@ export const conversationService = {
             user_number: 0,
             avatar_url: profileData.showAvatar !== false ? (profileData.avatarUrl || null) : null,
             show_avatar: profileData.showAvatar !== false,
-            verified: !!profileData.verified
+            verified: !!profileData.verified,
+            tacticalId: profileData.tacticalId || ''
           } : null
         });
       }
