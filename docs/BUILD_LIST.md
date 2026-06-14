@@ -23,7 +23,9 @@ This is the source of truth so nothing gets lost between sessions.
 ## E2E encryption (in progress)
 - [x] **Phase 2c — key bootstrap**: service (`identityKeyService` + `keySession`) + setup/unlock dialogs + opt-in Settings → Privacy & Security entry. Auto-prompt-on-login deferred to Phase 3 (when encryption activates). `rafter-code-review` on the identity flow still pending.
 - [ ] **Phase 2 — Firestore rules** for identity-key fields (owner-write only). → `rafter-code-review`
-- [ ] **Phase 3 — message encryption**: per-conversation ECDH key; encrypt-before-store / decrypt-on-read; mixed-state (legacy plaintext); stop storing plaintext `last_message_preview`. → `rafter-code-review`
+- **Phase 3 — message encryption** (in progress):
+  - [x] **3a** — `messageCrypto.ts`: ECDH conversation key (X25519 → BLAKE2b/conv-id) + XChaCha20-Poly1305 encrypt/decrypt + pack/unpack + 6 tests.
+  - [ ] **3b (high-risk wiring)** — surface peer `identityKeyPublic` in participants; encrypt-before-store in `sendMessage`; decrypt-on-read in `useDirectMessages`; mixed-state (legacy plaintext renders); graceful fallback when locked / peer has no key; stop storing plaintext `last_message_preview`. → `rafter-code-review` (changes the live messaging path).
 - [ ] **Phase 4 — attachment encryption** (also closes the public Supabase bucket leak).
 - [ ] **Phase 5 — verificationService** + `verifications/{me}/peers/{peer}` subcollection + rules; drop global self-grantable `profiles.verified`.
 - [ ] **Phase 6 — VerifyIdentityDialog** + ChatHeader real `VERIFIED` / `UNVERIFIED` / `KEY CHANGED` badge.
