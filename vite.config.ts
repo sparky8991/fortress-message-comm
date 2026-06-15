@@ -20,8 +20,11 @@ export default defineConfig(({ mode }) => ({
     },
   },
   optimizeDeps: {
-    // libsodium ships embedded WASM that Vite's dep pre-bundler can't handle;
-    // serve it un-bundled so crypto (sodium.ready) initialises in the browser.
-    exclude: ["libsodium-wrappers-sumo"],
+    // libsodium-wrappers-sumo is CommonJS — Vite must PRE-BUNDLE it (CJS→ESM) so the
+    // browser gets one fast ESM module and sodium.ready actually resolves. Excluding it
+    // served the raw multi-MB CJS un-bundled, which broke libsodium init (the setup hang)
+    // and stalled page load. `include` forces a correct pre-bundle even though the dep is
+    // only reached deep in the graph (via the encryption dialog).
+    include: ["libsodium-wrappers-sumo"],
   },
 }));

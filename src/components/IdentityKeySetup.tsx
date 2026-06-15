@@ -27,6 +27,7 @@ export const IdentityKeySetup = ({ isOpen, onClose, onComplete }: IdentityKeySet
   const [confirm, setConfirm] = useState('');
   const [recoveryCode, setRecoveryCode] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [status, setStatus] = useState('');
   const [error, setError] = useState('');
 
   const reset = () => {
@@ -34,27 +35,32 @@ export const IdentityKeySetup = ({ isOpen, onClose, onComplete }: IdentityKeySet
     setConfirm('');
     setRecoveryCode(null);
     setBusy(false);
+    setStatus('');
     setError('');
   };
 
   const handleCreate = async () => {
     if (passphrase.length < MIN_PASSPHRASE) {
-      setError(`Passphrase must be at least ${MIN_PASSPHRASE} characters.`);
+      setError(`[V01] Passphrase must be at least ${MIN_PASSPHRASE} characters.`);
       return;
     }
     if (passphrase !== confirm) {
-      setError('Passphrases do not match.');
+      setError('[V02] Passphrases do not match — re-type both to be sure.');
       return;
     }
     setError('');
+    setStatus('');
     setBusy(true);
     try {
-      const result = await setupIdentityKeys(passphrase);
+      const result = await setupIdentityKeys(passphrase, (code, label) => setStatus(`${code} · ${label}…`));
       setRecoveryCode(result.recoveryCode);
-    } catch {
-      setError('Could not set up encryption. Please try again.');
+    } catch (e) {
+      const err = e as { code?: string; message?: string };
+      console.error('[E2E-SETUP] failed:', err);
+      setError(`[${err?.code ?? 'ERR'}] ${err?.message ?? 'Could not set up encryption. Please try again.'}`);
     } finally {
       setBusy(false);
+      setStatus('');
     }
   };
 
@@ -116,6 +122,11 @@ export const IdentityKeySetup = ({ isOpen, onClose, onComplete }: IdentityKeySet
                 style={{ borderColor: FORTRESS.border, background: FORTRESS.surfaceRaised, color: FORTRESS.text }}
               />
             </div>
+            {busy && status && (
+              <div className="rounded-sm border px-3 py-2 font-mono text-[10px]" style={{ borderColor: FORTRESS.borderGreen, background: 'rgba(54,226,123,0.06)', color: FORTRESS.greenSoft }}>
+                {status}
+              </div>
+            )}
             {error && (
               <div className="rounded-sm border px-3 py-2 font-mono text-[10px]" style={{ borderColor: FORTRESS.redBorder, background: 'rgba(255,107,97,0.08)', color: FORTRESS.red }}>
                 {error}

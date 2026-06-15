@@ -1,6 +1,6 @@
 
 import React, { useState, useRef } from 'react';
-import { Send, Paperclip, Smile, FileText, X, Shield, Terminal, Mic, Copy, Flame } from 'lucide-react';
+import { Send, Paperclip, Smile, FileText, X, Shield, Terminal, Mic, Copy, Flame, Plus } from 'lucide-react';
 import { EmojiPicker } from './EmojiPicker';
 import { GifPicker } from './GifPicker';
 import { EncryptedImageUpload } from './EncryptedImageUpload';
@@ -11,6 +11,7 @@ import { toast } from '@/hooks/use-toast';
 import { MARK_META, type TrafficMark } from '@/lib/fortress';
 import { buildEncryptedPayloadMessage, stripEncryptedPayloadSecrets } from '@/utils/encryptedPayloadMessage';
 import { BURN_AFTER_READ_SECONDS } from '@/utils/burnAfterRead.js';
+import { MobileAttachSheet } from './MobileAttachSheet';
 
 type ReplyingTo = {
   messageId: string;
@@ -48,8 +49,16 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
   const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
   const [burnAfterReadEnabled, setBurnAfterReadEnabled] = useState(false);
   const [messageMark, setMessageMark] = useState<TrafficMark>('normal');
+  const [showAttachSheet, setShowAttachSheet] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const actionButtonClass = "fortress-focus grid h-[38px] w-[38px] flex-none place-items-center rounded border border-[#1C2B22] bg-transparent text-[#76897D] transition-colors hover:border-[#1E5C3C] hover:text-[#36E27B] active:scale-95";
+
+  // Open the shared (hidden) file input with a given accept filter — used by the mobile attach sheet.
+  const openFilePicker = (accept: string) => {
+    if (!fileInputRef.current) return;
+    fileInputRef.current.accept = accept;
+    fileInputRef.current.click();
+  };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -202,6 +211,15 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
         />
       )}
 
+      <MobileAttachSheet
+        open={showAttachSheet}
+        onClose={() => setShowAttachSheet(false)}
+        onPhoto={() => openFilePicker('image/*')}
+        onFile={() => openFilePicker('')}
+        onVoice={() => setShowVoiceRecorder(true)}
+        onGif={() => setShowGifPicker(true)}
+      />
+
       <div className="w-full max-w-full overflow-visible border-t border-[#1C2B22] bg-[#0C120F]">
         {/* Voice Recorder */}
         {showVoiceRecorder && (
@@ -282,8 +300,10 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
             </div>
           )}
           
-          <div className="flex w-full min-w-0 items-stretch gap-2">
-            <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
+          <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
+
+          {/* Desktop composer row (mobile uses the pill row + attach sheet below) */}
+          <div className="hidden w-full min-w-0 items-stretch gap-2 md:flex">
             
             <div className="flex flex-none gap-2">
               <button 
@@ -377,7 +397,65 @@ export const MessageInput = ({ onSendMessage, replyingTo, onCancelReply }: Messa
               <Send className="h-[15px] w-[15px]" />
             </button>
           </div>
-          
+
+          {/* Mobile composer row: single + (attach sheet) · pill input with inline emoji · send */}
+          <div className="flex w-full min-w-0 items-end gap-2 md:hidden">
+            <button
+              type="button"
+              onClick={() => setShowAttachSheet(true)}
+              className="fortress-focus grid h-11 w-11 flex-none place-items-center rounded-xl border border-[#1C2B22] bg-transparent text-[#76897D] transition-colors hover:border-[#1E5C3C] hover:text-[#36E27B] active:scale-95"
+              aria-label="Add attachment"
+            >
+              <Plus className="h-[18px] w-[18px]" />
+            </button>
+
+            <div className="relative flex min-w-0 flex-1 items-center gap-1 rounded-[20px] border border-[#1C2B22] bg-[#0F1612] pl-3.5 pr-1 shadow-[inset_0_1px_8px_rgba(54,226,123,0.06)] focus-within:border-[#1E5C3C] focus-within:ring-1 focus-within:ring-[#36E27B]/25">
+              <textarea
+                placeholder="Secure message..."
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
+                className="h-[42px] max-h-28 min-h-[42px] w-full resize-none scrollbar-hide border-0 bg-transparent py-[11px] font-mono text-[13px] text-[#DCEAE1] caret-[#36E27B] outline-none placeholder:text-[#76897D]/60"
+                rows={1}
+                style={{ letterSpacing: '0.5px', lineHeight: '1.15' }}
+                aria-label="Message input"
+              />
+              <div className="relative flex-none">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowEmojiPicker(!showEmojiPicker);
+                    setShowGifPicker(false);
+                  }}
+                  className="fortress-focus grid h-9 w-9 place-items-center rounded-full text-[#76897D] transition-colors hover:text-[#36E27B]"
+                  aria-label="Add emoji"
+                >
+                  <Smile className="h-[18px] w-[18px]" />
+                </button>
+                <EmojiPicker
+                  onEmojiSelect={handleEmojiSelect}
+                  isOpen={showEmojiPicker}
+                  onClose={() => setShowEmojiPicker(false)}
+                />
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleSend}
+              className="fortress-focus grid h-11 w-11 flex-none place-items-center rounded-xl bg-[#36E27B] text-[#06130B] shadow-[0_0_18px_rgba(54,226,123,0.18)] transition-colors hover:bg-[#7BEFA9] active:scale-95 disabled:cursor-not-allowed disabled:opacity-45"
+              disabled={!message.trim() && !attachment}
+              aria-label="Send message"
+            >
+              <Send className="h-[18px] w-[18px]" />
+            </button>
+          </div>
+
+          {/* GIF picker for mobile (opened from the attach sheet) */}
+          <div className="relative md:hidden">
+            <GifPicker isOpen={showGifPicker} onClose={() => setShowGifPicker(false)} onGifSelect={handleGifSelect} />
+          </div>
+
           <div className="mt-[7px] flex items-center justify-center">
             <div className={`flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[2px] ${
               burnAfterReadEnabled

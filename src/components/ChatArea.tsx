@@ -29,9 +29,10 @@ interface ChatAreaProps {
   activeChat: string;
   onStartCall: (type: 'voice' | 'video') => void;
   onToggleSidebar?: () => void;
+  onBack?: () => void;
 }
 
-export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaProps) => {
+export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar, onBack }: ChatAreaProps) => {
   const { settings: userSettings } = useUserSettings();
   const {
     conversations,
@@ -125,7 +126,7 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
   // If no active chat is selected, show welcome screen
   if (!activeChat) {
     return (
-      <div className="flex h-full min-h-0 w-full flex-col overflow-hidden fortress-shell">
+      <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden fortress-shell">
         {/* Header for mobile */}
         <div className="sticky top-0 z-30 border-b border-[#1C2B22] bg-[#07100b]/95 backdrop-blur-sm md:hidden">
           <div className="p-4 flex items-center justify-between">
@@ -207,20 +208,21 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
   };
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-col overflow-hidden fortress-shell">
+    <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden fortress-shell">
       {/* Header - Always visible at top */}
         <div className="sticky top-0 z-30 bg-[#0C120F]/95 backdrop-blur-sm">
         <ChatHeader
           contact={contact}
           onStartCall={onStartCall}
           onToggleSidebar={onToggleSidebar}
+          onBack={onBack}
         />
       </div>
 
       {/* Messages - Scrollable content area */}
-      <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide pb-24">
-        <MessageList 
-          messages={currentMessages} 
+      <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide pb-3">
+        <MessageList
+          messages={currentMessages}
           onReply={handleReply}
           onSendMessage={handleSendMessage}
           onStartNewGroup={handleStartNewGroup}
@@ -228,9 +230,13 @@ export const ChatArea = ({ activeChat, onStartCall, onToggleSidebar }: ChatAreaP
         />
       </div>
 
-      {/* Message Input - Fixed at bottom */}
-      <div className="fixed bottom-0 left-0 right-0 z-20 bg-[#0C120F]/95 backdrop-blur-sm md:left-80">
-        <MessageInput 
+      {/* Message Input - kept in normal flow at the bottom of the column so it sits
+          ABOVE the mobile bottom-nav. Previously it was `fixed bottom-0` like the nav,
+          and the nav's higher z-index covered it on phones — so there was no way to
+          send a message on mobile. In-flow it lands above the nav on mobile and right
+          of the sidebar on desktop automatically, and stays clear of the keyboard. */}
+      <div className="flex-none z-20 bg-[#0C120F]/95 backdrop-blur-sm">
+        <MessageInput
           onSendMessage={handleSendMessage}
           replyingTo={replyingTo}
           onCancelReply={handleCancelReply}

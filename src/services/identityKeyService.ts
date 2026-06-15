@@ -22,6 +22,7 @@ import {
   wrapPrivateKey,
   type WrappedKey,
 } from '@/lib/identityKeys';
+import { getSodium } from '@/lib/sodium';
 import { fingerprint } from '@/lib/safetyNumber';
 import { clearSessionPrivateKey, isUnlocked, setSessionPrivateKey } from '@/lib/keySession';
 import { clearConversationKeyCache } from './messageEncryption';
@@ -51,36 +52,110 @@ export const getKeyState = async (): Promise<KeyState> => {
   return isUnlocked() ? 'unlocked' : 'locked';
 };
 
+/** Coded error so the dialog + console show exactly which setup step failed. */
+export class SetupError extends Error {
+  constructor(public code: string, message: string) {
+    super(message);
+    this.name = 'SetupError';
+  }
+}
+
+export type SetupStep = 'E10' | 'E20' | 'E30' | 'E40' | 'E50' | 'E60' | 'E99';
+
+const STEP_LABEL: Record<SetupStep, string> = {
+  E10: 'Initializing crypto engine',
+  E20: 'Generating identity key',
+  E30: 'Generating recovery code',
+  E40: 'Encrypting keys (Argon2id)',
+  E50: 'Computing fingerprint',
+  E60: 'Saving to secure profile',
+  E99: 'Done',
+};
+
+/**
+ * Run one setup step under a time budget. If it overruns, reject with a coded
+ * SetupError instead of hanging forever — so a stuck step surfaces as e.g.
+ * "[E10] Initializing crypto engine timed out after 20s" rather than a frozen button.
+ */
+const step = async <T>(code: SetupStep, ms: number, run: () => Promise<T>): Promise<T> => {
+  let timer: ReturnType<typeof setTimeout>;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(
+      () => reject(new SetupError(code, `${STEP_LABEL[code]} timed out after ${Math.round(ms / 1000)}s`)),
+      ms,
+    );
+  });
+  try {
+    return await Promise.race([run(), timeout]);
+  } finally {
+    clearTimeout(timer!);
+  }
+};
+
 /**
  * First-time setup: generate an X25519 identity keypair, wrap the private key under
  * BOTH the passphrase and a one-time recovery code, publish the public key, and cache
  * the private key in-session. Returns the recovery code to display exactly once.
+ *
+ * Each step reports a code via onProgress (for a live status line) and is bounded by a
+ * timeout, so a hang or failure surfaces as a labelled code instead of a silent freeze.
  */
-export const setupIdentityKeys = async (passphrase: string): Promise<{ recoveryCode: string }> => {
+export const setupIdentityKeys = async (
+  passphrase: string,
+  onProgress?: (code: SetupStep, label: string) => void,
+): Promise<{ recoveryCode: string }> => {
   const user = auth.currentUser;
-  if (!user) throw new Error('Not authenticated');
+  if (!user) throw new SetupError('ERR-AUTH', 'Not signed in. Sign in again, then retry.');
 
-  const keyPair = await generateIdentityKeyPair();
-  const recoveryCode = await generateRecoveryCode();
-  const [wrappedPrivateKey, wrappedPrivateKeyByRecovery] = await Promise.all([
-    wrapPrivateKey(keyPair.privateKey, passphrase),
-    wrapPrivateKey(keyPair.privateKey, recoveryCode),
-  ]);
-  const identityKeyFingerprint = await fingerprint(keyPair.publicKey);
+  const report = (code: SetupStep) => {
+    // Step codes/labels only — never log keys, the passphrase, or the recovery code.
+    console.log(`[E2E-SETUP] ${code} ${STEP_LABEL[code]}`);
+    onProgress?.(code, STEP_LABEL[code]);
+  };
 
-  await setDoc(
-    profileRef(user.uid),
-    {
-      identityKeyPublic: keyPair.publicKey,
-      identityKeyFingerprint,
-      identityKeyUpdatedAt: serverTimestamp(),
-      wrappedPrivateKey,
-      wrappedPrivateKeyByRecovery,
-    },
-    { merge: true },
+  report('E10');
+  await step('E10', 20000, () => getSodium());
+
+  report('E20');
+  const keyPair = await step('E20', 15000, () => generateIdentityKeyPair());
+
+  report('E30');
+  const recoveryCode = await step('E30', 15000, () => generateRecoveryCode());
+
+  report('E40');
+  const [wrappedPrivateKey, wrappedPrivateKeyByRecovery] = await step('E40', 30000, () =>
+    Promise.all([
+      wrapPrivateKey(keyPair.privateKey, passphrase),
+      wrapPrivateKey(keyPair.privateKey, recoveryCode),
+    ]),
   );
 
+  report('E50');
+  const identityKeyFingerprint = await step('E50', 15000, () => fingerprint(keyPair.publicKey));
+
+  report('E60');
+  try {
+    await step('E60', 20000, () =>
+      setDoc(
+        profileRef(user.uid),
+        {
+          identityKeyPublic: keyPair.publicKey,
+          identityKeyFingerprint,
+          identityKeyUpdatedAt: serverTimestamp(),
+          wrappedPrivateKey,
+          wrappedPrivateKeyByRecovery,
+        },
+        { merge: true },
+      ),
+    );
+  } catch (e) {
+    if (e instanceof SetupError) throw e; // step timeout — already coded
+    const fbCode = (e as { code?: string })?.code ?? 'unknown';
+    throw new SetupError('ERR-WRITE', `Could not save keys to your profile (${fbCode}).`);
+  }
+
   setSessionPrivateKey(keyPair.privateKey);
+  report('E99');
   return { recoveryCode };
 };
 

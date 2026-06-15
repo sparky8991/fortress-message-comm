@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Phone, Video, Lock, Settings } from 'lucide-react';
+import { Phone, Video, Lock, Settings, ChevronLeft } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ChatSettingsDialog } from './ChatSettingsDialog';
 
@@ -15,9 +15,10 @@ interface ChatHeaderProps {
   contact: ContactInfo;
   onStartCall: (type: 'voice' | 'video') => void;
   onToggleSidebar?: () => void;
+  onBack?: () => void;
 }
 
-export const ChatHeader = ({ contact, onStartCall, onToggleSidebar }: ChatHeaderProps) => {
+export const ChatHeader = ({ contact, onStartCall, onToggleSidebar, onBack }: ChatHeaderProps) => {
   const isMobile = useIsMobile();
   const [showChatSettings, setShowChatSettings] = useState(false);
   const contactInitial = contact?.avatar || contact?.name?.charAt(0).toUpperCase() || '?';
@@ -26,7 +27,17 @@ export const ChatHeader = ({ contact, onStartCall, onToggleSidebar }: ChatHeader
     <>
       <div className="border-b border-[#1C2B22] bg-[#0C120F]/98 backdrop-blur-sm">
         <div className="flex h-16 items-center justify-between px-3 md:px-4">
-          <div className="flex min-w-0 flex-1 items-center gap-3">
+          <div className="flex min-w-0 flex-1 items-center gap-2 md:gap-3">
+            {/* Back to chat list (mobile) — the conversation is a full screen */}
+            {isMobile && (
+              <button
+                onClick={onBack || onToggleSidebar}
+                className="-ml-1 flex h-9 w-6 flex-none items-center justify-center text-[#76897D] transition-colors hover:text-[#ECF7F0] active:scale-95 fortress-focus"
+                aria-label="Back to chats"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+            )}
             {/* Avatar as sidebar toggle on mobile */}
             <button
               onClick={isMobile ? onToggleSidebar : undefined}

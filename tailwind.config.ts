@@ -23,6 +23,13 @@ export default {
 				mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', '"Liberation Mono"', '"Courier New"', 'monospace'],
 			},
 			colors: {
+				green: {
+					300: '#7BEFA9',
+					400: '#36E27B',
+					500: '#36E27B',
+					600: '#2BC46A',
+					700: '#1E5C3C',
+				},
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',

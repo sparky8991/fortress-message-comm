@@ -24,6 +24,9 @@ interface SidebarProps {
   onViewStatus?: (statusUser: StatusUser) => void;
   onCreateStatus?: () => void;
   statusRefreshKey?: number;
+  /** Controlled segmented tab (mobile bottom-nav drives this); falls back to internal state. */
+  activeTab?: 'chats' | 'teams' | 'security';
+  onTabChange?: (tab: 'chats' | 'teams' | 'security') => void;
 }
 
 const formatUtcTime = () =>
@@ -38,8 +41,12 @@ const formatUtcTime = () =>
 export const Sidebar = ({
   activeChat,
   onChatSelect,
+  activeTab: controlledTab,
+  onTabChange,
 }: SidebarProps) => {
-  const [activeTab, setActiveTab] = useState<'chats' | 'teams' | 'security'>('chats');
+  const [internalTab, setInternalTab] = useState<'chats' | 'teams' | 'security'>('chats');
+  const activeTab = controlledTab ?? internalTab;
+  const setActiveTab = onTabChange ?? setInternalTab;
   const [searchQuery, setSearchQuery] = useState('');
   const [showUserSearch, setShowUserSearch] = useState(false);
   const [showEditCallSign, setShowEditCallSign] = useState(false);
@@ -85,7 +92,7 @@ export const Sidebar = ({
   };
 
   return (
-    <div className="flex h-full w-80 flex-col border-r border-[#1C2B22] bg-[#0C120F] font-mono text-[#DCEAE1]">
+    <div className="flex h-full w-full flex-col border-r border-[#1C2B22] bg-[#0C120F] font-mono text-[#DCEAE1]">
       <div className="flex-none border-b border-[#1C2B22] px-3.5 py-3">
         <div className="flex items-center gap-2.5">
           <div className="grid h-[30px] w-[30px] flex-none place-items-center rounded-sm border border-[#36E27B] bg-[#36E27B]/10">
