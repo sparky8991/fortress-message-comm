@@ -19,4 +19,9 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  optimizeDeps: {
+    // libsodium ships embedded WASM that Vite's dep pre-bundler can't handle;
+    // serve it un-bundled so crypto (sodium.ready) initialises in the browser.
+    exclude: ["libsodium-wrappers-sumo"],
+  },
 }));
