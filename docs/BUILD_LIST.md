@@ -50,6 +50,7 @@ This is the source of truth so nothing gets lost between sessions.
 - [ ] Mobile: keep the Notifications number input ≥16px on mobile (avoid iOS zoom-on-focus).
 
 ## Performance (from "The Conductor Rewrite" — evaluated, worth doing)
+- [x] **Firestore read-quota fix (v3.6)** — removed the global `onSnapshot(collection(db,'conversations'))` in `useDirectMessages` that re-read every conversation in the project on every change. Root cause of the live `resource-exhausted` (quota exceeded) failure + a likely cross-tenant read. Now scoped to the user's own participation docs. Trade-off: non-active sidebar previews refresh on chat-switch / own-send / participation-change instead of instantly. Follow-ups: scoped per-conversation-doc listeners for live previews; `getUnreadCount` still reads all messages per conversation (optimize).
 - [ ] **Virtualize the message list** with `react-virtuoso` — render ~15 visible rows instead of the whole thread. Biggest win for long conversations. (`MessageList.tsx`)
 - [ ] **`React.memo` on message bubbles** + stable keys — isolate re-renders during sends/streaming.
 - [ ] (Optional, bigger, lower ROI) TanStack Router for stable route references — only if route-level re-renders become a problem.
