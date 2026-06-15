@@ -95,7 +95,7 @@ export const ContactList = ({
       {filteredContacts.length === 0 ? (
         <div className="px-5 py-9 text-center font-mono text-[#76897D]">
           <MessageSquare className="mx-auto mb-3 h-8 w-8 opacity-45" />
-          <p className="text-[9px] uppercase leading-relaxed tracking-[0.18em]">
+          <p className="text-[10px] uppercase leading-relaxed tracking-[0.18em]">
             {includeDirectMessages 
               ? "NO TRAFFIC YET. SEARCH CHANNELS TO OPEN COMMS."
               : "NO CHANNELS FOUND"
@@ -118,7 +118,7 @@ export const ContactList = ({
                 <div className="relative flex-none">
                   <Avatar className="h-[38px] w-[38px] rounded-sm">
                     <AvatarImage src={contact.avatar} />
-                    <AvatarFallback className="rounded-sm border border-[#1E5C3C] bg-[#12301F] font-mono text-[13px] font-black text-[#7BEFA9]">
+                    <AvatarFallback className="rounded-sm border border-[#1E5C3C] bg-[#12301F] font-mono text-[14px] font-black text-[#7BEFA9]">
                       {getContactInitials(contact.name)}
                     </AvatarFallback>
                   </Avatar>
@@ -133,9 +133,9 @@ export const ContactList = ({
                 <div className="min-w-0 flex-1">
                   <div className="flex items-baseline gap-1.5">
                     <div className="flex min-w-0 items-baseline gap-1.5">
-                      <h3 className="truncate font-mono text-[12px] font-black text-[#ECF7F0]">{contact.name}</h3>
+                      <h3 className="truncate font-mono text-[13px] font-black text-[#ECF7F0]">{contact.name}</h3>
                       <span
-                        className={`flex-none font-mono text-[8px] font-black uppercase tracking-[0.12em] ${
+                        className={`flex-none font-mono text-[10px] font-black uppercase tracking-[0.12em] ${
                           contact.verified ? 'text-[#36E27B]' : 'text-[#F2B43C]'
                         }`}
                       >
@@ -144,19 +144,19 @@ export const ContactList = ({
                     </div>
                     <div className="ml-auto flex flex-none items-center gap-1.5">
                       {contact.unreadCount > 0 && (
-                        <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-[#36E27B] px-1.5 font-mono text-[8px] font-black text-[#06130B]">
+                        <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-[#36E27B] px-1.5 font-mono text-[10px] font-black text-[#06130B]">
                           {contact.unreadCount > 99 ? '99+' : contact.unreadCount}
                         </span>
                       )}
                       {contact.time && (
-                        <span className="font-mono text-[8px] uppercase tracking-[0.08em] text-[#4A5A50]">
+                        <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-[#4A5A50]">
                           {contact.time}
                         </span>
                       )}
                     </div>
                   </div>
                   
-                  <p className="mt-1 truncate font-mono text-[10px] uppercase tracking-[0.08em] text-[#76897D]">
+                  <p className="mt-1 truncate font-mono text-[11px] uppercase tracking-[0.08em] text-[#76897D]">
                     {contact.lastMessage}
                   </p>
                 </div>

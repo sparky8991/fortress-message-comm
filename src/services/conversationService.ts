@@ -12,6 +12,7 @@ import {
   serverTimestamp,
   Timestamp
 } from 'firebase/firestore';
+import { decryptIncoming, encryptOutgoing } from './messageEncryption';
 
 type TimestampLike = Date | string | number | Timestamp | { toDate: () => Date } | null;
 
@@ -62,6 +63,7 @@ export interface Conversation {
       avatar_url: string | null;
       show_avatar?: boolean;
       verified?: boolean;
+      tacticalId?: string;
     };
   }[];
 }
@@ -150,24 +152,25 @@ export const conversationService = {
       );
       const messagesSnap = await getDocs(messagesQuery);
 
-      const messages = messagesSnap.docs.map(doc => {
-        const data = doc.data();
+      const messages = await Promise.all(messagesSnap.docs.map(async (docSnap) => {
+        const data = docSnap.data();
+        const encrypted = data.encrypted || false;
         return {
-          id: doc.id,
+          id: docSnap.id,
           conversation_id: data.conversation_id,
           sender_id: data.sender_id,
-          content: data.content,
+          content: await decryptIncoming(conversationId, data.content, encrypted),
           sent_at: toISOString(data.sent_at),
           message_type: data.message_type || 'text',
           read_at: data.read_at ? toISOString(data.read_at) : null,
-          encrypted: data.encrypted || false,
+          encrypted,
           attachment_url: data.attachment_url || null,
           attachment_name: data.attachment_name || null,
           attachment_type: data.attachment_type || null,
           reply_to_id: data.reply_to_id || null,
           metadata: data.metadata || null
         };
-      });
+      }));
 
       // Sort client-side by sent_at ascending
       return messages.sort((a, b) =>
@@ -194,16 +197,17 @@ export const conversationService = {
 
     try {
       const messagesRef = collection(db, 'direct_messages');
+      const outgoing = await encryptOutgoing(conversationId, content);
       const newMessage: Record<string, unknown> = {
         conversation_id: conversationId,
         sender_id: user.uid,
-        content,
+        content: outgoing.content,
         message_type: messageType,
         attachment_url: attachmentUrl || null,
         attachment_name: attachmentName || null,
         attachment_type: attachmentType || null,
         reply_to_id: replyToId || null,
-        encrypted: true,
+        encrypted: outgoing.encrypted,
         sent_at: serverTimestamp(),
         read_at: null
       };
@@ -219,7 +223,7 @@ export const conversationService = {
       const convRef = doc(db, 'conversations', conversationId);
 
       // Generate appropriate preview for message type
-      let lastMessagePreview = content.substring(0, 100);
+      let lastMessagePreview = outgoing.encrypted ? '🔒 Encrypted message' : content.substring(0, 100);
       if (messageType === 'voice') {
         const duration = metadata?.duration || 0;
         lastMessagePreview = `🎙️ Voice message (${duration}s)`;
@@ -243,7 +247,7 @@ export const conversationService = {
         sent_at: new Date().toISOString(),
         message_type: messageType,
         read_at: null,
-        encrypted: true,
+        encrypted: outgoing.encrypted,
         attachment_url: attachmentUrl || null,
         attachment_name: attachmentName || null,
         attachment_type: attachmentType || null,
@@ -303,7 +307,8 @@ export const conversationService = {
             user_number: 0,
             avatar_url: profileData.showAvatar !== false ? (profileData.avatarUrl || null) : null,
             show_avatar: profileData.showAvatar !== false,
-            verified: !!profileData.verified
+            verified: !!profileData.verified,
+            tacticalId: profileData.tacticalId || ''
           } : null
         });
       }

@@ -125,7 +125,7 @@ export const UserSearchDialog = ({ isOpen, onClose, onStartConversation }: UserS
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-md border-[#1E5C3C] bg-[#0C120F] text-[#DCEAE1]">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 font-mono text-[11px] font-extrabold uppercase tracking-[0.2em] text-green-400">
+          <DialogTitle className="flex items-center gap-2 font-mono text-[12px] font-extrabold uppercase tracking-[0.2em] text-green-400">
             <Search className="h-4 w-4" />
             User Search
           </DialogTitle>
@@ -139,13 +139,13 @@ export const UserSearchDialog = ({ isOpen, onClose, onStartConversation }: UserS
               onChange={(event) => setSearchTerm(event.target.value)}
               onKeyDown={(event) => event.key === 'Enter' && handleSearch()}
               placeholder="Search call sign or email..."
-              className="border-0 bg-transparent px-0 font-mono text-[11px] text-[#DCEAE1] placeholder-[#5C6E63] focus-visible:ring-0"
+              className="border-0 bg-transparent px-0 font-mono text-[12px] text-[#DCEAE1] placeholder-[#5C6E63] focus-visible:ring-0"
             />
           </div>
           <Button
             onClick={handleSearch}
             disabled={searchStage === 'searching' || !searchTerm.trim()}
-            className="rounded-sm bg-green-500 px-4 font-mono text-[9px] font-extrabold uppercase tracking-[0.2em] text-black hover:bg-green-400"
+            className="rounded-sm bg-green-500 px-4 font-mono text-[10px] font-extrabold uppercase tracking-[0.2em] text-black hover:bg-green-400"
           >
             Search
           </Button>
@@ -155,7 +155,7 @@ export const UserSearchDialog = ({ isOpen, onClose, onStartConversation }: UserS
           {searchStage === 'idle' && (
             <div className="flex h-[230px] flex-col items-center justify-center gap-3.5">
               <Search className="h-10 w-10 text-[#243B30]" strokeWidth={1.4} />
-              <div className="font-mono text-[10px] tracking-wide text-[#5C6E63]">
+              <div className="font-mono text-[11px] tracking-wide text-[#5C6E63]">
                 Enter a search term to find operators
               </div>
             </div>
@@ -164,7 +164,7 @@ export const UserSearchDialog = ({ isOpen, onClose, onStartConversation }: UserS
           {searchStage === 'searching' && (
             <div className="flex h-[230px] flex-col items-center justify-center gap-3">
               <Loader2 className="h-8 w-8 animate-spin text-green-400" />
-              <div className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#5C6E63]">
+              <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#5C6E63]">
                 Querying directory...
               </div>
             </div>
@@ -173,7 +173,7 @@ export const UserSearchDialog = ({ isOpen, onClose, onStartConversation }: UserS
           {searchStage === 'empty' && (
             <div className="flex h-[230px] flex-col items-center justify-center gap-3">
               <UserX className="h-9 w-9 text-[#5C2420]" strokeWidth={1.4} />
-              <div className="font-mono text-[10px] tracking-wide text-[#76897D]">
+              <div className="font-mono text-[11px] tracking-wide text-[#76897D]">
                 No users found matching your search
               </div>
             </div>
@@ -181,7 +181,7 @@ export const UserSearchDialog = ({ isOpen, onClose, onStartConversation }: UserS
 
           {searchStage === 'results' && (
             <div className="flex max-h-80 flex-col gap-2 overflow-y-auto pr-1">
-              <div className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#4A5A50]">
+              <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#4A5A50]">
                 {searchResults.length} result(s)
               </div>
               {searchResults.map((user) => (
@@ -199,13 +199,13 @@ export const UserSearchDialog = ({ isOpen, onClose, onStartConversation }: UserS
                         {user.username}
                       </span>
                       <span
-                        className="flex-none font-mono text-[7px] font-extrabold uppercase tracking-wide"
+                        className="flex-none font-mono text-[10px] font-extrabold uppercase tracking-wide"
                         style={{ color: user.verified ? '#36E27B' : '#F2B43C' }}
                       >
                         {user.verified ? 'Verified' : 'Unverified'}
                       </span>
                     </div>
-                    <div className="truncate font-mono text-[9px] tracking-wide text-[#76897D]">
+                    <div className="truncate font-mono text-[10px] tracking-wide text-[#76897D]">
                       {user.email || user.full_name}
                     </div>
                   </div>
@@ -213,7 +213,7 @@ export const UserSearchDialog = ({ isOpen, onClose, onStartConversation }: UserS
                     onClick={() => handleStartConversation(user.id)}
                     disabled={creatingId === user.id}
                     size="sm"
-                    className="flex-none gap-1 rounded-sm bg-transparent font-mono text-[8px] font-extrabold uppercase tracking-wide text-green-400 hover:bg-green-500/10"
+                    className="flex-none gap-1 rounded-sm bg-transparent font-mono text-[10px] font-extrabold uppercase tracking-wide text-green-400 hover:bg-green-500/10"
                     style={{ border: '1px solid #1E5C3C' }}
                   >
                     {creatingId === user.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <MessageSquare className="h-3.5 w-3.5" />}
@@ -225,7 +225,7 @@ export const UserSearchDialog = ({ isOpen, onClose, onStartConversation }: UserS
           )}
         </div>
 
-        <div className="border-t border-[#141E18] pt-2.5 text-center font-mono text-[7px] uppercase tracking-[0.15em] text-[#4A5A50]">
+        <div className="border-t border-[#141E18] pt-2.5 text-center font-mono text-[10px] uppercase tracking-[0.15em] text-[#4A5A50]">
           Directory search uses your signed-in account and returns matching operators
         </div>
       </DialogContent>

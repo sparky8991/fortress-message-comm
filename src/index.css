@@ -104,7 +104,7 @@
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
+    text-rendering: optimizeSpeed;
   }
 }
 
@@ -193,36 +193,36 @@
   }
 
   .fortress-command {
-    @apply font-mono uppercase tracking-[0.2em] text-[8px] text-[#76897D];
+    @apply font-mono uppercase tracking-[0.2em] text-[10px] text-[#76897D];
   }
 
   .fortress-command-strong {
-    @apply font-mono uppercase tracking-[0.16em] text-[9px] font-extrabold text-[#36E27B];
+    @apply font-mono uppercase tracking-[0.16em] text-[10px] font-extrabold text-[#36E27B];
   }
 
   .fortress-focus {
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#030806];
   }
 
-  .ft-nano  { @apply font-mono text-[7px] leading-[1.5]; }
-  .ft-micro { @apply font-mono text-[8px] leading-[1.5]; }
-  .ft-mini  { @apply font-mono text-[9px] leading-[1.5]; }
-  .ft-meta  { @apply font-mono text-[10px] leading-[1.5]; }
-  .ft-cap   { @apply font-mono text-[11px] leading-[1.5]; }
-  .ft-body  { @apply font-mono text-[12px] leading-[1.6]; }
-  .ft-emph  { @apply font-mono text-[13px] leading-[1.4]; }
-  .ft-head  { @apply font-mono text-[14px] leading-[1.2]; }
+  .ft-nano  { @apply font-mono text-[10px] leading-[1.5]; }
+  .ft-micro { @apply font-mono text-[10px] leading-[1.5]; }
+  .ft-mini  { @apply font-mono text-[10px] leading-[1.5]; }
+  .ft-meta  { @apply font-mono text-[11px] leading-[1.5]; }
+  .ft-cap   { @apply font-mono text-[12px] leading-[1.5]; }
+  .ft-body  { @apply font-mono text-[13px] leading-[1.6]; }
+  .ft-emph  { @apply font-mono text-[14px] leading-[1.4]; }
+  .ft-head  { @apply font-mono text-[15px] leading-[1.2]; }
 
   .ft-label {
-    @apply font-mono text-[8px] font-bold uppercase tracking-[0.2em] text-[#76897D];
+    @apply font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#76897D];
   }
 
   .ft-label-strong {
-    @apply font-mono text-[9px] font-extrabold uppercase tracking-[0.16em] text-[#36E27B];
+    @apply font-mono text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#36E27B];
   }
 
   [role="dialog"] h2.text-lg {
-    @apply text-[11px] font-extrabold uppercase tracking-[0.2em];
+    @apply text-[12px] font-extrabold uppercase tracking-[0.2em];
   }
 
   .fortress-panel .text-sm,

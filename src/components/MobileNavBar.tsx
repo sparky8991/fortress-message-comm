@@ -57,11 +57,11 @@ export const MobileNavBar = ({ activeTab, onTabChange, onNewChat }: MobileNavBar
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-lg border-t border-gray-800 z-40 safe-area-bottom">
-      {/* Floating action button for new chat */}
+      {/* Floating action button for new chat — bottom-right above the tab bar (no center notch) */}
       {onNewChat && (
         <button
           onClick={onNewChat}
-          className="absolute -top-7 left-1/2 transform -translate-x-1/2 w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 hover:from-green-400 hover:to-green-500 active:scale-95 rounded-2xl flex items-center justify-center shadow-xl shadow-green-500/30 transition-all z-10 border-4 border-gray-900"
+          className="absolute -top-7 right-4 w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 hover:from-green-400 hover:to-green-500 active:scale-95 rounded-2xl flex items-center justify-center shadow-xl shadow-green-500/30 transition-all z-10"
           aria-label="New chat"
         >
           <Plus className="w-6 h-6 text-black" />
@@ -69,19 +69,16 @@ export const MobileNavBar = ({ activeTab, onTabChange, onNewChat }: MobileNavBar
       )}
 
       <div className="flex items-center justify-around px-1 pt-2 pb-1">
-        {tabs.map((tab, index) => {
+        {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id ||
             (tab.id === 'profile' && location.pathname === '/profile-settings');
-
-          // Add extra margin in the middle for the FAB
-          const extraClass = index === 1 ? 'mr-6' : index === 2 ? 'ml-6' : '';
 
           return (
             <button
               key={tab.id}
               onClick={() => handleTabClick(tab.id)}
-              className={`flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all min-w-[60px] min-h-[52px] relative ${extraClass} ${
+              className={`flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all min-w-[60px] min-h-[52px] relative ${
                 isActive
                   ? 'text-green-400'
                   : 'text-gray-500 hover:text-gray-400 active:bg-gray-800/50'

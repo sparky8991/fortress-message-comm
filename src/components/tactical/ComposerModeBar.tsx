@@ -21,7 +21,7 @@ export const ComposerModeBar = ({
   onToggleBurn,
 }: ComposerModeBarProps) => (
   <div className="flex flex-wrap items-center gap-2">
-    <span className="font-mono text-[7px] uppercase tracking-[1.5px] text-[#4A5A50]">MARK</span>
+    <span className="font-mono text-[10px] uppercase tracking-[1.5px] text-[#4A5A50]">MARK</span>
 
     {ORDER.map((key) => {
       const meta = MARK_META[key];
@@ -32,7 +32,7 @@ export const ComposerModeBar = ({
             type="button"
             onClick={() => (key === 'locked' ? onLockedSelect() : onSelectMark(key as Exclude<TrafficMark, 'locked'>))}
             aria-pressed={messageMark === key}
-            className={`fortress-focus rounded-sm border px-2.5 py-1 font-mono text-[8px] font-extrabold uppercase tracking-[1.5px] transition-colors ${
+            className={`fortress-focus rounded-sm border px-2.5 py-1 font-mono text-[10px] font-extrabold uppercase tracking-[1.5px] transition-colors ${
               messageMark === key ? meta.onClass : MARK_IDLE_CLASS
             }`}
           >
@@ -53,7 +53,7 @@ export const ComposerModeBar = ({
         onClick={onToggleBurn}
         aria-pressed={burnEnabled}
         title="Burn after read: 2 minutes"
-        className={`fortress-focus ml-1 rounded-sm border px-2.5 py-1 font-mono text-[8px] font-extrabold uppercase tracking-[1.5px] transition-colors ${
+        className={`fortress-focus ml-1 rounded-sm border px-2.5 py-1 font-mono text-[10px] font-extrabold uppercase tracking-[1.5px] transition-colors ${
           burnEnabled
             ? 'border-orange-400/70 bg-orange-500/15 text-orange-300'
             : 'border-green-500/20 text-green-500/45 hover:border-orange-500/50 hover:text-orange-300'

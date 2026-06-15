@@ -38,6 +38,7 @@ const ProfileSettingsPage = () => {
     firstName: string | null;
     lastName: string | null;
     callSign: string | null;
+    tacticalId?: string | null;
     bio: string | null;
     avatarUrl: string | null;
     showAvatar: boolean;
@@ -46,6 +47,7 @@ const ProfileSettingsPage = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [callSign, setCallSign] = useState('');
+  const [tacticalId, setTacticalId] = useState('');
   const [bio, setBio] = useState('');
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [showAvatar, setShowAvatar] = useState(true);
@@ -144,6 +146,7 @@ const ProfileSettingsPage = () => {
           firstName: data.firstName || null,
           lastName: data.lastName || null,
           callSign: data.callSign || null,
+          tacticalId: data.tacticalId || null,
           bio: data.bio || null,
           avatarUrl: data.avatarUrl || null,
           showAvatar: data.showAvatar !== false
@@ -429,6 +432,7 @@ const ProfileSettingsPage = () => {
         lastName: lastName.trim() || null,
         callSign: callSign.trim() || null,
         callSignLower: callSign.trim().toLowerCase() || null,
+        tacticalId: tacticalId.trim().toUpperCase() || null,
         bio: bio.trim() || null,
         updatedAt: serverTimestamp()
       });
@@ -467,6 +471,7 @@ const ProfileSettingsPage = () => {
       setFirstName(profile.firstName || '');
       setLastName(profile.lastName || '');
       setCallSign(profile.callSign || '');
+      setTacticalId(profile.tacticalId || '');
       setBio(profile.bio || '');
       setAvatarUrl(profile.avatarUrl || null);
       setShowAvatar(profile.showAvatar !== false);
@@ -488,7 +493,7 @@ const ProfileSettingsPage = () => {
 
   return (
     <div className="min-h-screen fortress-shell text-[#DCEAE1]">
-      <div className="border-b border-[#1C2B22] bg-[#0C120F] py-2 text-center font-mono text-[9px] font-black uppercase tracking-[0.34em] text-[#36E27B]">
+      <div className="border-b border-[#1C2B22] bg-[#0C120F] py-2 text-center font-mono text-[10px] font-black uppercase tracking-[0.34em] text-[#36E27B]">
         Operator Settings // SecureChat Fortress // Authorized Personnel Only
       </div>
 
@@ -496,7 +501,7 @@ const ProfileSettingsPage = () => {
         <Button
           variant="ghost"
           onClick={() => navigate('/')}
-          className="mb-5 h-9 rounded-sm border border-transparent px-2 font-mono text-[9px] font-black uppercase tracking-[0.16em] text-[#76897D] hover:border-[#1E5C3C] hover:bg-[#36E27B]/10 hover:text-[#DCEAE1]"
+          className="mb-5 h-9 rounded-sm border border-transparent px-2 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-[#76897D] hover:border-[#1E5C3C] hover:bg-[#36E27B]/10 hover:text-[#DCEAE1]"
         >
           <ChevronLeft className="mr-2 h-4 w-4" />
           Back to terminal
@@ -507,15 +512,15 @@ const ProfileSettingsPage = () => {
             <div>
               <div className="flex items-center gap-2">
                 <ShieldCheck className="h-5 w-5 text-[#36E27B]" />
-                <h1 className="font-mono text-[15px] font-black uppercase tracking-[0.18em] text-[#ECF7F0]">
+                <h1 className="font-mono text-[16px] font-black uppercase tracking-[0.18em] text-[#ECF7F0]">
                   Terminal Settings
                 </h1>
               </div>
-              <p className="mt-1 font-mono text-[8px] uppercase tracking-[0.16em] text-[#76897D]">
+              <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.16em] text-[#76897D]">
                 Profile data stored in Firebase // visible fields controlled by operator
               </p>
             </div>
-            <div className="inline-flex items-center gap-2 self-start border border-[#1E5C3C] bg-[#36E27B]/10 px-3 py-2 font-mono text-[8px] font-black uppercase tracking-[0.16em] text-[#36E27B]">
+            <div className="inline-flex items-center gap-2 self-start border border-[#1E5C3C] bg-[#36E27B]/10 px-3 py-2 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-[#36E27B]">
               <Radio className="h-3.5 w-3.5" />
               Profile Active
             </div>
@@ -524,13 +529,13 @@ const ProfileSettingsPage = () => {
           <div className="grid min-h-[680px] lg:grid-cols-[230px_1fr]">
             <aside className="border-b border-[#1C2B22] bg-[#070B09] p-4 lg:border-b-0 lg:border-r">
               <nav className="space-y-2">
-                <div className="border border-[#36E27B] bg-[#36E27B]/10 px-3 py-3 font-mono text-[8px] font-black uppercase tracking-[0.16em] text-[#36E27B]">
+                <div className="border border-[#36E27B] bg-[#36E27B]/10 px-3 py-3 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-[#36E27B]">
                   Operator Profile
                 </div>
-                <div className="border border-[#1C2B22] px-3 py-3 font-mono text-[8px] font-black uppercase tracking-[0.16em] text-[#76897D]">
+                <div className="border border-[#1C2B22] px-3 py-3 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-[#76897D]">
                   Access Key
                 </div>
-                <div className="border border-[#1C2B22] px-3 py-3 font-mono text-[8px] font-black uppercase tracking-[0.16em] text-[#76897D]">
+                <div className="border border-[#1C2B22] px-3 py-3 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-[#76897D]">
                   Visibility
                 </div>
               </nav>
@@ -570,7 +575,7 @@ const ProfileSettingsPage = () => {
                           size="sm"
                           onClick={() => fileInputRef.current?.click()}
                           disabled={uploadingAvatar}
-                          className="h-9 rounded-sm border-[#1E5C3C] bg-[#070B09] font-mono text-[8px] font-black uppercase tracking-[0.14em] text-[#36E27B] hover:bg-[#36E27B]/10 hover:text-[#ECF7F0]"
+                          className="h-9 rounded-sm border-[#1E5C3C] bg-[#070B09] font-mono text-[10px] font-black uppercase tracking-[0.14em] text-[#36E27B] hover:bg-[#36E27B]/10 hover:text-[#ECF7F0]"
                         >
                           <Camera className="w-4 h-4 mr-2" />
                           {avatarUrl ? 'Change Photo' : 'Upload Photo'}
@@ -582,20 +587,20 @@ const ProfileSettingsPage = () => {
                             size="sm"
                             onClick={handleRemoveAvatar}
                             disabled={uploadingAvatar}
-                            className="h-9 rounded-sm border-[#5C2420] bg-[#070B09] font-mono text-[8px] font-black uppercase tracking-[0.14em] text-[#FF6B61] hover:bg-[#8C1D18]/20 hover:text-[#FFE0DC]"
+                            className="h-9 rounded-sm border-[#5C2420] bg-[#070B09] font-mono text-[10px] font-black uppercase tracking-[0.14em] text-[#FF6B61] hover:bg-[#8C1D18]/20 hover:text-[#FFE0DC]"
                           >
                             <Trash2 className="w-4 h-4 mr-2" />
                             Remove
                           </Button>
                         )}
                       </div>
-                      <p className="font-mono text-[8px] uppercase tracking-[0.12em] text-[#76897D]">PNG / JPG up to 5MB // profile storage rules apply</p>
+                      <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#76897D]">PNG / JPG up to 5MB // profile storage rules apply</p>
                     </div>
 
                     <div className="flex items-center justify-between gap-3 border border-[#1C2B22] bg-[#0F1612] px-3 py-3">
                       <div>
-                        <p className="font-mono text-[8px] font-black uppercase tracking-[0.16em] text-[#ECF7F0]">Show avatar</p>
-                        <p className="mt-1 font-mono text-[7px] uppercase tracking-[0.12em] text-[#76897D]">Visible to operators</p>
+                        <p className="font-mono text-[10px] font-black uppercase tracking-[0.16em] text-[#ECF7F0]">Show avatar</p>
+                        <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.12em] text-[#76897D]">Visible to operators</p>
                       </div>
                       <Toggle on={showAvatar} onClick={() => handleShowAvatarToggle(!showAvatar)} aria-label="Toggle avatar visibility" />
                     </div>
@@ -604,51 +609,57 @@ const ProfileSettingsPage = () => {
 
                 <div className="grid gap-5">
                   <div>
-                    <Label htmlFor="userEmail" className="font-mono text-[8px] font-black uppercase tracking-[0.18em] text-[#76897D]">Email Address</Label>
+                    <Label htmlFor="userEmail" className="font-mono text-[10px] font-black uppercase tracking-[0.18em] text-[#76897D]">Email Address</Label>
                     <div className="mt-2 flex items-center gap-3">
                       <Mail className="h-5 w-5 text-[#36E27B]" />
-                      <span className="min-h-10 flex-1 border border-[#1C2B22] bg-[#070B09] px-3 py-2 font-mono text-[12px] text-[#ECF7F0]">{userEmail || 'N/A'}</span>
+                      <span className="min-h-10 flex-1 border border-[#1C2B22] bg-[#070B09] px-3 py-2 font-mono text-[13px] text-[#ECF7F0]">{userEmail || 'N/A'}</span>
                     </div>
-                    <p className="mt-2 font-mono text-[8px] uppercase tracking-[0.12em] text-[#76897D]">Used for account login only - never shown to other operators.</p>
+                    <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[#76897D]">Used for account login only - never shown to other operators.</p>
                   </div>
 
                   <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                     <div>
-                      <Label htmlFor="firstName" className="font-mono text-[8px] font-black uppercase tracking-[0.18em] text-[#76897D]">First Name</Label>
-                      <Input id="firstName" value={firstName} onChange={e => setFirstName(e.target.value)} className="mt-2 rounded-sm border-[#1C2B22] bg-[#070B09] font-mono text-[12px] text-[#ECF7F0] placeholder:text-[#4A5A50] focus-visible:ring-[#36E27B]" placeholder="E.g., John" />
+                      <Label htmlFor="firstName" className="font-mono text-[10px] font-black uppercase tracking-[0.18em] text-[#76897D]">First Name</Label>
+                      <Input id="firstName" value={firstName} onChange={e => setFirstName(e.target.value)} className="mt-2 rounded-sm border-[#1C2B22] bg-[#070B09] font-mono text-[13px] text-[#ECF7F0] placeholder:text-[#4A5A50] focus-visible:ring-[#36E27B]" placeholder="E.g., John" />
                     </div>
                     <div>
-                      <Label htmlFor="lastName" className="font-mono text-[8px] font-black uppercase tracking-[0.18em] text-[#76897D]">Last Name</Label>
-                      <Input id="lastName" value={lastName} onChange={e => setLastName(e.target.value)} className="mt-2 rounded-sm border-[#1C2B22] bg-[#070B09] font-mono text-[12px] text-[#ECF7F0] placeholder:text-[#4A5A50] focus-visible:ring-[#36E27B]" placeholder="E.g., Doe" />
+                      <Label htmlFor="lastName" className="font-mono text-[10px] font-black uppercase tracking-[0.18em] text-[#76897D]">Last Name</Label>
+                      <Input id="lastName" value={lastName} onChange={e => setLastName(e.target.value)} className="mt-2 rounded-sm border-[#1C2B22] bg-[#070B09] font-mono text-[13px] text-[#ECF7F0] placeholder:text-[#4A5A50] focus-visible:ring-[#36E27B]" placeholder="E.g., Doe" />
                     </div>
                   </div>
 
                   <div>
-                    <Label htmlFor="callSign" className="font-mono text-[8px] font-black uppercase tracking-[0.18em] text-[#76897D]">Call Sign</Label>
+                    <Label htmlFor="callSign" className="font-mono text-[10px] font-black uppercase tracking-[0.18em] text-[#76897D]">Call Sign</Label>
                     <div className="relative mt-2">
-                      <Input id="callSign" value={callSign} onChange={handleCallSignChange} className={`rounded-sm border-[#1C2B22] bg-[#070B09] font-mono text-[12px] text-[#ECF7F0] placeholder:text-[#4A5A50] focus-visible:ring-[#36E27B] ${callSignError ? 'border-[#FF6B61]' : ''}`} placeholder="E.g., Maverick" />
+                      <Input id="callSign" value={callSign} onChange={handleCallSignChange} className={`rounded-sm border-[#1C2B22] bg-[#070B09] font-mono text-[13px] text-[#ECF7F0] placeholder:text-[#4A5A50] focus-visible:ring-[#36E27B] ${callSignError ? 'border-[#FF6B61]' : ''}`} placeholder="E.g., Maverick" />
                       {checkingCallSign && <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-[#36E27B]" />}
                     </div>
                     <div className={`mt-3 border px-3 py-3 ${callSignError ? 'border-[#5C2420] bg-[#8C1D18]/20' : 'border-[#6B4B18] bg-[#1A1507]'}`}>
-                      <div className={`flex items-center gap-2 font-mono text-[8px] font-black uppercase tracking-[0.16em] ${callSignError ? 'text-[#FF6B61]' : 'text-[#F2B43C]'}`}>
+                      <div className={`flex items-center gap-2 font-mono text-[10px] font-black uppercase tracking-[0.16em] ${callSignError ? 'text-[#FF6B61]' : 'text-[#F2B43C]'}`}>
                         <AlertTriangle className="h-4 w-4" />
                         {callSignError ? 'Call sign blocked' : 'Change limits'}
                       </div>
-                      <p className={`mt-1 font-mono text-[9px] uppercase tracking-[0.12em] ${callSignError ? 'text-[#FFE0DC]/80' : 'text-[#FFE0A8]/70'}`}>
+                      <p className={`mt-1 font-mono text-[10px] uppercase tracking-[0.12em] ${callSignError ? 'text-[#FFE0DC]/80' : 'text-[#FFE0A8]/70'}`}>
                         {callSignError || callsignLimitCopy}
                       </p>
                     </div>
                   </div>
 
                   <div>
-                    <Label htmlFor="bio" className="font-mono text-[8px] font-black uppercase tracking-[0.18em] text-[#76897D]">Bio</Label>
-                    <Textarea id="bio" value={bio} onChange={e => setBio(e.target.value)} maxLength={500} rows={4} className="mt-2 rounded-sm border-[#1C2B22] bg-[#070B09] font-mono text-[12px] text-[#ECF7F0] placeholder:text-[#4A5A50] focus-visible:ring-[#36E27B]" placeholder="Tell the net a little about yourself..." />
-                    <p className="mt-2 text-right font-mono text-[8px] uppercase tracking-[0.12em] text-[#76897D]">{bio.length} / 500</p>
+                    <Label htmlFor="tacticalId" className="font-mono text-[10px] font-black uppercase tracking-[0.18em] text-[#76897D]">Tactical ID</Label>
+                    <Input id="tacticalId" value={tacticalId} onChange={e => setTacticalId(e.target.value)} maxLength={16} className="mt-2 rounded-sm border-[#1C2B22] bg-[#070B09] font-mono text-[13px] uppercase tracking-[0.12em] text-[#ECF7F0] placeholder:text-[#4A5A50] focus-visible:ring-[#36E27B]" placeholder="E.g., REAPER-6" />
+                    <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[#76897D]">Short tactical code shown beside your call sign to other operators.</p>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="bio" className="font-mono text-[10px] font-black uppercase tracking-[0.18em] text-[#76897D]">Bio</Label>
+                    <Textarea id="bio" value={bio} onChange={e => setBio(e.target.value)} maxLength={500} rows={4} className="mt-2 rounded-sm border-[#1C2B22] bg-[#070B09] font-mono text-[13px] text-[#ECF7F0] placeholder:text-[#4A5A50] focus-visible:ring-[#36E27B]" placeholder="Tell the net a little about yourself..." />
+                    <p className="mt-2 text-right font-mono text-[10px] uppercase tracking-[0.12em] text-[#76897D]">{bio.length} / 500</p>
                   </div>
                 </div>
 
                 <div className="flex justify-end border-t border-[#1C2B22] pt-5">
-                  <Button type="submit" disabled={updating || loading || !!callSignError || checkingCallSign} className="h-10 rounded-sm bg-[#36E27B] px-5 font-mono text-[8px] font-black uppercase tracking-[0.16em] text-[#06130B] hover:bg-[#7BEFA9]">
+                  <Button type="submit" disabled={updating || loading || !!callSignError || checkingCallSign} className="h-10 rounded-sm bg-[#36E27B] px-5 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-[#06130B] hover:bg-[#7BEFA9]">
                     {updating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Save Operator Profile
                   </Button>
@@ -659,16 +670,16 @@ const ProfileSettingsPage = () => {
                 <div>
                   <div className="flex items-center gap-2">
                     <KeyRound className="h-5 w-5 text-[#36E27B]" />
-                    <h2 className="font-mono text-[11px] font-black uppercase tracking-[0.18em] text-[#ECF7F0]">Access Key</h2>
+                    <h2 className="font-mono text-[12px] font-black uppercase tracking-[0.18em] text-[#ECF7F0]">Access Key</h2>
                   </div>
-                  <p className="mt-1 font-mono text-[8px] uppercase tracking-[0.12em] text-[#76897D]">Change Firebase account password after re-authentication.</p>
+                  <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.12em] text-[#76897D]">Change Firebase account password after re-authentication.</p>
                 </div>
 
                 <div className="grid gap-5 lg:grid-cols-3">
                   <div>
-                    <Label htmlFor="currentPassword" className="font-mono text-[8px] font-black uppercase tracking-[0.18em] text-[#76897D]">Current Password</Label>
+                    <Label htmlFor="currentPassword" className="font-mono text-[10px] font-black uppercase tracking-[0.18em] text-[#76897D]">Current Password</Label>
                     <div className="relative mt-2">
-                      <Input id="currentPassword" type={showCurrentPassword ? 'text' : 'password'} value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} className="rounded-sm border-[#1C2B22] bg-[#070B09] pr-10 font-mono text-[12px] text-[#ECF7F0] placeholder:text-[#4A5A50] focus-visible:ring-[#36E27B]" placeholder="Current password" />
+                      <Input id="currentPassword" type={showCurrentPassword ? 'text' : 'password'} value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} className="rounded-sm border-[#1C2B22] bg-[#070B09] pr-10 font-mono text-[13px] text-[#ECF7F0] placeholder:text-[#4A5A50] focus-visible:ring-[#36E27B]" placeholder="Current password" />
                       <button type="button" onClick={() => setShowCurrentPassword(!showCurrentPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#36E27B]/70 hover:text-[#7BEFA9]">
                         {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -676,9 +687,9 @@ const ProfileSettingsPage = () => {
                   </div>
 
                   <div>
-                    <Label htmlFor="newPassword" className="font-mono text-[8px] font-black uppercase tracking-[0.18em] text-[#76897D]">New Password</Label>
+                    <Label htmlFor="newPassword" className="font-mono text-[10px] font-black uppercase tracking-[0.18em] text-[#76897D]">New Password</Label>
                     <div className="relative mt-2">
-                      <Input id="newPassword" type={showNewPassword ? 'text' : 'password'} value={newPassword} onChange={e => setNewPassword(e.target.value)} className="rounded-sm border-[#1C2B22] bg-[#070B09] pr-10 font-mono text-[12px] text-[#ECF7F0] placeholder:text-[#4A5A50] focus-visible:ring-[#36E27B]" placeholder="New password" />
+                      <Input id="newPassword" type={showNewPassword ? 'text' : 'password'} value={newPassword} onChange={e => setNewPassword(e.target.value)} className="rounded-sm border-[#1C2B22] bg-[#070B09] pr-10 font-mono text-[13px] text-[#ECF7F0] placeholder:text-[#4A5A50] focus-visible:ring-[#36E27B]" placeholder="New password" />
                       <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#36E27B]/70 hover:text-[#7BEFA9]">
                         {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -686,9 +697,9 @@ const ProfileSettingsPage = () => {
                   </div>
 
                   <div>
-                    <Label htmlFor="confirmPassword" className="font-mono text-[8px] font-black uppercase tracking-[0.18em] text-[#76897D]">Confirm Password</Label>
+                    <Label htmlFor="confirmPassword" className="font-mono text-[10px] font-black uppercase tracking-[0.18em] text-[#76897D]">Confirm Password</Label>
                     <div className="relative mt-2">
-                      <Input id="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="rounded-sm border-[#1C2B22] bg-[#070B09] pr-10 font-mono text-[12px] text-[#ECF7F0] placeholder:text-[#4A5A50] focus-visible:ring-[#36E27B]" placeholder="Confirm password" />
+                      <Input id="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="rounded-sm border-[#1C2B22] bg-[#070B09] pr-10 font-mono text-[13px] text-[#ECF7F0] placeholder:text-[#4A5A50] focus-visible:ring-[#36E27B]" placeholder="Confirm password" />
                       <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#36E27B]/70 hover:text-[#7BEFA9]">
                         {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -696,11 +707,11 @@ const ProfileSettingsPage = () => {
                   </div>
                 </div>
 
-                {passwordError && <p className="border border-[#5C2420] bg-[#8C1D18]/20 px-3 py-2 font-mono text-[9px] uppercase tracking-[0.12em] text-[#FF6B61]">{passwordError}</p>}
+                {passwordError && <p className="border border-[#5C2420] bg-[#8C1D18]/20 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[#FF6B61]">{passwordError}</p>}
 
                 <div className="flex justify-between gap-4 border-t border-[#1C2B22] pt-5">
-                  <p className="hidden font-mono text-[8px] uppercase tracking-[0.12em] text-[#76897D] sm:block">Minimum 6 characters // Current password required</p>
-                  <Button type="submit" disabled={updatingPassword || !currentPassword || !newPassword || !confirmPassword} className="h-10 rounded-sm bg-[#36E27B] px-5 font-mono text-[8px] font-black uppercase tracking-[0.16em] text-[#06130B] hover:bg-[#7BEFA9]">
+                  <p className="hidden font-mono text-[10px] uppercase tracking-[0.12em] text-[#76897D] sm:block">Minimum 6 characters // Current password required</p>
+                  <Button type="submit" disabled={updatingPassword || !currentPassword || !newPassword || !confirmPassword} className="h-10 rounded-sm bg-[#36E27B] px-5 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-[#06130B] hover:bg-[#7BEFA9]">
                     {updatingPassword && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Update Access Key
                   </Button>

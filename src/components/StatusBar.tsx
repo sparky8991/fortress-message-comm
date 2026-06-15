@@ -76,7 +76,7 @@ export const StatusBar = ({ onViewStatus, onCreateStatus, variant = 'top' }: Sta
               </div>
             )}
           </button>
-          <span className={`${isSidebar ? 'text-[8px] max-w-[58px]' : 'ft-meta max-w-[60px]'} text-green-500/60 mt-1 truncate font-mono`}>
+          <span className={`${isSidebar ? 'text-[10px] max-w-[58px]' : 'ft-meta max-w-[60px]'} text-green-500/60 mt-1 truncate font-mono`}>
             {myStatus ? 'Status' : 'Add Status'}
           </span>
         </div>
@@ -109,14 +109,14 @@ export const StatusBar = ({ onViewStatus, onCreateStatus, variant = 'top' }: Sta
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse" />
               )}
             </button>
-            <span className={`${isSidebar ? 'text-[8px] max-w-[58px]' : 'ft-meta max-w-[60px]'} text-green-500/60 mt-1 truncate font-mono`}>
+            <span className={`${isSidebar ? 'text-[10px] max-w-[58px]' : 'ft-meta max-w-[60px]'} text-green-500/60 mt-1 truncate font-mono`}>
               {statusUser.username}
             </span>
           </div>
         ))}
 
         {statusUsers.length === 0 && !myStatus && (
-          <div className={`${isSidebar ? 'text-[9px]' : 'ft-body'} text-green-500/45 pl-0.5 font-mono uppercase tracking-[0.16em]`}>
+          <div className={`${isSidebar ? 'text-[10px]' : 'ft-body'} text-green-500/45 pl-0.5 font-mono uppercase tracking-[0.16em]`}>
             No status traffic
           </div>
         )}

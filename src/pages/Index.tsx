@@ -37,7 +37,7 @@ const Index = () => {
   const [mobileTab, setMobileTab] = useState<'chats' | 'teams' | 'security' | 'profile'>('chats');
   const [showUserSearch, setShowUserSearch] = useState(false);
   const navigate = useNavigate();
-  const { activeConversation, switchToConversation } = useDirectMessages();
+  const { switchToConversation } = useDirectMessages();
   const { hasCompletedOnboarding, loading: riskLoading } = useUserRisk();
 
   const handleStatusCreated = useCallback(() => {
@@ -106,28 +106,22 @@ const Index = () => {
     }
   };
 
+  // Mobile: return from a full-screen conversation to the chat list home.
+  const handleBackToList = () => {
+    setActiveChat(null);
+    setSidebarOpen(false);
+  };
+
   const handleStartConversation = (conversationId: string) => {
     switchToConversation(conversationId);
     setActiveChat(conversationId);
     setShowUserSearch(false);
   };
 
-  // Determine the current chat type and ID
-  const getCurrentChatInfo = () => {
-    if (activeConversation) {
-      return {
-        id: activeConversation,
-        type: 'direct' as const
-      };
-    }
-    if (activeChat) {
-      return {
-        id: activeChat,
-        type: 'team' as const
-      };
-    }
-    return null; // No active chat
-  };
+  // The open chat (or null). activeChat is set in every selection path, so it's the
+  // single source of truth — clearing it returns to the mobile chat-list home.
+  const getCurrentChatInfo = () =>
+    activeChat ? { id: activeChat, type: 'direct' as const } : null;
 
   if (loading || riskLoading) {
     return (
@@ -167,6 +161,14 @@ const Index = () => {
   }
 
   const currentChat = getCurrentChatInfo();
+  // Mobile: a conversation fills the whole screen (no bottom nav) so the composer has
+  // full room; the chat list keeps the bottom nav. Pad the bottom accordingly, always
+  // including the device safe-area inset (home indicator / notch).
+  const mobileBottomPad = isMobile
+    ? currentChat
+      ? 'pb-[env(safe-area-inset-bottom)]'
+      : 'pb-[calc(4rem+env(safe-area-inset-bottom))]'
+    : '';
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden fortress-shell safe-area-inset">
@@ -183,17 +185,19 @@ const Index = () => {
           <div className="fortress-classification-strip hidden md:flex">
             SECRET//NOFORN — CLASSIFIED CHANNEL — AUTHORIZED PERSONNEL ONLY
           </div>
-          <div className={cn(
-            "flex min-h-0 w-full flex-1 overflow-hidden",
-            isMobile && "pb-16" // Make room for bottom nav
-          )}>
-            {/* Sidebar - hidden on mobile, shown on desktop */}
+          <div className={cn("flex min-h-0 w-full flex-1 overflow-hidden", mobileBottomPad)}>
+            {/* Sidebar / chat list:
+                desktop -> static left rail; mobile + no chat -> full-screen home;
+                mobile + in a chat -> slide-in drawer (quick chat switch). */}
             <div
               className={cn(
-                  'md:flex flex-col',
-                  'transition-all duration-300 ease-out',
-                  'fixed md:static inset-y-0 left-0 z-30 w-80',
-                  isMobile ? (sidebarOpen ? 'translate-x-0 flex shadow-2xl' : '-translate-x-full') : 'flex'
+                'flex flex-col transition-transform duration-300 ease-out',
+                !isMobile && 'w-80',
+                isMobile && !currentChat && 'w-full',
+                isMobile && currentChat && cn(
+                  'fixed inset-y-0 left-0 z-30 w-80',
+                  sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full',
+                ),
               )}
             >
               <Sidebar
@@ -202,46 +206,44 @@ const Index = () => {
                 statusRefreshKey={statusRefreshKey}
                 onViewStatus={(statusUser) => setViewingStatus(statusUser)}
                 onCreateStatus={() => setShowStatusCreator(true)}
+                activeTab={isMobile ? (mobileTab === 'profile' ? 'chats' : mobileTab) : undefined}
+                onTabChange={isMobile ? setMobileTab : undefined}
               />
             </div>
 
-            {/* Mobile overlay */}
-            {isMobile && sidebarOpen && (
+            {/* Mobile drawer overlay (only when in a conversation with the drawer open) */}
+            {isMobile && currentChat && sidebarOpen && (
                 <div
                   className="fixed inset-0 bg-black/60 backdrop-blur-sm z-20 transition-opacity duration-300"
                   onClick={() => setSidebarOpen(false)}
                 />
             )}
 
-            {/* Main content area */}
-            <div className="flex-1 min-w-0 min-h-0 flex flex-col overflow-hidden">
-              {/* Chat area */}
-              <div className={cn(
-                "flex-1 min-h-0",
-                isMobile && "pb-safe" // Extra padding for safe area
-              )}>
-                <ChatArea
-                  activeChat={currentChat?.id || ''}
-                  onStartCall={(type) => {
-                    setCallType(type);
-                    setIsInCall(true);
-                  }}
-                  onToggleSidebar={() => setSidebarOpen(true)}
-                />
+            {/* Conversation — desktop always; mobile only when a chat is open */}
+            {(!isMobile || currentChat) && (
+              <div className="flex-1 min-w-0 min-h-0 flex flex-col overflow-hidden">
+                {/* flex column so ChatArea fills via flex (reliable), not h-full % */}
+                <div className="flex-1 min-h-0 flex flex-col">
+                  <ChatArea
+                    activeChat={currentChat?.id || ''}
+                    onStartCall={(type) => {
+                      setCallType(type);
+                      setIsInCall(true);
+                    }}
+                    onToggleSidebar={() => setSidebarOpen(true)}
+                    onBack={handleBackToList}
+                  />
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
-          {/* Mobile Bottom Navigation */}
-          {isMobile && (
+          {/* Mobile Bottom Navigation — chat list (home) only; a conversation is full-screen.
+              Tabs drive the full-screen list's segmented view (no drawer needed). */}
+          {isMobile && !currentChat && (
             <MobileNavBar
               activeTab={mobileTab}
-              onTabChange={(tab) => {
-                setMobileTab(tab);
-                if (tab === 'chats' || tab === 'teams' || tab === 'security') {
-                  setSidebarOpen(true);
-                }
-              }}
+              onTabChange={setMobileTab}
               onNewChat={() => setShowUserSearch(true)}
             />
           )}

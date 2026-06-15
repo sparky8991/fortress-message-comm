@@ -18,7 +18,7 @@ const SectionTitle = ({
 }) => (
   <div className="flex items-center gap-2 border-b border-[#141E18] pb-2">
     <Icon className="h-3.5 w-3.5 text-[#36E27B]" />
-    <h3 className="font-mono text-[9px] font-black uppercase tracking-[0.18em] text-[#ECF7F0]">
+    <h3 className="font-mono text-[10px] font-black uppercase tracking-[0.18em] text-[#ECF7F0]">
       {children}
     </h3>
   </div>
@@ -26,8 +26,8 @@ const SectionTitle = ({
 
 const StatusLine = ({ label, value, muted }: { label: string; value: string; muted?: boolean }) => (
   <div className="flex items-center justify-between gap-3 font-mono">
-    <span className="text-[8px] uppercase tracking-[0.14em] text-[#76897D]">{label}</span>
-    <span className={`text-right text-[8px] font-black uppercase tracking-[0.12em] ${muted ? 'text-[#76897D]' : 'text-[#36E27B]'}`}>
+    <span className="text-[10px] uppercase tracking-[0.14em] text-[#76897D]">{label}</span>
+    <span className={`text-right text-[10px] font-black uppercase tracking-[0.12em] ${muted ? 'text-[#76897D]' : 'text-[#36E27B]'}`}>
       {value}
     </span>
   </div>
@@ -47,8 +47,8 @@ const SecurityRow = ({
   <div className="flex items-center gap-2.5 rounded-sm border border-[#1C2B22] bg-[#101814] px-3 py-2.5">
     <Icon className="h-4 w-4 flex-none text-[#36E27B]" />
     <div className="min-w-0 flex-1">
-      <div className="font-mono text-[9px] font-black uppercase tracking-[0.12em] text-[#ECF7F0]">{title}</div>
-      <div className="mt-0.5 font-mono text-[8px] uppercase tracking-[0.08em] text-[#76897D]">{description}</div>
+      <div className="font-mono text-[10px] font-black uppercase tracking-[0.12em] text-[#ECF7F0]">{title}</div>
+      <div className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-[#76897D]">{description}</div>
     </div>
     {children}
   </div>
@@ -107,7 +107,7 @@ export const SecurityPanel = () => {
       <section className="rounded-sm border border-[#1E5C3C] bg-[#36E27B]/[0.06] p-3">
         <div className="mb-3 flex items-center gap-2">
           <Shield className="h-4 w-4 text-[#36E27B]" />
-          <h3 className="font-mono text-[10px] font-black uppercase tracking-[0.18em] text-[#ECF7F0]">
+          <h3 className="font-mono text-[11px] font-black uppercase tracking-[0.18em] text-[#ECF7F0]">
             Security Status
           </h3>
           {loading && <Loader2 className="ml-auto h-3.5 w-3.5 animate-spin text-[#36E27B]" />}
@@ -126,7 +126,7 @@ export const SecurityPanel = () => {
             <Button
               onClick={handleSaveSettings}
               disabled={saving || loading}
-              className="h-7 rounded-sm bg-[#36E27B] px-2.5 font-mono text-[8px] font-black uppercase tracking-[0.12em] text-[#06130B] hover:bg-[#7BEFA9]"
+              className="h-7 rounded-sm bg-[#36E27B] px-2.5 font-mono text-[10px] font-black uppercase tracking-[0.12em] text-[#06130B] hover:bg-[#7BEFA9]"
             >
               {saving && <Loader2 className="mr-1.5 h-3 w-3 animate-spin" />}
               Save
@@ -148,7 +148,7 @@ export const SecurityPanel = () => {
 
         {autoDeleteMessages && (
           <div className="rounded-sm border border-[#1C2B22] bg-[#0F1612] p-2.5">
-            <div className="mb-2 font-mono text-[8px] uppercase tracking-[0.2em] text-[#76897D]">
+            <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.2em] text-[#76897D]">
               Cleanup window
             </div>
             <div className="flex flex-wrap gap-1.5">
@@ -168,7 +168,7 @@ export const SecurityPanel = () => {
               max="168"
               value={autoDeleteTimer}
               onChange={(e) => handleSettingChange(setAutoDeleteTimer, Number(e.target.value))}
-              className="mt-2 h-8 rounded-sm border-[#1C2B22] bg-[#101814] font-mono text-[10px] text-[#DCEAE1] focus-visible:ring-[#36E27B]"
+              className="mt-2 h-8 rounded-sm border-[#1C2B22] bg-[#101814] font-mono text-[11px] text-[#DCEAE1] focus-visible:ring-[#36E27B]"
               disabled={loading}
             />
           </div>
@@ -227,7 +227,7 @@ export const SecurityPanel = () => {
           <button
             type="button"
             onClick={() => setShowPinSetup(true)}
-            className="fortress-focus rounded-sm border border-[#1E5C3C] px-2 py-1 font-mono text-[8px] font-black uppercase tracking-[0.12em] text-[#36E27B] hover:bg-[#36E27B]/10"
+            className="fortress-focus rounded-sm border border-[#1E5C3C] px-2 py-1 font-mono text-[10px] font-black uppercase tracking-[0.12em] text-[#36E27B] hover:bg-[#36E27B]/10"
           >
             {pinEnabled ? 'Change' : 'Set up'}
           </button>
@@ -241,7 +241,7 @@ export const SecurityPanel = () => {
           <button
             type="button"
             onClick={() => setShowPanicPinSetup(true)}
-            className="fortress-focus rounded-sm border border-[#5C2420] px-2 py-1 font-mono text-[8px] font-black uppercase tracking-[0.12em] text-[#FF6B61] hover:bg-red-500/10"
+            className="fortress-focus rounded-sm border border-[#5C2420] px-2 py-1 font-mono text-[10px] font-black uppercase tracking-[0.12em] text-[#FF6B61] hover:bg-red-500/10"
           >
             {panicPinEnabled ? 'Change' : 'Set up'}
           </button>
@@ -254,7 +254,7 @@ export const SecurityPanel = () => {
               localStorage.removeItem('securechat_pin');
               setPinEnabled(false);
             }}
-            className="fortress-focus w-full rounded-sm border border-[#1C2B22] bg-transparent px-3 py-2 font-mono text-[8px] font-black uppercase tracking-[0.14em] text-[#76897D] hover:border-[#5C2420] hover:text-[#FF6B61]"
+            className="fortress-focus w-full rounded-sm border border-[#1C2B22] bg-transparent px-3 py-2 font-mono text-[10px] font-black uppercase tracking-[0.14em] text-[#76897D] hover:border-[#5C2420] hover:text-[#FF6B61]"
           >
             Disable PIN lock
           </button>
@@ -264,7 +264,7 @@ export const SecurityPanel = () => {
       <section className="space-y-2.5">
         <SectionTitle icon={AlertTriangle}>Emergency</SectionTitle>
         <div className="rounded-sm border border-[#5C2420] bg-red-950/15 p-3">
-          <p className="mb-3 font-mono text-[8px] uppercase leading-relaxed tracking-[0.1em] text-red-200/80">
+          <p className="mb-3 font-mono text-[10px] uppercase leading-relaxed tracking-[0.1em] text-red-200/80">
             {riskLevel === 'high-risk'
               ? 'Hold for 3 seconds to wipe messages, conversations, and local data.'
               : 'Emergency wipe is available when sensitive data must be cleared quickly.'}
@@ -276,14 +276,14 @@ export const SecurityPanel = () => {
       <section className="space-y-2.5 border-t border-[#141E18] pt-4">
         <SectionTitle icon={Settings}>Security Experience</SectionTitle>
         <div className="rounded-sm border border-[#1C2B22] bg-[#101814] p-3">
-          <p className="mb-3 font-mono text-[8px] uppercase tracking-[0.1em] text-[#76897D]">
+          <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.1em] text-[#76897D]">
             Adjust which advanced controls are visible in the app.
           </p>
           <div className="grid grid-cols-2 gap-1.5">
             <button
               type="button"
               onClick={() => setRiskLevel('normal')}
-              className={`fortress-focus rounded-sm border px-3 py-2 font-mono text-[8px] font-black uppercase tracking-[0.14em] transition-colors ${
+              className={`fortress-focus rounded-sm border px-3 py-2 font-mono text-[10px] font-black uppercase tracking-[0.14em] transition-colors ${
                 riskLevel === 'normal'
                   ? 'border-[#36E27B] bg-[#36E27B]/15 text-[#36E27B]'
                   : 'border-[#1C2B22] text-[#76897D] hover:border-[#1E5C3C] hover:text-[#DCEAE1]'
@@ -294,7 +294,7 @@ export const SecurityPanel = () => {
             <button
               type="button"
               onClick={() => setRiskLevel('high-risk')}
-              className={`fortress-focus rounded-sm border px-3 py-2 font-mono text-[8px] font-black uppercase tracking-[0.14em] transition-colors ${
+              className={`fortress-focus rounded-sm border px-3 py-2 font-mono text-[10px] font-black uppercase tracking-[0.14em] transition-colors ${
                 riskLevel === 'high-risk'
                   ? 'border-[#36E27B] bg-[#36E27B]/15 text-[#36E27B]'
                   : 'border-[#1C2B22] text-[#76897D] hover:border-[#1E5C3C] hover:text-[#DCEAE1]'

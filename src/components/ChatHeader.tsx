@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Phone, Video, Lock, Settings } from 'lucide-react';
+import { Phone, Video, Lock, Settings, ChevronLeft } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ChatSettingsDialog } from './ChatSettingsDialog';
 
@@ -8,15 +8,17 @@ interface ContactInfo {
   name: string;
   status: string;
   avatar: string;
+  tacticalId?: string;
 }
 
 interface ChatHeaderProps {
   contact: ContactInfo;
   onStartCall: (type: 'voice' | 'video') => void;
   onToggleSidebar?: () => void;
+  onBack?: () => void;
 }
 
-export const ChatHeader = ({ contact, onStartCall, onToggleSidebar }: ChatHeaderProps) => {
+export const ChatHeader = ({ contact, onStartCall, onToggleSidebar, onBack }: ChatHeaderProps) => {
   const isMobile = useIsMobile();
   const [showChatSettings, setShowChatSettings] = useState(false);
   const contactInitial = contact?.avatar || contact?.name?.charAt(0).toUpperCase() || '?';
@@ -25,7 +27,17 @@ export const ChatHeader = ({ contact, onStartCall, onToggleSidebar }: ChatHeader
     <>
       <div className="border-b border-[#1C2B22] bg-[#0C120F]/98 backdrop-blur-sm">
         <div className="flex h-16 items-center justify-between px-3 md:px-4">
-          <div className="flex min-w-0 flex-1 items-center gap-3">
+          <div className="flex min-w-0 flex-1 items-center gap-2 md:gap-3">
+            {/* Back to chat list (mobile) — the conversation is a full screen */}
+            {isMobile && (
+              <button
+                onClick={onBack || onToggleSidebar}
+                className="-ml-1 flex h-9 w-6 flex-none items-center justify-center text-[#76897D] transition-colors hover:text-[#ECF7F0] active:scale-95 fortress-focus"
+                aria-label="Back to chats"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+            )}
             {/* Avatar as sidebar toggle on mobile */}
             <button
               onClick={isMobile ? onToggleSidebar : undefined}
@@ -42,8 +54,13 @@ export const ChatHeader = ({ contact, onStartCall, onToggleSidebar }: ChatHeader
 
             <div className="min-w-0 flex-1">
               <div className="flex min-w-0 items-center gap-2">
-                <h2 className="truncate font-mono text-[14px] font-bold leading-none text-[#ECF7F0]">{contact?.name}</h2>
-                <span className="hidden rounded-sm border border-[#F2B43C]/45 bg-[#F2B43C]/10 px-1.5 py-0.5 font-mono text-[7px] font-black uppercase tracking-[0.18em] text-[#F2B43C] sm:inline-flex">
+                <h2 className="truncate font-mono text-[15px] font-bold leading-none text-[#ECF7F0]">{contact?.name}</h2>
+                {contact?.tacticalId && (
+                  <span className="flex-none truncate font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-[#76897D]">
+                    {contact.tacticalId}
+                  </span>
+                )}
+                <span className="hidden rounded-sm border border-[#F2B43C]/45 bg-[#F2B43C]/10 px-1.5 py-0.5 font-mono text-[10px] font-black uppercase tracking-[0.18em] text-[#F2B43C] sm:inline-flex">
                   UNVERIFIED
                 </span>
               </div>
@@ -51,15 +68,15 @@ export const ChatHeader = ({ contact, onStartCall, onToggleSidebar }: ChatHeader
                 // Compact mobile layout - just encryption status
                 <div className="flex items-center space-x-1">
                   <Lock className="h-2.5 w-2.5 text-[#36E27B]" />
-                  <span className="font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-[#36E27B]">PROTECTED</span>
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-[#36E27B]">PROTECTED</span>
                 </div>
               ) : (
                 // Full desktop layout
                 <div className="mt-0.5 flex flex-col space-y-0.5">
-                  <p className="truncate font-mono text-[8px] uppercase tracking-[0.22em] text-[#76897D]">
+                  <p className="truncate font-mono text-[10px] uppercase tracking-[0.22em] text-[#76897D]">
                     CHANNEL READY
                   </p>
-                  <div className="flex items-center space-x-1.5 font-mono text-[9px] font-bold uppercase tracking-[0.12em] text-[#36E27B]">
+                  <div className="flex items-center space-x-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.12em] text-[#36E27B]">
                     <Lock className="h-2.5 w-2.5 flex-shrink-0" />
                     <span className="truncate">
                       E2E ENCRYPTED · SIGNAL PROTOCOL · AES-256-GCM
@@ -98,10 +115,10 @@ export const ChatHeader = ({ contact, onStartCall, onToggleSidebar }: ChatHeader
           </div>
         </div>
         <div className="hidden items-center justify-between border-t border-[#6B4B18] bg-[#1A1507] px-4 py-1 md:flex">
-          <span className="font-mono text-[8px] font-bold uppercase tracking-[0.22em] text-[#F2B43C]">
+          <span className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-[#F2B43C]">
             [ ! ] VERIFY IDENTITY BEFORE PASSING SENSITIVE TRAFFIC
           </span>
-          <span className="font-mono text-[8px] font-bold uppercase tracking-[0.22em] text-[#4A5A50]">
+          <span className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-[#4A5A50]">
             SESSION ESTABLISHED
           </span>
         </div>

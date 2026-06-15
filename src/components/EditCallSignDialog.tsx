@@ -197,15 +197,15 @@ export const EditCallSignDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[460px] rounded-sm border-[#1E5C3C] bg-[#0C120F] p-0 font-mono text-[#DCEAE1] shadow-[0_0_50px_rgba(0,0,0,0.55)]">
+      <DialogContent className="w-screen max-w-[100vw] rounded-none border-[#1E5C3C] bg-[#0C120F] p-0 font-mono text-[#DCEAE1] shadow-[0_0_50px_rgba(0,0,0,0.55)] md:w-auto md:max-w-[460px] md:rounded-sm">
         <DialogHeader>
           <div className="border-b border-[#1C2B22] px-4 py-3">
-            <DialogTitle className="flex items-center gap-2 font-mono text-[11px] font-black uppercase tracking-[0.18em] text-[#36E27B]">
+            <DialogTitle className="flex items-center gap-2 font-mono text-[12px] font-black uppercase tracking-[0.18em] text-[#36E27B]">
               <UserCheck className="h-4 w-4" />
               Change Call Sign
             </DialogTitle>
           </div>
-          <DialogDescription className="px-4 pt-3 font-mono text-[8px] uppercase leading-relaxed tracking-[0.12em] text-[#76897D]">
+          <DialogDescription className="px-4 pt-3 font-mono text-[10px] uppercase leading-relaxed tracking-[0.12em] text-[#76897D]">
             Your call sign is the operator handle other users see inside SecureChat.
           </DialogDescription>
         </DialogHeader>
@@ -215,10 +215,10 @@ export const EditCallSignDialog = ({
             <div className="flex items-start gap-2">
               <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#F2B43C]" />
               <div>
-                <p className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-[#F2B43C]">
+                <p className="font-mono text-[10px] font-black uppercase tracking-[0.16em] text-[#F2B43C]">
                   Change limits
                 </p>
-                <ul className="mt-2 space-y-1 font-mono text-[8px] uppercase leading-relaxed tracking-[0.1em] text-[#FFE0A8]/75">
+                <ul className="mt-2 space-y-1 font-mono text-[10px] uppercase leading-relaxed tracking-[0.1em] text-[#FFE0A8]/75">
                   <li>Once per month</li>
                   <li>Maximum 3 changes per year</li>
                   <li className="text-[#FFE0A8]">Changes remaining this year: {remainingChanges}</li>
@@ -231,7 +231,7 @@ export const EditCallSignDialog = ({
             <div className="border border-[#5C2420] bg-[#8C1D18]/20 p-3">
               <div className="flex items-start gap-2">
                 <Info className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#FF6B61]" />
-                <p className="font-mono text-[8px] uppercase leading-relaxed tracking-[0.1em] text-[#FFE0DC]/85">
+                <p className="font-mono text-[10px] uppercase leading-relaxed tracking-[0.1em] text-[#FFE0DC]/85">
                   {changeRestrictionMessage}
                 </p>
               </div>
@@ -239,7 +239,7 @@ export const EditCallSignDialog = ({
           )}
 
           <div>
-            <label className="mb-2 block font-mono text-[8px] font-black uppercase tracking-[0.18em] text-[#76897D]">
+            <label className="mb-2 block font-mono text-[10px] font-black uppercase tracking-[0.18em] text-[#76897D]">
               New call sign
             </label>
             <Input
@@ -250,18 +250,18 @@ export const EditCallSignDialog = ({
                 setError(null);
               }}
               placeholder="ENTER CALL SIGN"
-              className="h-10 rounded-sm border-[#1C2B22] bg-[#070B09] font-mono text-[12px] text-[#ECF7F0] placeholder:text-[#4A5A50] focus-visible:ring-[#36E27B]"
+              className="h-10 rounded-sm border-[#1C2B22] bg-[#070B09] font-mono text-[13px] text-[#ECF7F0] placeholder:text-[#4A5A50] focus-visible:ring-[#36E27B]"
               disabled={!canChange || saving || checking}
               maxLength={20}
             />
-            <p className="mt-2 font-mono text-[8px] uppercase tracking-[0.12em] text-[#76897D]">
+            <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[#76897D]">
               2-20 characters - letters, numbers, underscores, and hyphens only.
             </p>
           </div>
 
           {error && (
             <div className="border border-[#5C2420] bg-[#8C1D18]/20 p-3">
-              <p className="font-mono text-[8px] uppercase leading-relaxed tracking-[0.1em] text-[#FF6B61]">{error}</p>
+              <p className="font-mono text-[10px] uppercase leading-relaxed tracking-[0.1em] text-[#FF6B61]">{error}</p>
             </div>
           )}
 
@@ -269,14 +269,14 @@ export const EditCallSignDialog = ({
             <Button
               variant="outline"
               onClick={onClose}
-              className="h-9 rounded-sm border-[#1C2B22] bg-transparent px-4 font-mono text-[8px] font-black uppercase tracking-[0.16em] text-[#76897D] hover:border-[#1E5C3C] hover:bg-[#36E27B]/10 hover:text-[#DCEAE1]"
+              className="h-9 rounded-sm border-[#1C2B22] bg-transparent px-4 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-[#76897D] hover:border-[#1E5C3C] hover:bg-[#36E27B]/10 hover:text-[#DCEAE1]"
             >
               Cancel
             </Button>
             <Button
               onClick={handleSave}
               disabled={!canChange || saving || checking || newCallSign.trim() === currentCallSign}
-              className="h-9 rounded-sm bg-[#36E27B] px-4 font-mono text-[8px] font-black uppercase tracking-[0.16em] text-[#06130B] hover:bg-[#7BEFA9]"
+              className="h-9 rounded-sm bg-[#36E27B] px-4 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-[#06130B] hover:bg-[#7BEFA9]"
             >
               {checking ? (
                 <>
