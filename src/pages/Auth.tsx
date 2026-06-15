@@ -24,6 +24,8 @@ import {
   MessageSquare,
   Palette,
   Shield,
+  ShieldCheck,
+  Smartphone,
   TimerReset,
   User,
   UserCheck,
@@ -36,6 +38,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { FORTRESS_VERSION } from '@/lib/fortress';
 
 type ProfileInput = {
   email: string | null;
@@ -65,38 +68,43 @@ const getAuthError = (error: unknown): AuthError => {
 
 const coreFeatures = [
   {
-    icon: Shield,
-    title: 'Protected messaging channels.',
-    text: 'Conversations run inside authenticated, access-controlled channels, with privacy tools layered on top for sensitive messages and media.',
+    icon: ShieldCheck,
+    title: 'End-to-end encryption.',
+    text: 'Once your keys are set, messages are sealed on your device with your own identity key and opened only on your recipient’s. The server stores ciphertext — never your words. Keys never leave your device.',
   },
   {
     icon: KeyRound,
     title: 'Key-locked media.',
-    text: 'Send a key-protected image or file that will not open without its decryption key. Share the key separately so the payload stays sealed until the right person unlocks it.',
+    text: 'Send a key-protected image or file that will not open without its one-time key. Share the key separately so the payload stays sealed until the right person unlocks it.',
   },
   {
     icon: Flame,
     title: 'Burn after reading.',
-    text: 'Hit the burn button and the message is scheduled to delete for both people two minutes after it is opened.',
+    text: 'Arm the burn and the message is scheduled to delete for both people two minutes after it is opened.',
   },
   {
     icon: ImageIcon,
     title: 'Send more than text.',
-    text: 'Share images, GIFs, files, and secure payloads without leaving the workspace.',
+    text: 'Share images, GIFs, files, and sealed payloads without leaving the channel.',
   },
   {
     icon: UserCheck,
     title: 'Call signs, not public names.',
-    text: 'Identify team members by call sign instead of exposing more personal detail than needed.',
+    text: 'Operate under a call sign instead of exposing more personal detail than the mission needs.',
   },
   {
-    icon: Users,
-    title: 'Built for teams.',
-    text: 'Group conversations, status updates, and privacy controls keep communication organized and contained.',
+    icon: Smartphone,
+    title: 'Installable on any device.',
+    text: 'Run SecureChat as an installable app on phone or desktop — full-screen, with a mobile build built for the field.',
   },
 ];
 
 const availablePrivacyControls = [
+  {
+    icon: ShieldCheck,
+    title: 'End-to-end encryption',
+    text: 'Generate identity keys on your device and your messages are sealed — once set up, the server only ever sees ciphertext.',
+  },
   {
     icon: Flame,
     title: 'Burn-after-read messages',
@@ -116,11 +124,6 @@ const availablePrivacyControls = [
     icon: EyeOff,
     title: 'Chat visibility controls',
     text: 'Control typing indicators, read receipts, message previews, and media behavior.',
-  },
-  {
-    icon: Palette,
-    title: 'Personal workspace themes',
-    text: 'Customize the workspace without changing how the team communicates.',
   },
 ];
 
@@ -150,8 +153,9 @@ const comingSoonControls = [
 const howItWorksSteps = [
   'Create your secure account.',
   'Choose your call sign.',
+  'Set up your encryption keys — a passphrase plus a one-time recovery code.',
   'Start private conversations.',
-  'Send messages, files, GIFs, and encrypted media.',
+  'Send messages, files, GIFs, and sealed media.',
   'Use key-locking or burn-after-read when something needs extra control.',
 ];
 
@@ -339,40 +343,58 @@ const AuthPage = () => {
     setAuthDialogOpen(true);
   };
 
+  const inputClass =
+    'w-full rounded-sm border border-[#1C2B22] bg-[#0F1612] py-3.5 pl-11 pr-4 font-mono text-[13px] text-[#DCEAE1] placeholder:text-[#76897D]/60 transition-colors focus:border-[#1E5C3C] focus:outline-none focus:ring-1 focus:ring-[#36E27B]/30';
+
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
-      <header className="sticky top-0 z-30 border-b border-slate-800/80 bg-slate-950/90 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+    <div className="relative min-h-screen overflow-hidden bg-[#070B09] font-mono text-[#DCEAE1] antialiased">
+      {/* Ambient atmosphere: radial glow + tactical grid + top edge light */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 z-0">
+        <div className="absolute inset-0 bg-[radial-gradient(900px_500px_at_78%_-5%,rgba(54,226,123,0.13),transparent_60%),radial-gradient(700px_500px_at_0%_100%,rgba(54,226,123,0.06),transparent_55%)]" />
+        <div className="absolute inset-0 opacity-[0.5] [background-image:linear-gradient(rgba(54,226,123,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(54,226,123,0.05)_1px,transparent_1px)] [background-size:46px_46px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_78%)]" />
+        <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-[#36E27B]/60 to-transparent" />
+      </div>
+
+      {/* Classification strip */}
+      <div className="relative z-20 flex items-center justify-center border-b border-[#5C2420]/70 bg-[#1A0B09] px-4 py-1 text-center">
+        <span className="font-mono text-[9px] font-bold uppercase tracking-[0.32em] text-[#FF6B61]/90 sm:text-[10px]">
+          SECRET//NOFORN — ENCRYPTED CHANNEL — AUTHORIZED PERSONNEL ONLY
+        </span>
+      </div>
+
+      {/* Header */}
+      <header className="sticky top-0 z-30 border-b border-[#1C2B22] bg-[#070B09]/85 backdrop-blur-md">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8">
           <a href="#top" className="flex items-center gap-3">
-            <img
-              src="/web-app-manifest-192x192.png"
-              alt="SecureChat"
-              className="h-11 w-11 rounded-xl border border-emerald-400/30 bg-emerald-500/10 p-1"
-            />
-            <div>
-              <div className="ft-head font-bold leading-tight">SecureChat</div>
-              <div className="font-mono ft-meta uppercase tracking-[0.28em] text-emerald-400">Fortress</div>
+            <div className="grid h-10 w-10 flex-none place-items-center rounded-sm border border-[#1E5C3C] bg-[#36E27B]/10 shadow-[0_0_18px_rgba(54,226,123,0.18)]">
+              <Shield className="h-5 w-5 text-[#36E27B]" />
+            </div>
+            <div className="leading-none">
+              <div className="font-mono text-[15px] font-extrabold uppercase tracking-[2px] text-[#ECF7F0]">SECURECHAT</div>
+              <div className="mt-1 font-mono text-[9px] uppercase tracking-[0.3em] text-[#36E27B]">
+                FORTRESS · {FORTRESS_VERSION}
+              </div>
             </div>
           </a>
 
-          <nav className="hidden items-center gap-6 ft-body text-slate-300 md:flex">
-            <a href="#features" className="hover:text-emerald-300">Features</a>
-            <a href="#privacy" className="hover:text-emerald-300">Privacy</a>
-            <a href="#how-it-works" className="hover:text-emerald-300">How it works</a>
+          <nav className="hidden items-center gap-7 font-mono text-[11px] uppercase tracking-[0.18em] text-[#76897D] md:flex">
+            <a href="#features" className="transition-colors hover:text-[#7BEFA9]">Features</a>
+            <a href="#privacy" className="transition-colors hover:text-[#7BEFA9]">Privacy</a>
+            <a href="#how-it-works" className="transition-colors hover:text-[#7BEFA9]">How it works</a>
           </nav>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <button
               type="button"
               onClick={() => openAuthDialog('login')}
-              className="rounded-lg border border-slate-700 px-4 py-2 ft-body font-semibold text-slate-200 transition hover:border-emerald-400/70 hover:text-emerald-300"
+              className="rounded-sm border border-[#1C2B22] px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[#DCEAE1] transition-colors hover:border-[#1E5C3C] hover:text-[#7BEFA9]"
             >
               Sign In
             </button>
             <button
               type="button"
               onClick={() => openAuthDialog('signup')}
-              className="hidden rounded-lg bg-emerald-500 px-4 py-2 ft-body font-bold text-slate-950 transition hover:bg-emerald-400 sm:inline-flex"
+              className="hidden rounded-sm bg-[#36E27B] px-4 py-2 font-mono text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#06130B] shadow-[0_0_18px_rgba(54,226,123,0.22)] transition-colors hover:bg-[#7BEFA9] sm:inline-flex"
             >
               Create Account
             </button>
@@ -380,106 +402,143 @@ const AuthPage = () => {
         </div>
       </header>
 
-      <main id="top">
-        <section className="relative overflow-hidden border-b border-slate-800">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.14),transparent_34%),linear-gradient(135deg,rgba(15,23,42,0.96),rgba(2,6,23,1))]" />
-          <div className="relative mx-auto grid min-h-[calc(100vh-76px)] max-w-7xl items-center gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1.08fr_0.92fr] lg:px-8 lg:py-16">
-            <div className="max-w-3xl">
-              <p className="mb-5 font-mono ft-body uppercase tracking-[0.35em] text-emerald-400">
-                Encrypted / Private / Controlled
-              </p>
-              <h1 className="max-w-4xl text-4xl font-black leading-[1.05] tracking-normal text-white sm:text-5xl lg:text-7xl">
-                Secure messaging for teams that need control.
+      <main id="top" className="relative z-10">
+        {/* Hero */}
+        <section className="border-b border-[#1C2B22]">
+          <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-14 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10 lg:px-8 lg:py-20">
+            <div className="max-w-2xl animate-in fade-in slide-in-from-bottom-3 duration-700">
+              <div className="mb-6 inline-flex items-center gap-2 rounded-sm border border-[#1E5C3C] bg-[#36E27B]/[0.07] px-3 py-1.5">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#36E27B] shadow-[0_0_10px_rgba(54,226,123,0.8)]" />
+                <span className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-[#36E27B]">
+                  Encrypted / Private / Controlled
+                </span>
+              </div>
+
+              <h1 className="font-mono text-4xl font-extrabold leading-[1.06] tracking-tight text-[#ECF7F0] sm:text-5xl lg:text-[64px]">
+                Encrypted comms for teams that need <span className="text-[#36E27B]">control.</span>
               </h1>
-              <p className="mt-6 max-w-2xl ft-head leading-8 text-slate-300">
-                Key-locked messages, burn-after-read, and encrypted media sharing built for fast,
-                private team communication.
-              </p>
-              <p className="mt-5 max-w-3xl ft-body leading-7 text-slate-400">
-                SecureChat is a private communication workspace for teams that need their
-                conversations to stay between the people in them. Send protected messages, lock the
-                sensitive ones behind a key only your recipient holds, share images, GIFs, and files
-                securely, and set messages to burn after they are read. Run your team under call
-                signs so communication stays fast, organized, and private in one place.
+
+              <p className="mt-6 max-w-xl font-mono text-[15px] leading-7 text-[#9FB2A6]">
+                End-to-end encryption, key-locked payloads, and burn-after-read — built for fast,
+                private team communication. Generate your keys and conversations are sealed on your
+                device, with the server holding only ciphertext — never your words.
               </p>
 
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <p className="mt-4 max-w-xl text-[13px] leading-6 text-[#76897D]">
+                SecureChat is a closed, account-based workspace — not a public network. Lock the sensitive
+                messages behind a key only your recipient holds, share images, GIFs, and files securely,
+                and run your team under call signs so comms stay fast, organized, and contained.
+              </p>
+
+              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                 <button
                   type="button"
                   onClick={() => openAuthDialog('signup')}
-                  className="inline-flex items-center justify-center rounded-lg bg-emerald-500 px-6 py-3 ft-body font-black text-slate-950 transition hover:bg-emerald-400"
+                  className="group inline-flex items-center justify-center rounded-sm bg-[#36E27B] px-6 py-3.5 font-mono text-[13px] font-extrabold uppercase tracking-[0.14em] text-[#06130B] shadow-[0_0_22px_rgba(54,226,123,0.22)] transition-all hover:bg-[#7BEFA9] hover:shadow-[0_0_30px_rgba(54,226,123,0.32)]"
                 >
                   Create Account
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </button>
                 <button
                   type="button"
                   onClick={() => openAuthDialog('login')}
-                  className="inline-flex items-center justify-center rounded-lg border border-slate-700 px-6 py-3 ft-body font-bold text-slate-100 transition hover:border-emerald-400/70 hover:text-emerald-300"
+                  className="inline-flex items-center justify-center rounded-sm border border-[#1C2B22] px-6 py-3.5 font-mono text-[13px] font-bold uppercase tracking-[0.14em] text-[#DCEAE1] transition-colors hover:border-[#1E5C3C] hover:text-[#7BEFA9]"
                 >
                   Sign In
                 </button>
                 <a
                   href="#how-it-works"
-                  className="inline-flex items-center justify-center rounded-lg px-6 py-3 ft-body font-bold text-slate-300 transition hover:text-emerald-300"
+                  className="inline-flex items-center justify-center px-2 py-3.5 font-mono text-[13px] font-bold uppercase tracking-[0.14em] text-[#76897D] transition-colors hover:text-[#7BEFA9]"
                 >
-                  See how it works
+                  See how it works →
                 </a>
+              </div>
+
+              <div className="mt-9 flex items-center gap-5 border-t border-[#141E18] pt-5 font-mono text-[10px] uppercase tracking-[0.18em] text-[#4A5A50]">
+                <span className="inline-flex items-center gap-1.5"><Lock className="h-3 w-3 text-[#36E27B]" /> X25519 · XChaCha20</span>
+                <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-3 w-3 text-[#36E27B]" /> Keys on device</span>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-emerald-500/20 bg-slate-900/70 p-4 shadow-2xl shadow-emerald-950/40 backdrop-blur">
-              <div className="rounded-xl border border-slate-700 bg-slate-950">
-                <div className="flex items-center justify-between border-b border-slate-800 px-4 py-3">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500 text-slate-950">
-                      <Shield className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <div className="font-bold">Fortress Channel</div>
-                      <div className="font-mono ft-meta uppercase text-emerald-400">Channel active</div>
-                    </div>
-                  </div>
-                  <Lock className="h-5 w-5 text-emerald-400" />
-                </div>
+            {/* Hero device preview — coded Fortress Channel card */}
+            <div className="relative animate-in fade-in slide-in-from-bottom-5 duration-1000">
+              {/* ambient glow + floating lock */}
+              <div aria-hidden className="absolute -inset-10 -z-10 bg-[radial-gradient(closest-side,rgba(54,226,123,0.16),transparent)]" />
+              <div aria-hidden className="absolute -left-7 top-1/3 hidden h-16 w-16 place-items-center rounded-xl border border-[#1E5C3C] bg-[#0C120F]/80 shadow-[0_0_30px_rgba(54,226,123,0.25)] backdrop-blur-sm lg:grid">
+                <Lock className="h-7 w-7 animate-pulse text-[#36E27B]" />
+              </div>
 
-                <div className="space-y-4 p-5">
-                  <div className="max-w-[82%] rounded-lg border border-slate-700 bg-slate-800 p-4">
-                    <div className="mb-2 inline-flex rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 font-mono ft-meta text-emerald-300">
-                      Raven
+              <div className="rounded-lg border border-[#1E5C3C]/70 bg-[#0C120F]/80 p-3 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8),0_0_50px_-12px_rgba(54,226,123,0.2)] backdrop-blur-md lg:[transform:perspective(1600px)_rotateY(-9deg)_rotateX(3deg)]">
+                <div className="overflow-hidden rounded-md border border-[#1C2B22] bg-[#070B09]">
+                  {/* card header */}
+                  <div className="flex items-center justify-between border-b border-[#141E18] bg-[#0C120F] px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <div className="grid h-9 w-9 place-items-center rounded-sm bg-[#36E27B] shadow-[0_0_16px_rgba(54,226,123,0.45)]">
+                        <Shield className="h-4 w-4 text-[#06130B]" />
+                      </div>
+                      <div className="leading-none">
+                        <div className="font-mono text-[13px] font-bold text-[#ECF7F0]">Fortress Channel</div>
+                        <div className="mt-1 flex items-center gap-1.5">
+                          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#36E27B]" />
+                          <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#36E27B]">Channel active</span>
+                        </div>
+                      </div>
                     </div>
-                    <p className="ft-body text-slate-200">Status check complete. Moving to private channel.</p>
-                    <div className="mt-3 flex items-center gap-2 font-mono ft-meta uppercase text-emerald-400">
-                      <Shield className="h-3.5 w-3.5" />
-                      Encrypted
-                    </div>
-                  </div>
-
-                  <div className="ml-auto max-w-[82%] rounded-lg border border-emerald-500/70 bg-black p-4 shadow-lg shadow-emerald-950/50">
-                    <div className="mb-3 flex items-center gap-2 font-mono ft-meta uppercase text-emerald-300">
-                      <FileKey2 className="h-4 w-4" />
-                      Key-locked payload
-                    </div>
-                    <div className="rounded-md border border-emerald-500/30 bg-emerald-500/10 p-3 ft-body text-emerald-100">
-                      File sealed. Recipient needs the one-time key to unlock it.
-                    </div>
-                    <div className="mt-3 flex items-center justify-between border-t border-emerald-900/70 pt-3 font-mono ft-meta uppercase text-emerald-400">
-                      <span>Burn optional</span>
-                      <Flame className="h-4 w-4" />
-                    </div>
+                    <Lock className="h-4 w-4 text-[#36E27B]" />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3 pt-2">
-                    <div className="rounded-lg border border-slate-800 bg-slate-900 p-3">
-                      <MessageSquare className="mb-3 h-5 w-5 text-cyan-300" />
-                      <div className="ft-body font-bold">Direct chat</div>
-                      <div className="ft-meta text-slate-500">Private messages</div>
+                  <div className="space-y-3 p-4">
+                    {/* incoming message */}
+                    <div className="max-w-[85%] rounded-md rounded-bl-sm border border-[#1C2B22] bg-[#101814] p-3.5">
+                      <div className="mb-2 inline-flex rounded-sm border border-[#1E5C3C] bg-[#36E27B]/10 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-[0.12em] text-[#7BEFA9]">
+                        Raven
+                      </div>
+                      <p className="font-mono text-[12px] leading-relaxed text-[#DCEAE1]">
+                        Status check complete. Moving to private channel.
+                      </p>
+                      <div className="mt-2.5 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.1em] text-[#5C6E63]">
+                        <span className="inline-flex items-center gap-1 text-[#36E27B]"><ShieldCheck className="h-3 w-3" /> Encrypted</span>
+                        <span>10:24 ✓✓</span>
+                      </div>
                     </div>
-                    <div className="rounded-lg border border-slate-800 bg-slate-900 p-3">
-                      <TimerReset className="mb-3 h-5 w-5 text-orange-300" />
-                      <div className="ft-body font-bold">Burn mode</div>
-                      <div className="ft-meta text-slate-500">Two minute timer</div>
+
+                    {/* key-locked payload */}
+                    <div className="rounded-md border border-[#1E5C3C] bg-black/70 p-3.5 shadow-[0_0_24px_-8px_rgba(54,226,123,0.3)]">
+                      <div className="mb-3 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="grid h-7 w-7 place-items-center rounded-sm border border-[#1E5C3C] bg-[#36E27B]/10">
+                            <Lock className="h-3.5 w-3.5 text-[#36E27B]" />
+                          </div>
+                          <span className="font-mono text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#36E27B]">Key-locked payload</span>
+                        </div>
+                        <ShieldCheck className="h-4 w-4 text-[#36E27B]/70" />
+                      </div>
+                      <div className="rounded-sm border border-[#1C2B22] bg-[#0F1612] p-3 font-mono text-[11px] leading-relaxed text-[#DCEAE1]">
+                        File sealed. Recipient needs the one-time key to unlock it.
+                      </div>
+                      <div className="mt-3 flex items-center justify-between border-t border-[#141E18] pt-2.5 font-mono text-[9px] uppercase tracking-[0.14em] text-[#36E27B]">
+                        <span>Burn after read</span>
+                        <Flame className="h-3.5 w-3.5" />
+                      </div>
                     </div>
+
+                    {/* mode tiles */}
+                    <div className="grid grid-cols-2 gap-2.5">
+                      <div className="rounded-md border border-[#1C2B22] bg-[#0C120F] p-3">
+                        <MessageSquare className="mb-2.5 h-4 w-4 text-[#7BEFA9]" />
+                        <div className="font-mono text-[11px] font-bold text-[#ECF7F0]">Direct chat</div>
+                        <div className="font-mono text-[9px] uppercase tracking-[0.08em] text-[#5C6E63]">Private messages</div>
+                      </div>
+                      <div className="rounded-md border border-[#1C2B22] bg-[#0C120F] p-3">
+                        <Flame className="mb-2.5 h-4 w-4 text-[#F2792B]" />
+                        <div className="font-mono text-[11px] font-bold text-[#ECF7F0]">Burn mode</div>
+                        <div className="font-mono text-[9px] uppercase tracking-[0.08em] text-[#5C6E63]">Self-destruct</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 border-t border-[#141E18] px-4 py-2.5 font-mono text-[9px] uppercase tracking-[0.18em] text-[#4A5A50]">
+                    <ShieldCheck className="h-3 w-3 text-[#36E27B]" /> End-to-end encrypted · keys on device only
                   </div>
                 </div>
               </div>
@@ -487,27 +546,36 @@ const AuthPage = () => {
           </div>
         </section>
 
-        <section id="features" className="border-b border-slate-800 bg-slate-950 px-4 py-16 sm:px-6 lg:px-8">
+        {/* Features */}
+        <section id="features" className="border-b border-[#1C2B22] px-4 py-16 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl">
             <div className="max-w-3xl">
-              <p className="font-mono ft-body uppercase tracking-[0.3em] text-emerald-400">What you can do</p>
-              <h2 className="mt-3 text-3xl font-black text-white sm:text-4xl">
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.3em] text-[#36E27B]">What you can do</p>
+              <h2 className="mt-3 font-mono text-3xl font-extrabold tracking-tight text-[#ECF7F0] sm:text-4xl">
                 A private workspace for sensitive team conversations.
               </h2>
-              <p className="mt-4 text-slate-400">
-                SecureChat is a closed, account-based messaging space, not a public network. Once
-                you are in, every conversation runs through channels you control.
+              <p className="mt-4 text-[14px] leading-7 text-[#76897D]">
+                Once you are in, every conversation runs through channels you control — sealed end-to-end,
+                with privacy tools layered on top for the traffic that needs them.
               </p>
             </div>
 
-            <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {coreFeatures.map((feature) => {
+            <div className="mt-10 grid gap-3.5 md:grid-cols-2 xl:grid-cols-3">
+              {coreFeatures.map((feature, i) => {
                 const Icon = feature.icon;
                 return (
-                  <article key={feature.title} className="rounded-lg border border-slate-800 bg-slate-900/70 p-5">
-                    <Icon className="mb-4 h-6 w-6 text-emerald-400" />
-                    <h3 className="ft-head font-bold text-white">{feature.title}</h3>
-                    <p className="mt-3 ft-body leading-6 text-slate-400">{feature.text}</p>
+                  <article
+                    key={feature.title}
+                    className="group rounded-md border border-[#1C2B22] bg-[#0C120F]/80 p-5 transition-colors hover:border-[#1E5C3C]"
+                  >
+                    <div className="mb-4 inline-grid h-10 w-10 place-items-center rounded-sm border border-[#1E5C3C] bg-[#36E27B]/10 text-[#36E27B] transition-shadow group-hover:shadow-[0_0_18px_rgba(54,226,123,0.22)]">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <h3 className="font-mono text-[15px] font-bold text-[#ECF7F0]">{feature.title}</h3>
+                    <p className="mt-2.5 text-[13px] leading-6 text-[#76897D]">{feature.text}</p>
+                    <div className="mt-4 font-mono text-[9px] uppercase tracking-[0.22em] text-[#2BC46A]/60">
+                      {String(i + 1).padStart(2, '0')} / 06
+                    </div>
                   </article>
                 );
               })}
@@ -515,22 +583,23 @@ const AuthPage = () => {
           </div>
         </section>
 
-        <section id="privacy" className="border-b border-slate-800 bg-slate-900 px-4 py-16 sm:px-6 lg:px-8">
+        {/* Privacy */}
+        <section id="privacy" className="border-b border-[#1C2B22] bg-[#0A0F0C] px-4 py-16 sm:px-6 lg:px-8">
           <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.85fr_1.15fr]">
             <div>
-              <p className="font-mono ft-body uppercase tracking-[0.3em] text-emerald-400">Privacy tools</p>
-              <h2 className="mt-3 text-3xl font-black text-white sm:text-4xl">
-                Simple controls that make private messaging feel private.
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.3em] text-[#36E27B]">Privacy tools</p>
+              <h2 className="mt-3 font-mono text-3xl font-extrabold tracking-tight text-[#ECF7F0] sm:text-4xl">
+                Controls that make private messaging actually private.
               </h2>
-              <p className="mt-4 text-slate-400">
-                Start with the tools that already matter in daily use, then grow into stronger
-                device-based controls as the mobile app matures.
+              <p className="mt-4 text-[14px] leading-7 text-[#76897D]">
+                Start with the tools that matter in daily use — encryption is on by default once your keys
+                are set — then grow into stronger device-based controls as the mobile app matures.
               </p>
             </div>
 
-            <div className="grid gap-4 xl:grid-cols-2">
-              <div className="rounded-lg border border-emerald-500/30 bg-slate-950 p-5">
-                <div className="mb-5 inline-flex rounded-full bg-emerald-500 px-3 py-1 ft-meta font-black uppercase text-slate-950">
+            <div className="grid gap-3.5 xl:grid-cols-2">
+              <div className="rounded-md border border-[#1E5C3C] bg-[#0C120F] p-5">
+                <div className="mb-5 inline-flex rounded-sm bg-[#36E27B] px-2.5 py-1 font-mono text-[10px] font-extrabold uppercase tracking-[0.18em] text-[#06130B]">
                   Available now
                 </div>
                 <div className="space-y-4">
@@ -538,10 +607,10 @@ const AuthPage = () => {
                     const Icon = item.icon;
                     return (
                       <div key={item.title} className="flex gap-3">
-                        <Icon className="mt-1 h-5 w-5 shrink-0 text-emerald-400" />
+                        <Icon className="mt-0.5 h-4 w-4 shrink-0 text-[#36E27B]" />
                         <div>
-                          <h3 className="font-bold text-white">{item.title}</h3>
-                          <p className="ft-body text-slate-400">{item.text}</p>
+                          <h3 className="font-mono text-[13px] font-bold text-[#ECF7F0]">{item.title}</h3>
+                          <p className="mt-0.5 text-[12px] leading-5 text-[#76897D]">{item.text}</p>
                         </div>
                       </div>
                     );
@@ -549,8 +618,8 @@ const AuthPage = () => {
                 </div>
               </div>
 
-              <div className="rounded-lg border border-slate-700 bg-slate-950 p-5">
-                <div className="mb-5 inline-flex rounded-full border border-slate-600 px-3 py-1 ft-meta font-black uppercase text-slate-300">
+              <div className="rounded-md border border-[#1C2B22] bg-[#0C120F] p-5">
+                <div className="mb-5 inline-flex rounded-sm border border-[#6B4E16] bg-[#F2B43C]/10 px-2.5 py-1 font-mono text-[10px] font-extrabold uppercase tracking-[0.18em] text-[#F2B43C]">
                   Coming soon
                 </div>
                 <div className="space-y-4">
@@ -558,10 +627,10 @@ const AuthPage = () => {
                     const Icon = item.icon;
                     return (
                       <div key={item.title} className="flex gap-3">
-                        <Icon className="mt-1 h-5 w-5 shrink-0 text-cyan-300" />
+                        <Icon className="mt-0.5 h-4 w-4 shrink-0 text-[#F2B43C]/80" />
                         <div>
-                          <h3 className="font-bold text-white">{item.title}</h3>
-                          <p className="ft-body text-slate-400">{item.text}</p>
+                          <h3 className="font-mono text-[13px] font-bold text-[#ECF7F0]">{item.title}</h3>
+                          <p className="mt-0.5 text-[12px] leading-5 text-[#76897D]">{item.text}</p>
                         </div>
                       </div>
                     );
@@ -572,97 +641,100 @@ const AuthPage = () => {
           </div>
         </section>
 
-        <section id="how-it-works" className="border-b border-slate-800 bg-slate-950 px-4 py-16 sm:px-6 lg:px-8">
+        {/* How it works */}
+        <section id="how-it-works" className="border-b border-[#1C2B22] px-4 py-16 sm:px-6 lg:px-8">
           <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-2">
             <div>
-              <p className="font-mono ft-body uppercase tracking-[0.3em] text-emerald-400">How it works</p>
-              <h2 className="mt-3 text-3xl font-black text-white sm:text-4xl">
-                Get in, pick a call sign, and keep the conversation contained.
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.3em] text-[#36E27B]">How it works</p>
+              <h2 className="mt-3 font-mono text-3xl font-extrabold tracking-tight text-[#ECF7F0] sm:text-4xl">
+                Get in, pick a call sign, set your keys, stay contained.
               </h2>
-              <div className="mt-8 space-y-4">
+              <div className="mt-8 space-y-2.5">
                 {howItWorksSteps.map((step, index) => (
-                  <div key={step} className="flex gap-4 rounded-lg border border-slate-800 bg-slate-900 p-4">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500 font-mono font-black text-slate-950">
+                  <div key={step} className="flex items-center gap-4 rounded-md border border-[#1C2B22] bg-[#0C120F] p-3.5">
+                    <div className="grid h-8 w-8 shrink-0 place-items-center rounded-sm border border-[#1E5C3C] bg-[#36E27B]/10 font-mono text-[13px] font-extrabold text-[#36E27B]">
                       {index + 1}
                     </div>
-                    <p className="pt-1 text-slate-200">{step}</p>
+                    <p className="text-[13px] leading-5 text-[#DCEAE1]">{step}</p>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="rounded-lg border border-emerald-500/30 bg-black p-6">
-              <div className="mb-4 flex items-center gap-3 text-emerald-400">
-                <KeyRound className="h-6 w-6" />
-                <h3 className="text-2xl font-black text-white">How key-locked messages work</h3>
+            <div className="rounded-md border border-[#1E5C3C] bg-black/60 p-6 shadow-[0_0_40px_-16px_rgba(54,226,123,0.25)]">
+              <div className="mb-4 flex items-center gap-3">
+                <KeyRound className="h-6 w-6 text-[#36E27B]" />
+                <h3 className="font-mono text-xl font-extrabold text-[#ECF7F0]">How key-locked messages work</h3>
               </div>
-              <p className="text-slate-300">
-                Encrypt your message or media, send it, and SecureChat gives you a one-time
-                decryption key. Pass that key to your recipient through a separate channel.
-                Without it, the payload stays locked. No key, no message.
+              <p className="text-[13px] leading-7 text-[#9FB2A6]">
+                Encrypt your message or media, send it, and SecureChat gives you a one-time decryption key.
+                Pass that key to your recipient through a separate channel. Without it, the payload stays
+                locked. No key, no message.
               </p>
-              <div className="mt-6 rounded-lg border border-amber-400/30 bg-amber-400/10 p-4 ft-body text-amber-100">
-                Built-in privacy tools reduce what you expose, but no tool replaces good judgment.
-                Only share sensitive information with people you trust.
+              <div className="mt-6 rounded-sm border border-[#6B4E16] bg-[#F2B43C]/[0.08] p-4 text-[12px] leading-6 text-[#F2D79B]">
+                Built-in encryption and privacy tools reduce what you expose, but no tool replaces good
+                judgment. Only share sensitive information with people you trust.
               </div>
             </div>
           </div>
         </section>
 
-        <section className="bg-slate-900 px-4 py-16 sm:px-6 lg:px-8">
-          <div className="mx-auto grid max-w-7xl gap-6 rounded-xl border border-slate-700 bg-slate-950 p-8 md:grid-cols-[1fr_auto] md:items-center">
+        {/* CTA */}
+        <section className="px-4 py-16 sm:px-6 lg:px-8">
+          <div className="mx-auto grid max-w-7xl items-center gap-6 rounded-lg border border-[#1E5C3C] bg-[#0C120F] p-8 shadow-[0_0_50px_-18px_rgba(54,226,123,0.25)] md:grid-cols-[1fr_auto]">
             <div className="max-w-3xl">
-              <p className="font-mono ft-body uppercase tracking-[0.3em] text-emerald-400">Ready to go dark?</p>
-              <h2 className="mt-3 text-3xl font-black text-white">
-                Create an account and start sending messages that stay yours.
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.3em] text-[#36E27B]">Ready to go dark?</p>
+              <h2 className="mt-3 font-mono text-2xl font-extrabold tracking-tight text-[#ECF7F0] sm:text-3xl">
+                Create an account and send messages that stay yours.
               </h2>
-              <p className="mt-3 text-slate-400">
-                Use key-locking when the payload needs another layer, and burn-after-read when the
-                message should disappear after it is opened.
+              <p className="mt-3 text-[13px] leading-6 text-[#76897D]">
+                Encryption on by default once your keys are set. Use key-locking when the payload needs
+                another layer, and burn-after-read when the message should disappear after it is opened.
               </p>
             </div>
             <button
               type="button"
               onClick={() => openAuthDialog('signup')}
-              className="inline-flex w-full items-center justify-center rounded-lg bg-emerald-500 px-6 py-3 ft-body font-black text-slate-950 transition hover:bg-emerald-400 md:w-auto"
+              className="group inline-flex w-full items-center justify-center rounded-sm bg-[#36E27B] px-6 py-3.5 font-mono text-[13px] font-extrabold uppercase tracking-[0.14em] text-[#06130B] shadow-[0_0_22px_rgba(54,226,123,0.22)] transition-all hover:bg-[#7BEFA9] md:w-auto"
             >
               Create Account
-              <ArrowRight className="ml-2 h-5 w-5" />
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </button>
           </div>
         </section>
       </main>
 
-      <footer className="border-t border-slate-800 bg-slate-950 px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 ft-body text-slate-500 sm:flex-row sm:items-center sm:justify-between">
-          <span>SecureChat by Johnathan Carlson.</span>
-          <span className="inline-flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-            Firebase authentication and enforced access rules protect account access.
+      <footer className="relative z-10 border-t border-[#1C2B22] bg-[#070B09] px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 font-mono text-[11px] uppercase tracking-[0.14em] text-[#4A5A50] sm:flex-row sm:items-center sm:justify-between">
+          <span>SecureChat · Fortress {FORTRESS_VERSION} · by Johnathan Carlson</span>
+          <span className="inline-flex items-center gap-2 text-[#5C6E63]">
+            <CheckCircle2 className="h-3.5 w-3.5 text-[#36E27B]" />
+            Firebase auth + enforced access rules + on-device keys
           </span>
         </div>
       </footer>
 
+      {/* Auth Dialog */}
       <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto border-slate-700 bg-slate-900 text-white sm:max-w-md">
+        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-sm border-[#1E5C3C] bg-[#0C120F] font-mono text-[#DCEAE1] sm:max-w-md">
           <DialogHeader>
-            <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500">
-              <Shield className="h-8 w-8 text-slate-950" />
+            <div className="mx-auto mb-3 grid h-14 w-14 place-items-center rounded-sm border border-[#1E5C3C] bg-[#36E27B]/10 shadow-[0_0_22px_rgba(54,226,123,0.25)]">
+              <Shield className="h-7 w-7 text-[#36E27B]" />
             </div>
-            <DialogTitle className="text-center text-2xl font-black">
-              {isLogin ? "Let's get you logged in" : 'Create your account'}
+            <DialogTitle className="text-center font-mono text-xl font-extrabold uppercase tracking-[0.12em] text-[#ECF7F0]">
+              {isLogin ? 'Access terminal' : 'Establish identity'}
             </DialogTitle>
-            <DialogDescription className="text-center text-slate-400">
-              {isLogin ? 'Access your secure account.' : 'Set up your secure workspace in seconds.'}
+            <DialogDescription className="text-center font-mono text-[11px] uppercase tracking-[0.14em] text-[#76897D]">
+              {isLogin ? 'Sign in to your secure channel.' : 'Set up your secure workspace in seconds.'}
             </DialogDescription>
           </DialogHeader>
 
           <button
             onClick={handleGoogleSignIn}
             disabled={loading}
-            className="mt-2 flex w-full items-center justify-center rounded-xl bg-white px-6 py-4 ft-head font-bold text-slate-900 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-2 flex w-full items-center justify-center rounded-sm border border-[#1C2B22] bg-[#0F1612] px-6 py-3.5 font-mono text-[13px] font-bold text-[#DCEAE1] transition-colors hover:border-[#1E5C3C] hover:bg-[#101814] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <svg className="mr-3 h-6 w-6" viewBox="0 0 24 24">
+            <svg className="mr-3 h-5 w-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
               <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
@@ -672,101 +744,101 @@ const AuthPage = () => {
           </button>
 
           <div className="flex items-center gap-4">
-            <div className="h-px flex-1 bg-slate-700" />
-            <span className="ft-body text-slate-500">or</span>
-            <div className="h-px flex-1 bg-slate-700" />
+            <div className="h-px flex-1 bg-[#1C2B22]" />
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#4A5A50]">or</span>
+            <div className="h-px flex-1 bg-[#1C2B22]" />
           </div>
 
-          <form onSubmit={handleAuth} className="space-y-4">
+          <form onSubmit={handleAuth} className="space-y-3.5">
             {!isLogin && (
               <>
                 <div className="relative">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                    <User className="h-5 w-5 text-emerald-500" />
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                    <User className="h-4 w-4 text-[#36E27B]" />
                   </div>
                   <input
-                    placeholder="Enter First Name"
+                    placeholder="First name"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     required
                     autoComplete="given-name"
-                    className="w-full rounded-xl border border-slate-700 bg-slate-800 py-4 pl-12 pr-4 text-white placeholder-slate-400 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className={inputClass}
                   />
                 </div>
 
                 <div className="relative">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                    <User className="h-5 w-5 text-emerald-500" />
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                    <User className="h-4 w-4 text-[#36E27B]" />
                   </div>
                   <input
-                    placeholder="Enter Last Name"
+                    placeholder="Last name"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     required
                     autoComplete="family-name"
-                    className="w-full rounded-xl border border-slate-700 bg-slate-800 py-4 pl-12 pr-4 text-white placeholder-slate-400 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className={inputClass}
                   />
                 </div>
 
                 <div className="relative">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                    <UserCheck className="h-5 w-5 text-emerald-500" />
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                    <UserCheck className="h-4 w-4 text-[#36E27B]" />
                   </div>
                   <input
-                    placeholder="Enter Call Sign"
+                    placeholder="Call sign"
                     value={callSign}
                     onChange={(e) => setCallSign(e.target.value)}
                     required
                     autoComplete="username"
-                    className="w-full rounded-xl border border-slate-700 bg-slate-800 py-4 pl-12 pr-4 text-white placeholder-slate-400 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className={inputClass}
                   />
                 </div>
               </>
             )}
 
             <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                <Mail className="h-5 w-5 text-emerald-500" />
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                <Mail className="h-4 w-4 text-[#36E27B]" />
               </div>
               <input
                 type="email"
-                placeholder="Enter Email Address"
+                placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoComplete="email"
-                className="w-full rounded-xl border border-slate-700 bg-slate-800 py-4 pl-12 pr-4 text-white placeholder-slate-400 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className={inputClass}
               />
             </div>
 
             <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                <Lock className="h-5 w-5 text-emerald-500" />
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                <Lock className="h-4 w-4 text-[#36E27B]" />
               </div>
               <input
                 type="password"
-                placeholder="Enter Password"
+                placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 autoComplete={isLogin ? 'current-password' : 'new-password'}
-                className="w-full rounded-xl border border-slate-700 bg-slate-800 py-4 pl-12 pr-4 text-white placeholder-slate-400 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className={inputClass}
               />
             </div>
 
             {!isLogin && (
               <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                  <Lock className="h-5 w-5 text-emerald-500" />
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                  <Lock className="h-4 w-4 text-[#36E27B]" />
                 </div>
                 <input
                   type="password"
-                  placeholder="Confirm Password"
+                  placeholder="Confirm password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required={!isLogin}
                   autoComplete="new-password"
-                  className="w-full rounded-xl border border-slate-700 bg-slate-800 py-4 pl-12 pr-4 text-white placeholder-slate-400 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className={inputClass}
                 />
               </div>
             )}
@@ -774,35 +846,35 @@ const AuthPage = () => {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-center rounded-xl bg-emerald-500 px-6 py-4 ft-head font-black text-slate-950 transition-colors hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex w-full items-center justify-center rounded-sm bg-[#36E27B] px-6 py-3.5 font-mono text-[13px] font-extrabold uppercase tracking-[0.16em] text-[#06130B] shadow-[0_0_18px_rgba(54,226,123,0.22)] transition-colors hover:bg-[#7BEFA9] disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <ArrowRight className="mr-3 h-6 w-6" />
+              <ArrowRight className="mr-2.5 h-4 w-4" />
               {loading ? 'PROCESSING...' : (isLogin ? 'SIGN IN' : 'CREATE ACCOUNT')}
             </button>
           </form>
 
           {success && (
-            <div className="rounded-xl border border-emerald-700 bg-emerald-900/50 p-4">
-              <p className="font-mono ft-body text-emerald-400">{success}</p>
+            <div className="rounded-sm border border-[#1E5C3C] bg-[#36E27B]/10 p-3.5">
+              <p className="font-mono text-[12px] text-[#7BEFA9]">{success}</p>
             </div>
           )}
 
           {error && (
-            <div className="rounded-xl border border-red-700 bg-red-900/50 p-4">
-              <pre className="whitespace-pre-wrap font-mono ft-meta text-red-400">{error}</pre>
+            <div className="rounded-sm border border-[#5C2420] bg-[#FF6B61]/[0.08] p-3.5">
+              <pre className="whitespace-pre-wrap font-mono text-[11px] leading-5 text-[#FF6B61]">{error}</pre>
             </div>
           )}
 
           <div className="text-center">
-            <p className="text-slate-400">
-              {isLogin ? "Don't have an account?" : 'Already have an account?'}{' '}
+            <p className="font-mono text-[12px] text-[#76897D]">
+              {isLogin ? "No account?" : 'Already enlisted?'}{' '}
               <button
                 type="button"
                 onClick={() => {
                   setIsLogin(!isLogin);
                   resetForm();
                 }}
-                className="font-bold text-emerald-500 transition-colors hover:text-emerald-400"
+                className="font-bold text-[#36E27B] transition-colors hover:text-[#7BEFA9]"
               >
                 {isLogin ? 'Create one' : 'Sign in'}
               </button>

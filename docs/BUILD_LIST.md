@@ -5,7 +5,7 @@ This is the source of truth so nothing gets lost between sessions.
 
 ## Conventions
 - **Version:** bump `FORTRESS_VERSION` in `src/lib/fortress.ts` on **every user-visible update**.
-  Sequence: `v2.9 → v3.0 → v3.1 → v3.2 …` (after `x.9`, roll to `(x+1).0`). Currently **v3.3**.
+  Sequence: `v2.9 → v3.0 → v3.1 → v3.2 …` (after `x.9`, roll to `(x+1).0`). Currently **v3.4**.
 - **Branch:** redesign + E2E work lives on `tactical-crispness-pass` (not merged; `main` + live Netlify untouched).
 - **Per change:** `npm run build` green + `npm test` green; small commits; security-sensitive diffs get `rafter-code-review`.
 
@@ -44,7 +44,8 @@ This is the source of truth so nothing gets lost between sessions.
 - [ ] **Responsive container-width layout** (`react-handoff/PWA_PLAN.md`): add `useLayoutMode` (ResizeObserver) → wide (≥900 two-pane) / compact (600–899 icon rail + single pane + back) / narrow (<600 = mobile build). Optionally migrate `sw.js` → `vite-plugin-pwa`/Workbox.
 
 ## Visual / UI
-- [ ] Gray/slate legacy screens → tactical palette: `Auth` landing (confirm direction — a marketing landing may intentionally stay distinct), `Onboarding`, legacy security panels (LockdownMode, ScreenLock, EncryptedFileVault, BroadcastChannels, DeadManSwitch, BurnerIdentities, GhostSessionManager).
+- [x] **Landing page (`Auth.tsx`) tactical redesign + feature sync** (v3.4) — reskinned slate/emerald → FORTRESS green/black terminal, coded glassmorphic hero, E2E-led feature story (claims softened to match the opt-in key setup + plaintext fallback). Also: `SettingRow`/`StatusPill` box-fit fixes.
+- [ ] Remaining gray/slate screens → tactical: `Onboarding`, legacy security panels (LockdownMode, ScreenLock, EncryptedFileVault, BroadcastChannels, DeadManSwitch, BurnerIdentities, GhostSessionManager).
 - [ ] Mobile: keep the Notifications number input ≥16px on mobile (avoid iOS zoom-on-focus).
 
 ## Performance (from "The Conductor Rewrite" — evaluated, worth doing)

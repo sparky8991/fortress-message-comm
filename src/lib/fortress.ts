@@ -20,7 +20,7 @@ export const FORTRESS = {
   redBorder: '#5C2420',
 } as const;
 
-export const FORTRESS_VERSION = 'v3.3';
+export const FORTRESS_VERSION = 'v3.4';
 export const FORTRESS_BUILD = '0615Z';
 
 export const alpha = (hex: string, opacity: number): string => {
