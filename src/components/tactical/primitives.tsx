@@ -52,7 +52,7 @@ export const SettingRow = ({
         {desc}
       </div>
     </div>
-    {children}
+    <div className="flex flex-none items-center">{children}</div>
   </div>
 );
 

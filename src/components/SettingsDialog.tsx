@@ -119,7 +119,7 @@ const SubLabel = ({ children }: { children: React.ReactNode }) => (
 
 const StatusPill = ({ children }: { children: React.ReactNode }) => (
   <span
-    className="rounded-sm border px-2 py-1 font-mono text-[11px] font-extrabold uppercase tracking-[1.5px]"
+    className="inline-block whitespace-nowrap rounded-sm border px-2.5 py-1 font-mono text-[11px] font-extrabold uppercase tracking-[1.5px]"
     style={{ borderColor: FORTRESS.amberBorder, color: FORTRESS.amber, background: alpha(FORTRESS.amber, 0.06) }}
   >
     {children}
