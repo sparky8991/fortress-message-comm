@@ -54,26 +54,15 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
-      // Register service worker for PWA
+      // Register the service worker for offline shell + installability.
+      // NOTE: deliberately no `controllerchange -> location.reload()` handler —
+      // that pattern spins into a refresh loop on deploy (blank/bouncing page).
+      // SW updates apply on the next navigation instead.
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js')
-            .then(registration => {
-              console.log('SW registered:', registration.scope);
-              registration.update();
-            })
-            .catch(error => {
-              console.log('SW registration failed:', error);
-            });
-        });
-
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-          if (sessionStorage.getItem('securechat-sw-reloaded') === 'true') {
-            return;
-          }
-
-          sessionStorage.setItem('securechat-sw-reloaded', 'true');
-          window.location.reload();
+            .then((registration) => console.log('SW registered:', registration.scope))
+            .catch((error) => console.log('SW registration failed:', error));
         });
       }
     </script>

@@ -41,6 +41,7 @@ This is the source of truth so nothing gets lost between sessions.
 
 ## PWA (next phase — already installable)
 - [x] Installable today: `sw.js` + `site.webmanifest` + 192/512 icons + iOS splash present.
+- [x] **SW reload-loop hotfix (v3.5)** — removed the `controllerchange` → `location.reload()` + forced `registration.update()` from index.html that bounced the live site (blank/refresh loop) after a deploy. SW updates now apply on the next navigation. Production build re-verified via local preview (landing renders clean, no JS errors).
 - [ ] **Responsive container-width layout** (`react-handoff/PWA_PLAN.md`): add `useLayoutMode` (ResizeObserver) → wide (≥900 two-pane) / compact (600–899 icon rail + single pane + back) / narrow (<600 = mobile build). Optionally migrate `sw.js` → `vite-plugin-pwa`/Workbox.
 
 ## Visual / UI
