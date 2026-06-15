@@ -228,21 +228,22 @@ export const useDirectMessages = () => {
   // Load conversations on mount (only if authenticated)
   useEffect(() => {
     let unsubscribeParticipants: (() => void) | null = null;
-    let unsubscribeConversations: (() => void) | null = null;
 
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (unsubscribeParticipants) {
         unsubscribeParticipants();
         unsubscribeParticipants = null;
       }
-      if (unsubscribeConversations) {
-        unsubscribeConversations();
-        unsubscribeConversations = null;
-      }
 
       if (user) {
         loadConversations();
 
+        // Scope the live listener to THIS user's participation docs only.
+        // (Removed a global onSnapshot(collection(db, 'conversations')) that
+        // re-read EVERY conversation in the project on every change — it torched
+        // the Firestore read quota [resource-exhausted] and could read other
+        // users' conversations. New/removed chats still refresh the list here;
+        // the open conversation stays live via the per-conversation listener.)
         const participantsQuery = query(
           collection(db, 'conversation_participants'),
           where('user_id', '==', user.uid)
@@ -253,18 +254,11 @@ export const useDirectMessages = () => {
         }, (error) => {
           console.error('Error in conversation participants subscription:', error);
         });
-
-        unsubscribeConversations = onSnapshot(collection(db, 'conversations'), () => {
-          loadConversations();
-        }, (error) => {
-          console.error('Error in conversations subscription:', error);
-        });
       }
     });
     return () => {
       unsubscribe();
       if (unsubscribeParticipants) unsubscribeParticipants();
-      if (unsubscribeConversations) unsubscribeConversations();
     };
   }, []);
 
